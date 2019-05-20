@@ -1,5 +1,8 @@
-diag_norcpm is a diagnostic package to plot the output data from NorESM members.
-    as a goal.
+# (Name of the package)
+
+
+*diag_norcpm is a package to plot the output data from NorESM members.
+  -as a goal.
 
 It contains a mainscript: diag_norcpm.sh
     which define the plot name and the directories of input data
