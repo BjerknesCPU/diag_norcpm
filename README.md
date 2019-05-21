@@ -1,5 +1,5 @@
 # What's it
-    diag_norcpm is a diagnostic package to plot the output data from NorESM members.
+    diag_norcpm is a diagnostic package to plot the output data of NorCPM.
 
 # Acceptable data structure and usage
     example:
@@ -7,8 +7,8 @@
             /path/to/model_version/["hindcast"]/runname_YYYYMMDD/ensemble_mem0-9/atm/hist/data.nc
             (["hindcast"] means the script can handle with and without "hindcast" directory)
         the command would be
-            /path/to/diag_norcpm.sh  /path/to/model_version/[hindcast]
-        output figure directory will be
+            /path/to/diag_norcpm.sh  /path/to/model_version/["hindcast"]
+        output figures (in each receipe sub-directory) will be
             ./model_version-runname
 
 # Code structure
@@ -32,13 +32,11 @@
 
 # Process flow
 ```
-------------------
-| diag_norcpm.sh |
-|   plotCase     |
-|   recipe(s)    |
-|   input data   |
-|   output dir   |
-------------------
+-------------------
+| diag_norcpm.sh  |
+|   setup env.    |
+|   and variables |
+-------------------
         |
         V
 -------------------------------------
@@ -47,12 +45,15 @@
 |   generate plot scripts in recipe |
 |       Codes/gen_proc_plot.py      |
 |   run scripts parallelly          |
+|   make html pages                 |
 -------------------------------------
 ```
 
 
 # How it work
-    Generate plot scripts, doplot.py replace strings in plot script template.
-    The strings to be replace are defined in recipe and plot script template(as default value).
-    See Codes/gen_proc_plot.py
+    1. Setup run environment. Including script path and NCL (or other plotting language) environment.
+    2. Generate plot scripts, doplot.py replace strings in plot script template.
+        The strings to be replace are defined in recipe and plot script template(as default value).
+    3. Run plot scripts, which produce figures, index.html and README for each receipt directories.
+    4. Generate index.html for each recipes.
 
