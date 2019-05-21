@@ -2,14 +2,14 @@
     diag_norcpm is a diagnostic package to plot the output data from NorESM members.
 
 # Acceptable data structure and usage
-example:
-    if data path is 
-        /path/to/model_version/["hindcast"]/runname_YYYYMMDD/ensemble_mem0-9/atm/hist/data.nc
-        (["hindcast"] means the script can handle with and without "hindcast" directory)
-    the command would be
-        /path/to/diag_norcpm.sh  /path/to/model_version/[hindcast]
-    output figure directory will be
-        ./model_version-runname
+    example:
+        if data path is 
+            /path/to/model_version/["hindcast"]/runname_YYYYMMDD/ensemble_mem0-9/atm/hist/data.nc
+            (["hindcast"] means the script can handle with and without "hindcast" directory)
+        the command would be
+            /path/to/diag_norcpm.sh  /path/to/model_version/[hindcast]
+        output figure directory will be
+            ./model_version-runname
 
 # Code structure
     It contains a mainscript: diag_norcpm.sh
