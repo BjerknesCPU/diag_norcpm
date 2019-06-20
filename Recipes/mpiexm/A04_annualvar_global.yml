@@ -7,10 +7,10 @@ Description:
 COMPONENT:  mpiom
 VARIABLE:  sst
 PLOTRES: |
-    res@mpMinLatF = 20.
-    res@mpMaxLatF = 70.
-    res@mpMinLonF = -110.
-    res@mpMaxLonF =   40.
+    res@mpMinLatF = -90.
+    res@mpMaxLatF = 90.
+    res@mpMinLonF = 0.
+    res@mpMaxLonF =   360.
     res@cnLinesOn = False
     res@cnFillOn = True
     res@lbOrientation = "Vertical"

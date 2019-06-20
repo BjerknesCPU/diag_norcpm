@@ -1,0 +1,61 @@
+# plot for seasonal hindcasts
+
+Title: Atlantic Nino predictionskill (testing, not done yet)
+Description: 
+    Correlation and RMSE of Atlantic Nino, use first member as true solution, exmining the predictability of model.
+COMPONENT:  ocn
+VARIABLE:  sst
+MINLAT: -5.
+MAXLAT:  5.
+MINLON: -20.
+MAXLON:  0.
+REG: AtlNino
+
+Scripts:
+# proc section
+-  # this dash line is necessary for yaml parser, do not remove it.
+    plotScript: plot_forecast_correlation.ncl
+    CORTITLE: REG forecast correlation 
+    RMSETITLE: REG forecast RMSE from 
+    CORFIGFILENAME: fig_cor_forecast_REG
+    RMSEFIGFILENAME: fig_rmse_forecast_REG
+    FORECASTDIRS: BASEDIR/RUNPRE????????
+    READSAMEMONTH: False
+#-  # this dash line is necessary for yaml parser, do not remove it.
+#    plotScript: plot_forecast_correlation.ncl
+#    CORTITLE: REG forecast correlation from Jan
+#    RMSETITLE: REG forecast RMSE from Jan
+#    CORFIGFILENAME: fig_cor_forecast_REG_from_Jan
+#    RMSEFIGFILENAME: fig_rmse_forecast_REG_from_Jan
+#    FORECASTDIRS: BASEDIR/RUNPRE????01??
+#
+#-  # this dash line is necessary for yaml parser, do not remove it.
+#    plotScript: plot_forecast_correlation.ncl
+#    CORTITLE: REG forecast correlation from Apr
+#    RMSETITLE: REG forecast RMSE from Apr
+#    CORFIGFILENAME: fig_cor_forecast_REG_from_Apr
+#    RMSEFIGFILENAME: fig_rmse_forecast_REG_from_Apr
+#    FORECASTDIRS: BASEDIR/RUNPRE????04??
+#
+#-  # this dash line is necessary for yaml parser, do not remove it.
+#    plotScript: plot_forecast_correlation.ncl
+#    CORTITLE: REG forecast correlation from Jul
+#    RMSETITLE: REG forecast RMSE from Jul
+#    CORFIGFILENAME: fig_cor_forecast_REG_from_Jul
+#    RMSEFIGFILENAME: fig_rmse_forecast_REG_from_Jul
+#    FORECASTDIRS: BASEDIR/RUNPRE????07??
+#
+#-  # this dash line is necessary for yaml parser, do not remove it.
+#    plotScript: plot_forecast_correlation.ncl
+#    CORTITLE: REG forecast correlation from Oct
+#    RMSETITLE: REG forecast RMSE from Oct
+#    CORFIGFILENAME: fig_cor_forecast_REG_from_Oct
+#    RMSEFIGFILENAME: fig_rmse_forecast_REG_from_Oct
+#    FORECASTDIRS: BASEDIR/RUNPRE????10??
+#
+#-  # this dash line is necessary for yaml parser, do not remove it.
+#    plotScript: mk_html_page.sh
+#    FIGFILES: fig_cor_forecast_REG fig_cor_forecast_REG_from_Jan fig_cor_forecast_REG_from_Apr fig_cor_forecast_REG_from_Jul fig_cor_forecast_REG_from_Oct fig_rmse_forecast_REG fig_rmse_forecast_REG_from_Jan fig_rmse_forecast_REG_from_Apr fig_rmse_forecast_REG_from_Jul fig_rmse_forecast_REG_from_Oct
+#    COLUMN: 5
+#    COMMENT: Atlantic Nino prediction skill, compare with persistence prediction.
+#                             

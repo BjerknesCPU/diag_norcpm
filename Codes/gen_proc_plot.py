@@ -6,6 +6,7 @@ def gen_proc_plot(template:str,recipe):
     '''
     diagcmd = r';DIAG_NORCPM;' # read setting from ncl comments
     needcmd = 'NeedBeReplace'  # special variable 
+    OutputReplaces = False
 
     ## planeize the recipe
     precipe = {}
@@ -53,7 +54,7 @@ def gen_proc_plot(template:str,recipe):
     keys = [ i for i in keysinscript.keys()]
     keys.sort(key=len,reverse=True) 
     ### print replacing strings
-    if True:
+    if OutputReplaces:
         print('======== keys to replace with order')
         for i in keys:
             print('    '+i+': '+keysinscript[i])

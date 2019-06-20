@@ -142,7 +142,7 @@ for recipe in Recipes:
     if not os.path.exists(outputDir+'/'+recipeName): os.makedirs(outputDir+'/'+recipeName)
  
     # write README
-    open(outputDir+'/'+recipeName+'/README',"w").write('Title: '+title+'\nDescription: '+desc+'\n')
+    open(outputDir+'/'+recipeName+'/README',"w").write('Title: "'+title+'"\nDescription: "'+desc+'"\n')
 
     # get all capital in recipe
     baseDict = dict()
@@ -229,6 +229,7 @@ def run_seq(workdir,scripts,logfile):
         logf.flush()
         sp.run([cmd,fn],stdout=logf,stderr=logf)
     logf.close()
+
 #### make and run process list
 procall = []
 for r in AllScripts.keys():

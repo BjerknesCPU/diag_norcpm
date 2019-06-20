@@ -37,7 +37,13 @@ fi
 # plotRecipes: figures you want to plot, if none or empty means *.yml in Recipes/, Split with comma
 plotRecipes='mpiexm/A01_mpiexm_annualvar.yml'
 plotRecipes='16_AnoCor_seaice_frac.yml'
+plotRecipes='13_nino34_predic_skill.yml'
 plotRecipes=''
+plotRecipes='testing/14_AtlNino_predic_skill.yml'
+plotRecipes='17_AnoCor_sst_alllead.yml,18_AnoCor_prec.yml,19_AnoCor_sst_obs.yml'
+plotRecipes='mpiexm/A01_mpiexm_annualvar.yml,mpiexm/A03_dif_tsurf.yml'
+plotRecipes='mpiexm/A01_mpiexm_annualvar.yml'
+plotRecipes='mpiexm/A04_annualvar_global.yml'
 
 #--------------------------- case settings end -------------------------
 
@@ -48,7 +54,8 @@ plotRecipes=''
 outputDir="$(pwd)/${plotCase}"
 
 ## observation or reanalysis data to compare, not done yet, heavily depends on machine
-obsDataDir='/cluster/projects/nn9039k/NorCPM/Obs'
+#### set OBSDIR in Defaults.yml
+####obsDataDir='/cluster/projects/nn9039k/NorCPM/Obs'
 
 
 ## root directory of this package, sould contain doplot.py
@@ -71,7 +78,7 @@ NCL=$(which ncl)
 
 # do plot
 export plotCase BASEDIR plotRecipes RUNPRE
-export outputDir obsDataDir diag_norcpm_Root defaultRecipe
+export outputDir diag_norcpm_Root defaultRecipe
 export PYTHON NCL
 echo '================================= diag settings:'
 echo "plotCase:    ${plotCase}"
@@ -79,4 +86,5 @@ echo "Data dir:    ${BASEDIR}"
 echo "Case prefix: ${RUNPRE}"
 echo "outputDir:   ${outputDir}"
 echo '================================= '
+
 "$PYTHON" "${diag_norcpm_Root}/doplot.py"
