@@ -7,6 +7,7 @@
 load "CODEDIR/mpiexm/func_read_mpiexm.ncl"
 begin
     figfn = "FIGFILENAME"
+    cachefile = figfn+".nc"
     title = "TITLE"
     varname = "VARIABLE"
     component = "COMPONENT"
@@ -19,31 +20,39 @@ begin
     years = ispan(min(ybe),max(ybe),1)
     months = (/MONTHS/)
 
-    ;varall = read_mpiexm_YZLL(case,casedir,component,varname,years,1)
-    varall = read_mpiexm_season_YZLL(case,casedir,component,varname,ispan(min(ybe),max(ybe),1),months,1)
-
-    ;; make time series
-    if(component.eq."mpiom")then
-        ;; lat2d/lon2d
-        lat2d = varall@lat2d
-        lon2d = varall@lon2d
-        tmask = .not.ismissing(varall(0,0,:,:))  ;; 
-        tmask = tmask .and. (lat2d.ge.min(latbe) .and. lat2d.le.max(latbe))
-        tmask = tmask .and. (lon2d.ge.min(lonbe) .and. lon2d.le.max(lonbe))
-        pi = atan(1.)*4
-        wgt2d = cos(lat2d/180*pi)
-        wgt2d = where(tmask,wgt2d,0)
-        if(False)then ;; check nc file
-            system("rm -f tmp.nc")
-            f = addfile("tmp.nc","c")
-            f->wgt2d = wgt2d
-            f->lat2d = lat2d
-            f->tmask = where(tmask,1,0)
-        end if
-        varts = wgt_areaave2(varall,wgt2d,0)
+    if(isfilepresent(cachefile))then
+        f = addfile(cachefile,"r")
+        varts = f->varts
     else
-        print("plot_annual_timeseries.ncl: other component not done yet")
-        exit
+        ;varall = read_mpiexm_YZLL(case,casedir,component,varname,years,1)
+        varall = read_mpiexm_season_YZLL(case,casedir,component,varname,ispan(min(ybe),max(ybe),1),months,1)
+
+        ;; make time series
+        if(component.eq."mpiom")then
+            ;; lat2d/lon2d
+            lat2d = varall@lat2d
+            lon2d = varall@lon2d
+            tmask = .not.ismissing(varall(0,0,:,:))  ;; 
+            tmask = tmask .and. (lat2d.ge.min(latbe) .and. lat2d.le.max(latbe))
+            tmask = tmask .and. (lon2d.ge.min(lonbe) .and. lon2d.le.max(lonbe))
+            pi = atan(1.)*4
+            wgt2d = cos(lat2d/180*pi)
+            wgt2d = where(tmask,wgt2d,0)
+            if(False)then ;; check nc file
+                system("rm -f tmp.nc")
+                f = addfile("tmp.nc","c")
+                f->wgt2d = wgt2d
+                f->lat2d = lat2d
+                f->tmask = where(tmask,1,0)
+            end if
+            varts = wgt_areaave2(varall,wgt2d,0)
+        else
+            print("plot_annual_timeseries.ncl: other component not done yet")
+            exit
+        end if
+
+        f = addfile(cachefile,"c")
+        f->varts = varts 
     end if
 
     varstd = stddev(varts(:,0))

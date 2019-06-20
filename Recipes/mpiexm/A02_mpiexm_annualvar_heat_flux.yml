@@ -1,11 +1,11 @@
 # plot data variance in mpiexm
 # mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
 
-Title: Sampling and average exp
+Title: Sampling and average exp echam6
 Description: 
     Case plot for mpiexm compare
-COMPONENT:  mpiom
-VARIABLE:  sst
+COMPONENT:  echam6
+VARIABLE:  ahfs
 PLOTRES: |
     res@mpMinLatF = 20.
     res@mpMaxLatF = 70.

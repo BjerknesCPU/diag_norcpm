@@ -1,0 +1,24 @@
+# plot for each run
+
+Title: Potential predictability Z500
+Description: 
+    plot SST along for each initTime and member
+COMPONENT:  ocn
+VARIABLE:  sst
+MINLAT: -5.
+MAXLAT:  5.
+MINLON: -150.
+MAXLON: -90.
+
+Scripts:
+# proc section
+-  # this dash line is necessary for yaml parser, do not remove it.
+    plotScript: plot_each_initTime_member.ncl
+    FORECASTDIRS: BASEDIR/RUNPRE{1,2}???01??
+
+#-  # this dash line is necessary for yaml parser, do not remove it.
+    #plotScript: mk_html_page.sh
+    #FIGFILES: fig_cor_forecast_REG fig_cor_forecast_REG_from_Jan fig_cor_forecast_REG_from_Apr fig_cor_forecast_REG_from_Jul fig_cor_forecast_REG_from_Oct fig_rmse_forecast_REG fig_rmse_forecast_REG_from_Jan fig_rmse_forecast_REG_from_Apr fig_rmse_forecast_REG_from_Jul fig_rmse_forecast_REG_from_Oct
+    #COLUMN: 5
+    #COMMENT: nino3.4 prediction skill, compare with persistence prediction.
+                             

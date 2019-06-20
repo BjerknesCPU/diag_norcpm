@@ -1,0 +1,112 @@
+# plot data difference in mpiexm
+# mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
+
+Title: Mean SST difference at North Atlantic
+Description: 
+    SST of Cases minus control run
+COMPONENT:  mpiom
+MODELN: 1
+VARIABLE: sst
+PLOTRES: |
+    res@mpMinLatF =  20.
+    res@mpMaxLatF =  70.
+    res@mpMinLonF =  -110.
+    res@mpMaxLonF =  40.
+    ;res@mpCenterLonF = 180.
+    res@cnLinesOn = False
+    res@cnFillOn = True
+    res@cnLevels = fspan(-1.,1,11)
+    res@lbOrientation = "Vertical"
+    res@pmLabelBarWidthF   = 0.05
+    res@pmLabelBarOrthogonalPosF = 0.01
+    res@cnLevelSelectionMode = "ExplicitLevels"
+CCASE: f05_1AGCM
+CONTROLDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CCASE
+CONTROLYEARBE: 1950,2051
+
+Scripts:
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: f06_5AGCMs_NASPG_average_pgchiu
+    CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+    YEARBE: 1950,2020
+    TITLE: "SST dif. IEave-Control (nyear: IE=101, CTL=101)"
+    FIGFILENAME: dif_sst_average_case
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: f06_5AGCMs_NASPG_sample
+    CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+    YEARBE: 2050,2140
+    TITLE: "SST dif. IEsam-Control (nyear: IE=91, CTL=101)"
+    FIGFILENAME: dif_sst_sample_case
+
+-  # DJF
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: f06_5AGCMs_NASPG_average_pgchiu
+    CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+    YEARBE: 1950,2020
+    MONTHS: "12,1,2"
+    TITLE: "DJF SST dif. IEave-Control (nyear: IE=101, CTL=101)"
+    FIGFILENAME: dif_sst_average_case_DJF
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: f06_5AGCMs_NASPG_sample
+    CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+    YEARBE: 2050,2140
+    MONTHS: "12,1,2"
+    TITLE: "DJF SST dif. IEsam-Control (nyear: IE=91, CTL=101)"
+    FIGFILENAME: dif_sst_sample_case_DJF
+-  # MAM
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: f06_5AGCMs_NASPG_average_pgchiu
+    CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+    YEARBE: 1950,2020
+    MONTHS: "3,4,5"
+    TITLE: "MAM SST dif. IEave-Control (nyear: IE=101, CTL=101)"
+    FIGFILENAME: dif_sst_average_case_MAM
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: f06_5AGCMs_NASPG_sample
+    CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+    YEARBE: 2050,2140
+    MONTHS: "3,4,5"
+    TITLE: "MAM SST dif. IEsam-Control (nyear: IE=91, CTL=101)"
+    FIGFILENAME: dif_sst_sample_case_MAM
+-  # JJA
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: f06_5AGCMs_NASPG_average_pgchiu
+    CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+    YEARBE: 1950,2020
+    MONTHS: "6,7,8"
+    TITLE: "JJA SST dif. IEave-Control (nyear: IE=101, CTL=101)"
+    FIGFILENAME: dif_sst_average_case_JJA
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: f06_5AGCMs_NASPG_sample
+    CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+    YEARBE: 2050,2140
+    MONTHS: "6,7,8"
+    TITLE: "JJA SST dif. IEsam-Control (nyear: IE=91, CTL=101)"
+    FIGFILENAME: dif_sst_sample_case_JJA
+-  # SON
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: f06_5AGCMs_NASPG_average_pgchiu
+    CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+    YEARBE: 1950,2020
+    MONTHS: "9,10,11"
+    TITLE: "SON SST dif. IEave-Control (nyear: IE=101, CTL=101)"
+    FIGFILENAME: dif_sst_average_case_SON
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: f06_5AGCMs_NASPG_sample
+    CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+    YEARBE: 2050,2140
+    MONTHS: "9,10,11"
+    TITLE: "SON SST dif. IEsam-Control (nyear: IE=91, CTL=101)"
+    FIGFILENAME: dif_sst_sample_case_SON
+
+-  
+    plotScript: mk_html_page.sh
+    FIGFILES: dif_sst_sample_case dif_sst_average_case dif_sst_sample_case_DJF dif_sst_average_case_DJF dif_sst_sample_case_MAM dif_sst_average_case_MAM dif_sst_sample_case_JJA dif_sst_average_case_JJA dif_sst_sample_case_SON dif_sst_average_case_SON 
+    COLUMN: figures IEsam IEave '</tr><tr>' ANN 2 DJF 2 MAM 2 JJA 2 SON 2
+    COMMENT: SST diference between interactive ensemble and control run.

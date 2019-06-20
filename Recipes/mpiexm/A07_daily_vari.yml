@@ -1,0 +1,30 @@
+# plot echam6 mean daily variance along members
+# ex. the temperature at 1990-01-01, the variance between 5 members
+
+Title: ECHAM6(atm) mean daily variance along members of tsurf
+Description: mean daily variance
+COMPONENT: echam6
+VARIABLE: tsurf  # tsurf should be very small or 0
+TVN: tsurf # for title replacment
+PLOTRES: ;; PLOTRES
+
+CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+    ## CASE define later
+CCASE: f05_1AGCM
+CONTROLDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CCASE
+CONTROLYEARBE: 1950,2050
+TCNY: 101 # number of control years, for title
+
+Scripts:
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_variance.ncl
+    CASE: f06_5AGCMs_NASPG_average_pgchiu
+    YEARBE: 1950,2050
+    TITLE: "TVN daily variance IEave/Control (nyear: IE=101, CTL=TCNY)"
+    FIGFILENAME: sst_TVN_ratio_average_case
+
+#-  
+#    plotScript: mk_html_page.sh
+#    FIGFILES: sst_var_ratio_sample_case sst_var_ratio_average_case sst_ts_sample_case sst_ts_average_case sst_ts_control_case sst_var_ratio_sample_case_DJF sst_var_ratio_average_case_DJF sst_var_ratio_sample_case_MAM sst_var_ratio_average_case_MAM sst_var_ratio_sample_case_JJA sst_var_ratio_average_case_JJA sst_var_ratio_sample_case_SON sst_var_ratio_average_case_SON sst_ts_sample_case_DJF sst_ts_average_case_DJF sst_ts_control_case_DJF sst_ts_sample_case_MAM sst_ts_average_case_MAM sst_ts_control_case_MAM sst_ts_sample_case_JJA sst_ts_average_case_JJA sst_ts_control_case_JJA sst_ts_sample_case_SON sst_ts_average_case_SON sst_ts_control_case_SON 
+#    COLUMN: figs IEsam IEav Control '</tr><tr>' ANN 2 ANN 3 DJF 2 MAM 2 JJA 2 SON 2 DJF 3 MAM 3 JJA 3 SON 3
+#    COMMENT: SST variance ratio to control run #, and annual anomaly time series.

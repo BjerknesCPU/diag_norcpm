@@ -1,6 +1,6 @@
 # plot for seasonal hindcasts
 
-Title: LSvendsen ENSO predictionskill
+Title: ENSO predictionskill
 Description: 
     Correlation and RMSE of Nino3.4, use first member as true solution, exmining the predictability of model.
 COMPONENT:  ocn

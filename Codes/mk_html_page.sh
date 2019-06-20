@@ -30,7 +30,7 @@ echo '<p>'                          >> "${htmlfn}"
 echo '<pre>'                        >> "${htmlfn}"
 echo "$comment"                     >> "${htmlfn}"
 echo '</pre>'                       >> "${htmlfn}"
-echo '</p>'                         >> "${htmlfn}"
+#echo '</p>'                         >> "${htmlfn}"
 echo '</div>'                       >> "${htmlfn}"
 
 
@@ -38,7 +38,28 @@ echo '</div>'                       >> "${htmlfn}"
 pid=$$
 row=1
 icol=0
+
+
+echo "<table>"    >> "${htmlfn}"
+echo "<tr>"       >> "${htmlfn}"
+
+# if column start with non integer
+while [ ! -z "${column[$icol]}" ] ; do
+    if [[ "${column[$icol]}" =~ ^[0-9]+$ ]] ; then
+        break
+    else
+        if [ "${column[$icol]}" = '</tr><tr>' ]; then
+            echo "${column[$icol]}"             >> "${htmlfn}"
+        else
+            echo "<th>${column[$icol]}</th>"    >> "${htmlfn}"
+        fi
+        icol=$(expr $icol + 1)
+    fi
+done
+
 col=${column[$icol]}
+
+## show figures with table
 for i in ${figs}; do
     if [ -f "${i}.ps" ] ; then ## ps2png
         convert -density 300 "${i}.ps" ${i}.png
@@ -49,30 +70,33 @@ for i in ${figs}; do
         mv tmp-${pid}.png ${i}.png
         ## thumbnail
         convert -thumbnail 300 "${i}.png" "${i}_thumb.png"
-        ## fig entry
-        echo "<a href='${i}.png'><img src='${i}_thumb.png'></a>"    >> "${htmlfn}"
-        if [ $row -ge $col ];then
-            echo '</br>' >> "${htmlfn}"
-            icol=$(expr $icol + 1)
-            while [ ! -z "${column[$icol]}" ] ; do
-                if [[ "${column[$icol]}" =~ ^[0-9]+$ ]] ; then
-                    break
-                else
-                    echo "<b>${column[$icol]}</b>"    >> "${htmlfn}"
-                    icol=$(expr $icol + 1)
-                fi
-            done
-            if [ $icol -ge $ncolarr ];then
-                icol=$(expr $ncolarr - 1)
+    fi
+
+    ## fig entry
+    echo "<th><a href='${i}.png'><img src='${i}_thumb.png'></a></th>"    >> "${htmlfn}"
+    if [ $row -ge $col ];then
+        echo '</tr>' >> "${htmlfn}"
+        echo '<tr>' >> "${htmlfn}"
+        icol=$(expr $icol + 1)
+        while [ ! -z "${column[$icol]}" ] ; do
+            if [[ "${column[$icol]}" =~ ^[0-9]+$ ]] ; then
+                break
+            else
+                echo "<th><b>${column[$icol]}</b></th>"    >> "${htmlfn}"
+                icol=$(expr $icol + 1)
             fi
-            col=${column[$icol]}
-            row=1
-        else
-            row=$(expr $row + 1)
+        done
+        if [ $icol -ge $ncolarr ];then
+            icol=$(expr $ncolarr - 1)
         fi
+        col=${column[$icol]}
+        row=1
+    else
+        row=$(expr $row + 1)
     fi
 done
-
+echo "</tr>"       >> "${htmlfn}"
+echo "</table>"    >> "${htmlfn}"
 
 # html footer
 echo '</body>'  >>"${htmlfn}"

@@ -55,6 +55,9 @@ begin
         print("ls_monthly_nc_files(): no file in "+path)
         exit
     end if
+    ;print("ls_monthly_nc_files(): read ncfiles:")
+    ;print(fns)
+    ;exit
     return fns
 end
 
@@ -206,17 +209,37 @@ begin
     end if
     return varall
 end
-
-undef("read_noresm_members_leadseason")
-function read_noresm_members_leadseason(dirs,component,vn,lead_season,ocngridfile)
+undef("read_norcpm_forecasts_members_wgt")
+function read_norcpm_forecasts_members_wgt(forecastdirs,component,varname,ocngridfile)
 begin
-    ;; read var in member dirs with lead_season
+    ;; not begin yet
+    ;; get weighting for area mean
+    ;; only forecastdir(0) will be use
+end
+
+undef("mod_date_and_to_cd_")
+function mod_date_and_to_cd_(time,component,opt)
+begin
+    ;; since atm save monthly hist data at next month 
+    ;;  ie. time coordinate is 1990-02-01-0000 in 1990-01 file
+    tt = time
+    if(component.eq."atm")then
+        tt = time-1
+    end if
+    return cd_calendar(tt,opt)
+end
+undef("read_noresm_members_leadmonths")
+function read_noresm_members_leadmonths(dirs,component,vn,lead_months,ocngridfile)
+begin
+    ;; read var in member dirs with lead_months
     ;; return varall(members, months,lev,y,x)
 
-    ;; lead_season=1 .and. start_ym=198610 => read months=198611,198612,198701
-    ;;                                        dmonths    =    +1     +2     +3
-    ;; lead_season=2 .and. start_ym=198610 => read months=198702,198703,198704
-    ;;                                        dmonths    =    +4     +5     +6
+    ;; lead_months=1 .and. start_ym=198610 => read months=198611
+    ;;                                        dmonths    =    +1
+    ;; lead_months=4 .and. start_ym=198610 => read months=198702
+    ;;                                        dmonths    =    +4
+    ;; lead_months=0 .and. start_ym=198610 => read months=198610
+    ;;                                        dmonths    =    +0
     ;; assume one time per file
 
     nmember = dimsizes(dirs)
@@ -232,24 +255,25 @@ begin
     ;; check first data file name in all memebers
     fn = systemfunc("ls "+dirs(0)+"/"+component+"/hist/*"+monfix+"*.nc|sort|head -n1")
     if(ismissing(fn))then
-        print("read_noresm_members_leadseason(): no file in "+dirs(0))
+        print("read_noresm_members_leadmonths(): no file in "+dirs(0))
         print("cmd: ls "+dirs(0)+"/"+component+"/hist/*"+monfix+"*.nc|sort|head -n1")
     end if
     f = addfile(fn,"r")
     t0 = f->time
-    t0a = cd_calendar(t0,0) ;; should be only one value in monthly data
+    t0a = mod_date_and_to_cd_(t0,component,0) ;; should be only one value in monthly data
+    t0units = t0@units
     delete(f)
 
     t0change = False
     do i = 1,nmember-1
         fn = systemfunc("ls "+dirs(i)+"/"+component+"/hist/*"+monfix+"*.nc|sort|head -n1")
         f = addfile(fn,"r")
-        if(.not.all(t0a.eq.cd_calendar(f->time,0)))then
+        if(.not.all(t0a.eq.mod_date_and_to_cd_(f->time,component,0)))then
             newt0 = f->time
             if(t0 .lt. newt0)then
                 t0change = True
                 t0 := newt0
-                t0a = cd_calendar(t0,0)
+                t0a = mod_date_and_to_cd_(t0,component,0)
             end if
         end if
         delete(f)
@@ -260,22 +284,13 @@ begin
         print("use "+t0s+" as first month")
     end if
 
-    ;; parse forecast months(season) to read
-    dmonths  = (/1,2,3/) +((lead_season-1)*3)
-    if(component.eq."atm")then ;; wired time coordinate in atm(month+1)
-        if(t0a(0,2).eq.1 .and.t0a(0,3).eq.0.and.t0a(0,4).eq.0)then
-            dmonths = dmonths-1
-        else
-            print("check time coordinate in "+dir(0))
-        end if
-    end if
-    ndmon = dimsizes(dmonths)
-    needMM = toint(t0a(0,1))+dmonths
+    ;; comfirm  model time to read
+    ndmon = dimsizes(lead_months)
+    needMM = toint(t0a(0,1))+lead_months
     needYY = needMM*0+toint(t0a(0,0))
     needYY = where(needMM.gt.12,needYY+1,needYY)
     needMM = where(needMM.gt.12,needMM-12,needMM)
     needYYMMs = needYY+"-"+sprinti("%2.2d",needMM)
-    delete(dmonths)
     
     ;; create var for all members
     fn = systemfunc("ls "+dirs(0)+"/"+component+"/hist/*"+monfix+"."+needYYMMs(0)+".nc")
@@ -291,9 +306,9 @@ begin
     ;; read data
     do m = 0, nmember-1
     do t = 0, ndmon-1
-        fn = systemfunc("ls "+dirs(m)+"/"+component+"/hist/*"+monfix+"."+needYYMMs(t)+".nc")
+        fn := systemfunc("ls "+dirs(m)+"/"+component+"/hist/*"+monfix+"."+needYYMMs(t)+".nc")
         f = addfile(fn,"r")
-        readTime(m,t) = f->time
+        readTime(m,t) = cd_convert(f->time,t0units)
         if(vartype.eq."short")then
             var1 = short2flt(f->$vn$)
         else
@@ -315,7 +330,11 @@ begin
     do t = 0, ndmon-1
         if (.not. all(readTime(:,t).eq.readTime(0,t)))then
             print("read_noresm_members_leadseason(): read time wrong")
-            print(readTime)
+            ;print(readTime)
+            do m = 0, nmember-1
+                fn := systemfunc("ls "+dirs(m)+"/"+component+"/hist/*"+monfix+"."+needYYMMs(t)+".nc")
+                print(""+fn)
+            end do
         end if
     end do
 
@@ -333,8 +352,178 @@ begin
     
     return varall
 end
+undef("read_noresm_members_leadseason")
+function read_noresm_members_leadseason(dirs,component,vn,lead_season,ocngridfile)
+begin
+    ;; read var in member dirs with lead_season
+    ;; return varall(members, months,lev,y,x)
 
-undef("read_noresm_forecasts_members_leadseason")
+    ;; lead_season=1 .and. start_ym=198610 => read months=198611,198612,198701
+    ;;                                        dmonths    =    +1     +2     +3
+    ;; lead_season=2 .and. start_ym=198610 => read months=198702,198703,198704
+    ;;                                        dmonths    =    +4     +5     +6
+    ;; assume one time per file
+
+    dmonths  = (/1,2,3/) +((lead_season-1)*3)
+    return read_noresm_members_leadmonths(dirs,component,vn,dmonths,ocngridfile)
+end
+
+undef("read_noresm_forecasts_members_leadmonths")
+function read_noresm_forecasts_members_leadmonths(forecastDirs,component,vn,lead_months,ocngridfile)
+begin
+    ;; read forecasts in noresm forecast members
+    ;; forecastDirs are directories contain forecast members subdir
+    ;; ex. forecastDirs(0)+"/"+memberDirs(0)+"/ocn/hist/"+ncfile
+
+    ;; debug check
+    if(isatt(forecastDirs,"check_month"))then
+        checkMonth = forecastDirs@check_month
+    else
+        checkMonth = True
+    end if
+    ;; read data
+    nforecast = dimsizes(forecastDirs)
+    ;;;; 1st forecast
+    memDirs = systemfunc("ls -d "+forecastDirs(0)+"/*")
+    ;;;; check memDirs (TBD)
+    ;;;; read first forecast
+    varF1 = read_noresm_members_leadmonths(memDirs,component,vn,lead_months,ocngridfile)
+    t0all = varF1@t0
+    t0all@units = varF1@t0units
+    dims1 = dimsizes(varF1)
+    dims = array_append_record(nforecast,dims1,0) 
+    ndim = dimsizes(dims)
+    varall = conform_dims(dims,varF1,ispan(1,ndim-1,1)) ;; f,m,dmon,z,y,x or f,m,dmon,y,x
+    readMM = varF1@readMM ;; the read months of var
+    sameReadMM = True
+
+    delete(varF1)
+    delete(memDirs)
+    
+    ;actual_range = varall@actual_range
+    ;vaild_range = varall@vaild_range
+    do f = 1,nforecast-1
+        memDirs = systemfunc("ls -d "+forecastDirs(f)+"/*")
+        varF1 = read_noresm_members_leadmonths(memDirs,component,vn,lead_months,ocngridfile)
+        ;; check read months
+        if(checkMonth .and. any(readMM.ne.varF1@readMM))then
+            print("readMM is not consistant, maybe t0 is not at same month?")
+            print("1st  readMM: "+str_join(readMM,","))
+            print("this readMM: "+str_join(varF1@readMM,","))
+            sameReadMM = False
+        end if
+        ;if(isatt(varF1,"actual_range"))then
+        ;    actual_range(0) := min((/varF1@actual_range(0),actual_range(0)/))
+        ;    actual_range(1) := max((/varF1@actual_range(1),actual_range(1)/))
+        ;end if
+        ;if(isatt(varF1,"valid_range"))then
+        ;    valid_range(0) := min((/varF1@valid_range(0),valid_range(0)/))
+        ;    valid_range(1) := max((/varF1@valid_range(1),valid_range(1)/))
+        ;end if
+        if(ndim.eq.6);then
+            varall(f,:,:,:,:,:) = varF1
+        end if
+        if(ndim.eq.5);then
+            varall(f,:,:,:,:) = varF1
+        end if
+        if(ndim.eq.4);then
+            varall(f,:,:,:) = varF1
+        end if
+        t0all := array_append_record(t0all,varF1@t0,0)
+        delete(varF1)
+        delete(memDirs)
+    end do
+    t0all@calendar = "noleap"
+    varall!0 = "forecast"
+    varall&forecast = t0all
+    if(sameReadMM)then
+        varall@readMM = readMM
+    else
+        delete(varall@readMM)
+    end if
+    delete(varall@readYY)
+    delete(varall@t0)
+    delete(varall@t0units)
+
+    ;varall@actural_range = actural_range
+    ;varall@valid_range = valid_range
+    return varall
+end
+
+undef("get_var_area_wgt2d")
+function get_var_area_wgt_lat_lon_2d(var,whichone)
+begin
+    ;; get 2D wgt or lat or lon from var
+    ;; whichone should be "lat", "lon", "wgt"
+    if(isatt(var,"lat2d"))then
+        ; ocn use 2d area, lat and lon
+        if(whichone.eq."wgt")then
+            varcod = var&area2d
+        end if
+        if(whichone.eq."lat")then
+            varcod = var&lat2d
+        end if
+        if(whichone.eq."lon")then
+            varcod = var&lon2d
+        end if
+        if(dimsizes(dimsizes(varcod)).eq.1)then ;; read from nc, 2d attitude is saved as 1d 
+            dims = dimsizes(var)
+            ndim = dimsizes(dims)
+            varcod := ondtond(varcod,dims(ndim-2:)) ;; assume rightmost is lat,lon
+        end if
+        return varcod
+    else 
+        ; atm use 1D lat and lon
+        lats = varall&lat
+        lons = varall&lon
+        if(whichone.eq."wgt")then
+            varcod = conform_dim((/dimsizes(lats),dimsizes(lons)/),NormCosWgtGlobe(lats),0)
+        end if
+        if(whichone.eq."lat")then
+            varcod = conform_dim((/dimsizes(lats),dimsizes(lons)/),lats,0)
+        end if
+        if(whichone.eq."lon")then
+            varcod = conform_dim((/dimsizes(lats),dimsizes(lons)/),lons,0)
+        end if
+        return varcod
+    end if
+    print("get_var_area_wgt_lat_lon_2d(): ERROR, see var summary:")
+    printVarSummary(var)
+    print("get_var_area_wgt_lat_lon_2d(): whichone = "+whichone)
+    exit
+end
+
+undef("read_noresm_forecasts_ens_leadmonths")
+function read_noresm_forecasts_ens_leadmonths(forecastDirs,component,vn,lead_months,ocngridfile)
+begin
+    ;; read ensemble mean
+    ;; smaller memory usage
+    nm = dimsizes(lead_months)
+    var1m = read_noresm_forecasts_members_leadmonths(forecastDirs,component,vn,lead_months(0),ocngridfile)
+        ;; forecast, member, time, [lev,] lat, lon
+    varens1m = dim_avg_n_Wrap(var1m,1)
+    dims = dimsizes(varens1m)
+    dims(1) = nm ;; num of lead months
+    ;ensall = conform_dims(dims,varens1m,(/0,2,3/)) ;; assume [forecast, time, lat, lon]
+    printVarSummary(varens1m)
+    ensall = new(dims,typeof(varens1m))
+    ensall(:,0,:,:) = varens1m
+    delete(var1m)
+    delete(varens1m)
+    do m = 1, nm-1
+        var1m = read_noresm_forecasts_members_leadmonths(forecastDirs,component,vn,lead_months(m),ocngridfile)
+        varens1m = dim_avg_n_Wrap(var1m,1)
+        ensall(:,m,:,:) = varens1m ;; assume [forecast, time, lat, lon]
+        delete(var1m)
+        delete(varens1m)
+    end do
+    if(isatt(ensall,"valid_range"))then
+        delete(ensall@valid_range)
+    end if
+    return ensall
+end
+
+undef("read_noresm_forecasts_members_leadseason") ;; wait to be obsoleted using read_noresm_forecasts_members_leadmonths()
 function read_noresm_forecasts_members_leadseason(forecastDirs,component,vn,lead_season,ocngridfile)
 begin
     ;; read forecasts in noresm forecast members
@@ -406,3 +595,132 @@ begin
     ;varall@valid_range = valid_range
     return varall
 end
+
+
+    undef("obsolete_read_noresm_members_leadseason") ;; replaced since read_noresm_members_leadmonths() applied
+    function obsolete_read_noresm_members_leadseason(dirs,component,vn,lead_season,ocngridfile)
+    begin 
+        ;; read var in member dirs with lead_season
+        ;; return varall(members, months,lev,y,x)
+
+        ;; lead_season=1 .and. start_ym=198610 => read months=198611,198612,198701
+        ;;                                        dmonths    =    +1     +2     +3
+        ;; lead_season=2 .and. start_ym=198610 => read months=198702,198703,198704
+        ;;                                        dmonths    =    +4     +5     +6
+        ;; assume one time per file
+
+        nmember = dimsizes(dirs)
+
+        monfix=""
+        if(component.eq."ocn")then
+            monfix="hm"
+        end if
+        if(component.eq."atm")then
+            monfix="h0"
+        end if
+
+        ;; check first data file name in all memebers
+        fn = systemfunc("ls "+dirs(0)+"/"+component+"/hist/*"+monfix+"*.nc|sort|head -n1")
+        if(ismissing(fn))then
+            print("read_noresm_members_leadseason(): no file in "+dirs(0))
+            print("cmd: ls "+dirs(0)+"/"+component+"/hist/*"+monfix+"*.nc|sort|head -n1")
+        end if
+        f = addfile(fn,"r")
+        t0 = f->time
+        t0a = mod_date_and_to_cd_(t0,component,0) ;; should be only one value in monthly data
+        delete(f)
+
+        t0change = False
+        do i = 1,nmember-1
+            fn = systemfunc("ls "+dirs(i)+"/"+component+"/hist/*"+monfix+"*.nc|sort|head -n1")
+            f = addfile(fn,"r")
+            if(.not.all(t0a.eq.mod_date_and_to_cd_(f->time,component,0)))then
+                newt0 = f->time
+                if(t0 .lt. newt0)then
+                    t0change = True
+                    t0 := newt0
+                    t0a = mod_date_and_to_cd_(t0,component,0)
+                end if
+            end if
+            delete(f)
+        end do
+        if(t0change)then
+            t0s= t0a(0,0)+"-"+t0a(0,1)
+            print("time not contsisant: "+fn)
+            print("use "+t0s+" as first month")
+        end if
+
+        ;; parse forecast months(season) to read
+        dmonths  = (/1,2,3/) +((lead_season-1)*3)
+        if(component.eq."atm")then ;; wired time coordinate in atm(month+1)
+            if(t0a(0,2).eq.1 .and.t0a(0,3).eq.0.and.t0a(0,4).eq.0)then
+                dmonths = dmonths-1
+            else
+                print("check time coordinate in "+dir(0))
+            end if
+        end if
+        ndmon = dimsizes(dmonths)
+        needMM = toint(t0a(0,1))+dmonths
+        needYY = needMM*0+toint(t0a(0,0))
+        needYY = where(needMM.gt.12,needYY+1,needYY)
+        needMM = where(needMM.gt.12,needMM-12,needMM)
+        needYYMMs = needYY+"-"+sprinti("%2.2d",needMM)
+        delete(dmonths)
+        
+        ;; create var for all members
+        fn = systemfunc("ls "+dirs(0)+"/"+component+"/hist/*"+monfix+"."+needYYMMs(0)+".nc")
+        f = addfile(fn,"r")
+        vartype = getfilevartypes(f,vn)
+        dims1 = getfilevardimsizes(f,vn)
+
+        dims1(0) = ndmon ;; set t as dmonth
+        varall = new(array_append_record(nmember,dims1,0),where(vartype.eq."short","float",vartype))
+        ndim = dimsizes(dims1) +1 ;; ndim of varall
+
+        readTime = new((/nmember,ndmon/),typeof(t0))
+        ;; read data
+        do m = 0, nmember-1
+        do t = 0, ndmon-1
+            fn = systemfunc("ls "+dirs(m)+"/"+component+"/hist/*"+monfix+"."+needYYMMs(t)+".nc")
+            f = addfile(fn,"r")
+            readTime(m,t) = f->time
+            if(vartype.eq."short")then
+                var1 = short2flt(f->$vn$)
+            else
+                var1 = f->$vn$
+            end if
+
+            if(ndim.eq.5)then ;; member,t=dmonth,z,y,x
+                varall(m,t,:,:,:) = var1(0,:,:,:) ;; one time per file
+            end if
+            if(ndim.eq.4)then ;; member,t=dmonth,y,x
+                varall(m,t,:,:) = var1(0,:,:) ;; one time per file
+            end if
+            delete(f)
+            delete(var1)
+        end do
+        end do
+
+        ;; check read time
+        do t = 0, ndmon-1
+            if (.not. all(readTime(:,t).eq.readTime(0,t)))then
+                print("read_noresm_members_leadseason(): read time wrong")
+                print(readTime)
+            end if
+        end do
+
+        ;; assign coordinate
+        varall!0 = "member"
+        varall&member = ispan(1,nmember,1)
+        varall!1 = "time"
+        varall&time = readTime(0,:)
+        varall@t0 = t0
+        varall@t0units = varall&time@units
+        varall@readMM = needMM
+        varall@readYY = needYY
+        ;; assign grid if ocn grid
+        assign_ocn_grid(varall,ocngridfile)
+        
+        return varall
+    end
+
