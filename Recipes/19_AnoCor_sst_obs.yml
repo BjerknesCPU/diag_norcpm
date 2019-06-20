@@ -15,6 +15,7 @@ BEFOREPLOT: |
     res@mpMaxLatF = 75.
     res@mpMinLatF = -60.
 OBSPROXY: 0
+    # 0: observation; >0: which member as obs proxy data
 
 Scripts:
 # proc section

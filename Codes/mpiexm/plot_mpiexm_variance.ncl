@@ -1,4 +1,7 @@
 
+;;
+;; plot variance ratio in lat/lon of case/control
+;;
 ;;DIAG_NORCPM; FIGFILENAME: fig
 ;;DIAG_NORCPM; PLOTRES: ;; PLOTRES
 ;;DIAG_NORCPM; TITLE: title

@@ -2,6 +2,10 @@
 procedure reorder_dim_var(var)
 begin
     ;; assume time, lat,lon
+    if(isatt(var,"lat2d"))then ;; not fixed grid
+        return
+    end if
+
     ndim = dimsizes(dimsizes(var))
     if(ndim.eq.3)then
         if(isMonotonic(var&$var!1$).eq.-1)then ;; reorder from south to north
@@ -37,19 +41,53 @@ begin
     end if
 end
 
-function fn_mpiexm(case, casedir,component,varname,year,month,modeln)
+function fn_mpiexm(case, casedir,component,varname,year[1],month[*],modeln)
 begin
     ;; get data file name
     ;; very simple one, rewrite if need to expand it
 
     datadir = casedir+"/outdata/"+component+"/"
-    if (component.eq."echam6")then
+    if (component.eq."echam6")then ;; it's daily data, and some of them are grb file. Damn.
         yyyymm = year+sprinti("%2.2d",month)
         ;; "_echam_", "_co2_", "_trdiag_"
-        if(modeln.eq.0)then ;; control run
-            fn = case+"_"+component+"_echam_"+yyyymm+".grb"
+        ;; if any operation for daily data
+        if(isatt(varname,"cdo_operator"))then ;; sould be string or string array
+            if(dimsizes(varname@cdo_operator).eq.1)then
+                cdoop = "-"+varname@cdo_operator
+            else
+                cdoop = str_join("-"+varname@cdo_operator," ")
+            end if
         else
-            fn = case+sprinti("%2.2d",modeln)+"_"+component+"_echam_"+yyyymm+".nc"
+            cdoop = "-timmean"
+        end if
+        if(modeln.eq.0)then ;; control run, use grb file
+
+            gribfn = casedir+"/outdata/"+component+"/"+case+"_"+component+"_echam_"+yyyymm+".grb"
+            fns = case+"_"+varname+"_"+str_sub_str(cdoop," ","_")+"_"+component+"_echam_"+yyyymm+".nc"
+
+            ;; make tmp nc file
+            nf = dimsizes(gribfn)
+            do i =0, nf-1
+                if(isfilepresent(fns(i)))then
+                    continue
+                end if
+                system("cdo --silent -t echam6 -f nc "+cdoop+" -select,name="+varname+" "+dailyfn(i)+" 'tmp_"+fns(i)+"' && mv 'tmp_"+fns(i)+"'  '"+fns(i)+"'")
+            end do
+            return fns
+        else
+            dailyfn = casedir+"/outdata/"+component+"/"+case+sprinti("%2.2d",modeln)+"_"+component+"_echam_"+yyyymm+".nc"
+            fns = case+"_"+varname+"_"+str_sub_str(cdoop," ","_")+"_"+component+"_echam_"+yyyymm+".nc"
+            fn = case+"_"+varname+"_"+str_sub_str(cdoop," ","_")+"_"+component+"_echam_"+year+"-"+str_join(month,"-")+".nc"
+            ;; make tmp nc file
+            nf = dimsizes(dailyfn)
+            do i =0, nf-1
+                if(isfilepresent(fns(i)))then
+                    continue
+                end if
+                system("cdo --silent -t echam6 -f nc "+cdoop+" -select,name="+varname+" "+dailyfn(i)+" 'tmp_"+fns(i)+"' && mv 'tmp_"+fns(i)+"'  '"+fns(i)+"'")
+            end do
+            return fns
+
         end if
     end if
     if (component.eq."mpiom")then
@@ -65,11 +103,10 @@ begin
     ;; read months monthly data in same year
     ;; modeln: mondel number, if echam6 is more than 1 run
     varname = ivarname
-    if(modeln .eq.0)then ;; someone save control run as grb format
-        varname = varname+"_GDS4_SFC" ;; for surface variable....
-    end if 
+    ;if(modeln .eq.0)then ;; someone save control run as grb format
+    ;    varname = varname+"_GDS4_SFC" ;; for surface variable....
+    ;end if 
     if(component.eq."echam6")then
-        ;; pass now
         fns = fn_mpiexm(case, casedir,component,varname,year,months,modeln)
         ;print(fns)
         ;print("read_mpiexm_12m(): reading echam6 is not done yet")
@@ -249,3 +286,27 @@ begin
     return read_mpiexm_season_YZLL(case, casedir,component,varname,years,ispan(1,12,1),modeln)
 end
 
+function read_mpiexm_season_mean_ZLL(case, casedir,component,varname,years,imonths,modeln)
+begin
+    ;; frontend of read_mpiexm_season_1y(), read yearly average
+    ;; output var in lev,,y,x
+
+    if(any(imonths .eq.0))then
+        months = ispan(1,12,1)
+    else
+        months = imonths
+    end if
+
+    ny = dimsizes(years)
+    nmonth = dimsizes(months)
+    var1y = dim_avg_n_Wrap(read_mpiexm_season_1y(case,casedir,component,varname,years(0),months,modeln),0)
+    var1y = var1y/ny
+
+    do y =  1,ny-1
+        ;;print("read_mpiexm_season_YZLL(): reading "+years(y))
+        var1y = var1y + (dim_avg_n_Wrap(read_mpiexm_season_1y(case,casedir,component,varname,years(y),months,modeln),0)/ny)
+    end do
+    var1y@months = months
+    var1y@years = years
+    return var1y
+end

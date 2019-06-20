@@ -29,21 +29,28 @@ plotCase=$(basename $(dirname ${BASEDIR}))-${Dir} ## {model_ver}_{hindcasts}
 
 # prefixRun: ana_19800115_me_  # 
 RUNPRE=${Dir%hindcasts} # remove "hindcast" string
-if [ -z "$(ls $BASEDIR/$RUNPRE*)" ]; then # if not, take first forecast run and remove tailling date
-    RUNPRE=$(ls -d $BASEDIR/*_????????|head -n1)
-    RUNPRE=$(basename $RUNPRE | sed "s/[0-9]\{8\}$//")
+if [ -z "$(ls $BASEDIR/$RUNPRE* 2>/dev/null)" ]; then # if not, take first forecast run and remove tailling date
+    RUNPRE=$(ls -d $BASEDIR/*_???????? 2>/dev/null |head -n1 )
+    RUNPRE=$(basename $RUNPRE 2>/dev/null | sed "s/[0-9]\{8\}$//")
 fi
 
 # plotRecipes: figures you want to plot, if none or empty means *.yml in Recipes/, Split with comma
 plotRecipes='mpiexm/A01_mpiexm_annualvar.yml'
 plotRecipes='16_AnoCor_seaice_frac.yml'
 plotRecipes='13_nino34_predic_skill.yml'
-plotRecipes=''
 plotRecipes='testing/14_AtlNino_predic_skill.yml'
 plotRecipes='17_AnoCor_sst_alllead.yml,18_AnoCor_prec.yml,19_AnoCor_sst_obs.yml'
 plotRecipes='mpiexm/A01_mpiexm_annualvar.yml,mpiexm/A03_dif_tsurf.yml'
 plotRecipes='mpiexm/A01_mpiexm_annualvar.yml'
 plotRecipes='mpiexm/A04_annualvar_global.yml'
+plotRecipes='mpiexm/A05_dif_sst.yml,mpiexm/A06_dif_sst_NAtl.yml'
+plotRecipes='mpiexm/A03_dif_tsurf.yml'
+plotRecipes='testing/14_AtlNino_predic_skill.yml'
+plotRecipes='17_AnoCor_sst_alllead.yml,18_AnoCor_prec.yml,19_AnoCor_sst_obs.yml'
+plotRecipes='mpiexm/A01_mpiexm_annualvar.yml,mpiexm/A03_dif_tsurf.yml'
+plotRecipes='mpiexm/A01_mpiexm_annualvar.yml'
+plotRecipes='mpiexm/A04_annualvar_global.yml'
+plotRecipes=''
 
 #--------------------------- case settings end -------------------------
 
@@ -59,19 +66,21 @@ outputDir="$(pwd)/${plotCase}"
 
 
 ## root directory of this package, sould contain doplot.py
-diag_norcpm_Root="${HOME}/work/diag_norcpm"
+diag_norcpm_Root="${HOME}/scratch/diag_norcpm"
 
 ## root directory of this package, sould contain doplot.py
 defaultRecipe="${diag_norcpm_Root}/Defaults.yml"
 
 ## python used to run doplot.py, develop with python3.4, but other version should ok.
-echo before module load
-module -q purge
-module -q load NCO/4.7.2-intel-2018a
-module -q load CDO/1.9.3-intel-2018a
-module -q load NCL/6.5.0-intel-2018a
-module -q unload LibTIFF/4.0.9/GCCcore-6.4.0
-module -q load Python/3.6.4-intel-2018a
+if [[ $(hostname) =~ .*fram.sigma2.no ]] ; then ## Fram
+    module -q purge
+    module -q load NCO/4.7.2-intel-2018a
+    module -q load CDO/1.9.3-intel-2018a
+    module -q load NCL/6.5.0-intel-2018a
+    module -q unload LibTIFF/4.0.9/GCCcore-6.4.0
+    module -q load Python/3.6.4-intel-2018a
+fi
+
 PYTHON=$(which python)
 NCL=$(which ncl)
 #--------------------------- machine settings end -----------------------

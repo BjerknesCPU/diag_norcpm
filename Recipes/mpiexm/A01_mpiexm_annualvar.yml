@@ -1,7 +1,7 @@
 # plot data variance in mpiexm
 # mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
 
-Title: Sampling and average exp
+Title: IEsam and IEave SST Annual variance ratio with control run
 Description: 
     Case plot for mpiexm compare
 COMPONENT:  mpiom
@@ -21,7 +21,7 @@ PLOTRES: |
     res@cnLevelSelectionMode = "ExplicitLevels"
     ;res@cnLevels = (/.2,1,2,3,4,5/)
     res@cnLevels = (/.2,.4,.6,.8,1.,1.2/)
-    res@gsnRightString = "non-dimensional"
+    res@gsnRightString = "1"
 
     lres@cnLineColor = "Red"
     lres@cnLinesOn = True
