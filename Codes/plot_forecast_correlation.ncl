@@ -26,6 +26,9 @@ begin
     ;;     presistent forecast
     ;;     members in every initTime
     ;; 
+    print("plot_forecast_correlation.ncl: observation data reading is not apply yet")
+    print("plot_forecast_correlation.ncl: do not run this util fix")
+    exit
     
     ocngridfile  ="OCNGRIDFILE"
     forecastdirs = systemfunc("ls -d FORECASTDIRS")

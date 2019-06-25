@@ -51,6 +51,8 @@ plotRecipes='mpiexm/A01_mpiexm_annualvar.yml,mpiexm/A03_dif_tsurf.yml'
 plotRecipes='mpiexm/A01_mpiexm_annualvar.yml'
 plotRecipes='mpiexm/A04_annualvar_global.yml'
 plotRecipes=''
+plotRecipes='20_rank_histogram.yml'
+plotRecipes='21_rank_histogram_obs.yml,22_rank_histogram_ano_obs.yml'
 
 #--------------------------- case settings end -------------------------
 

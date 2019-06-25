@@ -19,7 +19,6 @@ BASEDIR            = os.environ.get('BASEDIR')
 RUNPRE             = os.environ.get('RUNPRE')
 plotRecipes        = os.environ.get('plotRecipes')
 outputDir           = os.environ.get('outputDir')
-obsDataDir          = os.environ.get('obsDataDir')
 diag_norcpm_Root    = os.environ.get('diag_norcpm_Root')
 DefaultYML          = os.environ.get('defaultRecipe')
 
@@ -109,7 +108,6 @@ for i in plotRecipes:
 
         #### add variables defined in diag_norcpm.sh
         recipeRootfn = os.path.splitext(os.path.basename(i))[0]
-        recipe.update({'OBSDIR':obsDataDir})
         recipe.update({'CODEDIR':CodeDir})
         recipe.update({'BASEDIR':BASEDIR})
         recipe.update({'RUNPRE':RUNPRE})

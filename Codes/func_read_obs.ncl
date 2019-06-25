@@ -45,7 +45,7 @@ begin
 
     ;; check datadir
     if(.not. isfilepresent(datadir+"/"+years(0)+"_01.nc"))
-        print("obs data not found in "+datadir)
+        print("read_nn9039k_obs_months(): obs data not found in "+datadir)
         return False
     end if
 
@@ -234,9 +234,9 @@ begin
     readyears = where(readmonths .gt.12, readyears+1,readyears)
     readmonths = where(readmonths .gt.12, readmonths-12,readmonths)
     ;; on fram server
-    if(.not.ismissing(str_match(hostname,"fram.sigma2.no")))then
+    ;if(.not.ismissing(str_match(hostname,"fram.sigma2.no")))then
         varall = read_nn9039k_obs_months(obsdir,datadir,varname,readyears,readmonths)
-    end if
+    ;end if
     return varall
 end
 
