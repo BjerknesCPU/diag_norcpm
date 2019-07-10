@@ -30,14 +30,13 @@ plotCase=$(basename $(dirname ${BASEDIR}))-${Dir} ## {model_ver}_{hindcasts}
 # prefixRun: ana_19800115_me_  # 
 RUNPRE=${Dir%hindcasts} # remove "hindcast" string
 if [ -z "$(ls $BASEDIR/$RUNPRE* 2>/dev/null)" ]; then # if not, take first forecast run and remove tailling date
-    RUNPRE=$(ls -d $BASEDIR/*_???????? 2>/dev/null |head -n1 )
+    RUNPRE=$(ls -d $BASEDIR/*_???????{0..9} 2>/dev/null |head -n1 )
+echo $RUNPRE
     RUNPRE=$(basename $RUNPRE 2>/dev/null | sed "s/[0-9]\{8\}$//")
 fi
-
 # plotRecipes: figures you want to plot, if none or empty means *.yml in Recipes/, Split with comma
 plotRecipes='mpiexm/A01_mpiexm_annualvar.yml'
 plotRecipes='16_AnoCor_seaice_frac.yml'
-plotRecipes='13_nino34_predic_skill.yml'
 plotRecipes='testing/14_AtlNino_predic_skill.yml'
 plotRecipes='17_AnoCor_sst_alllead.yml,18_AnoCor_prec.yml,19_AnoCor_sst_obs.yml'
 plotRecipes='mpiexm/A01_mpiexm_annualvar.yml,mpiexm/A03_dif_tsurf.yml'
@@ -50,9 +49,10 @@ plotRecipes='17_AnoCor_sst_alllead.yml,18_AnoCor_prec.yml,19_AnoCor_sst_obs.yml'
 plotRecipes='mpiexm/A01_mpiexm_annualvar.yml,mpiexm/A03_dif_tsurf.yml'
 plotRecipes='mpiexm/A01_mpiexm_annualvar.yml'
 plotRecipes='mpiexm/A04_annualvar_global.yml'
-plotRecipes=''
 plotRecipes='20_rank_histogram.yml'
-plotRecipes='21_rank_histogram_obs.yml,22_rank_histogram_ano_obs.yml'
+plotRecipes='20_rank_histogram.yml,21_rank_histogram_obs.yml,22_rank_histogram_ano_obs.yml'
+plotRecipes='13_nino34_predic_skill.yml' # take ~1hr
+plotRecipes=''
 
 #--------------------------- case settings end -------------------------
 

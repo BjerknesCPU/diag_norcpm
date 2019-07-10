@@ -2,7 +2,8 @@
 
 Title: ENSO predictionskill
 Description: 
-    Correlation and RMSE of Nino3.4, use first member as true solution, exmining the predictability of model.
+    Correlation and RMSE of Nino3.4, compare with HadISST.
+Thumbnail: fig_cor_forecast_nino34_thumb.png
 COMPONENT:  ocn
 VARIABLE:  sst
 MINLAT: -5.
@@ -16,10 +17,11 @@ Scripts:
 -  # this dash line is necessary for yaml parser, do not remove it.
     plotScript: plot_forecast_correlation.ncl
     CORTITLE: REG forecast correlation 
-    RMSETITLE: REG forecast RMSE from 
+    RMSETITLE: REG forecast RMSE
     CORFIGFILENAME: fig_cor_forecast_REG
     RMSEFIGFILENAME: fig_rmse_forecast_REG
     FORECASTDIRS: BASEDIR/RUNPRE????????
+    READSAMEMONTH: False
 -  # this dash line is necessary for yaml parser, do not remove it.
     plotScript: plot_forecast_correlation.ncl
     CORTITLE: REG forecast correlation from Jan

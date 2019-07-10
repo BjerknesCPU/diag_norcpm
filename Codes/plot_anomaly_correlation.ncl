@@ -241,7 +241,11 @@ begin
             res@gsnRightString = "TITLERIGHT"
         end if
 
-        res@mpCenterLonF = 180.
+        res@mpLimitMode = "LatLon"
+        res@mpMinLonF = -330.
+        res@mpMaxLonF =   30.
+        res@mpCenterLonF =   -150.
+
 
         ;; for add dot shading
         res@gsnDraw = False

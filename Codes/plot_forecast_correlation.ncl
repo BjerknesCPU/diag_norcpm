@@ -5,7 +5,7 @@
 ;;DIAG_NORCPM; TITLE: Prediction Correlation
 ;;DIAG_NORCPM; TITLELEFT: 
 ;;DIAG_NORCPM; TITLERIGHT: 
-;;DIAG_NORCPM; LEADMONTHS: 13
+;;DIAG_NORCPM; LEADMONTHS: 12
 ;;DIAG_NORCPM; READSAMEMONTH: True
     ;; check if read are same month(Jan ... etc)
 ;;DIAG_NORCPM; OBSDATASET: SST/HADISST
@@ -19,6 +19,8 @@
 load "CODEDIR/func_read_all_members.ncl"
 load "CODEDIR/func_read_obs.ncl"
 load "CODEDIR/func_persistence_prediction_skill.ncl"
+load "CODEDIR/func_wallClockElapseTime.ncl" ;; original function does not support "CEST" timezone 
+load "$NCARG_ROOT/lib/ncarg/nclscripts/esmf/ESMF_regridding.ncl"
 begin
     ;; xy plot, forecast time(x) and correlation/RMSE(y)
     ;; member 01(ind 0) is assumed as true solution
@@ -26,10 +28,9 @@ begin
     ;;     presistent forecast
     ;;     members in every initTime
     ;; 
-    print("plot_forecast_correlation.ncl: observation data reading is not apply yet")
-    print("plot_forecast_correlation.ncl: do not run this util fix")
-    exit
-    
+    ;;print("plot_forecast_correlation.ncl: observation data reading is not apply yet")
+    ;;print("plot_forecast_correlation.ncl: do not run this until fix")
+    ;;exit
     ocngridfile  ="OCNGRIDFILE"
     forecastdirs = systemfunc("ls -d FORECASTDIRS")
     forecastdirs@check_month = READSAMEMONTH
@@ -42,131 +43,148 @@ begin
     obsdata = "OBSDATASET"
     obsvar = "OBSVARIABLE"
 
+    nmember = 9+1 ;; bad idea, try other way. 0 is for ensemble mean
+
     cachefile = "CORFIGFILENAME.nc"
     if(isfilepresent(cachefile))then
         f = addfile(cachefile,"r")
-        varall_rmse = f->varall_rmse
-        varall_cor = f->varall_cor
-        ppCor  = f->ppCor
-        ppRmse = f->ppRmse
+        varcor = f->varcor
+        varrmse = f->varrmse
+        ppcor  = f->ppcor
+        pprmse = f->pprmse
         wgt = f->wgt
-        varall = f->varall
-
+        obswgt = f->obswgt
 
     else
-        varcor = new(plotmonths,"float")
-        varrmse = new(plotmonths,"float")
-        varobs = read_obs_monthly(obsdir,obsdata,obsvar,(/1965,2000/))
-        exit
-        varens = read_noresm_forecasts_ens_leadmonths(forecastdirs,component,varname,ispan(0,12,1),ocngridfile) 
-        printVarSummary(varens)
-        do m = 0, plotmonths
-            var1m = read_noresm_forecasts_members_leadmonths(forecastdirs,component,varname,m,ocngridfile) 
-                ;; [forecast | 104] x [member | 9] x [time | 1] x [y | 384] x [x | 320]
-            if(.not.isvar("wgt"))then
+        varcor = new(plotmonths+1,"float")
+        varrmse = new(plotmonths+1,"float")
+        ppcor = new(plotmonths+1,"float")
+        pprmse = new(plotmonths+1,"float")
+        do m = 0, plotmonths  ;; for each lead month
+            wcStrt     = systemfunc("date")
+            var1m = read_noresm_forecasts_ens_leadmonths(forecastdirs,component,varname,m,ocngridfile) 
+            wallClockElapseTime(wcStrt, "Read ens 1 month", 0)
+                ;; [forecast | 104] x [time | 1] x [y | 384] x [x | 320]
+            if(.not.isvar("wgt"))then ;; run only once
                 ;; get weighting for area mean and desired region
                 wgt = get_var_area_wgt_lat_lon_2d(var1m,"wgt")
                 lat2d = get_var_area_wgt_lat_lon_2d(var1m,"lat")
                 lon2d = get_var_area_wgt_lat_lon_2d(var1m,"lon")
-                wgtmask = .not.ismissing(var1m)
+                wgtmask = .not.ismissing(var1m(0,0,:,:))
                 wgtmask = wgtmask .and. lat2d.ge.min(latbe) .and. lat2d.le.max(latbe)
                 wgtmask = wgtmask .and. lon2d.ge.min(lonbe) .and. lon2d.le.max(lonbe)
                 wgt = where(wgtmask,wgt,0)
                 wgt = wgt/sum(wgt)  ; normalize area as weight
+                delete(wgtmask)
+                
+                dims = dimsizes(var1m)
+                var_mean = new((/dims(0),plotmonths+1/),"float")
+                delete(dims)
             end if
-            var1m_mean = wgt_areaave2(var1m,wgt,0) ;; forecast,member,1 or forecast,member,1,lev
-            ;; correlation with 1st member
+            if(.not.isvar("inittimec"))then
+                inittimec = var1m&forecast
+            else
+                if (any(inittimec .ne. var1m&forecast))then
+                    print("inittimec wrong: ")
+                    print(inittimec +" "+ var1m&forecast)
+                    exit
+                end if
+            end if
 
-            
+            var_mean(:,m) = wgt_areaave2(var1m,wgt,0) ;; forecast,1 
+
+            ;; read obs data and get mean
+            inittime = cd_calendar(var1m&forecast,-1)
+            varobsny1m = read_obs_months(obsdir,obsdata,obsvar,inittime/100,mod(inittime,100)+m) ;; t,y,x
+            if(.not.isvar("obswgt"))then ;; run only once
+                obswgt = get_var_area_wgt_lat_lon_2d(varobsny1m,"wgt")
+                obslat2d = get_var_area_wgt_lat_lon_2d(varobsny1m,"lat")
+                obslon2d = get_var_area_wgt_lat_lon_2d(varobsny1m,"lon")
+                if(min(obslon2d).ge.0)then
+                    obslon2d = obslon2d - 360.
+                end if
+                wgtmask = .not.ismissing(varobsny1m(0,:,:))
+                wgtmask = wgtmask .and. obslat2d.ge.min(latbe) .and. obslat2d.le.max(latbe)
+                wgtmask = wgtmask .and. obslon2d.ge.min(lonbe) .and. obslon2d.le.max(lonbe)
+                obswgt = where(wgtmask,obswgt,0)
+                obswgt = obswgt/sum(obswgt)
+
+                obsdims = dimsizes(varobsny1m)
+                obs_mean = new((/obsdims(0),plotmonths+1/),"float")
+            end if
+
+            ;; obsdata regional mean
+            obs_mean(:,m) = wgt_areaave2(varobsny1m,obswgt,0) ;; t
+
+            delete(var1m)
+            delete(varobsny1m)
         end do
 
-        if(False)then ;; read all version, comsume too much memory
-            varall = read_norcpm_forecasts_members_var(forecastdirs,component,varname,ocngridfile) 
-                ;; forcast,member,time,y,x or forecast,member,time,lev,y,x
-            dims = dimsizes(varall)
-            ndim = dimsizes(dims)
+        ;; remove climatology of model
+        ;; var_mean(inittimec),lead_month)
+        ;;;; get month of each element
+        dims = dimsizes(var_mean)
+        initta = cd_calendar(inittimec,0)
+        initmon= initta(:,1)
+        var_month = new(dims,"integer")
+        do j = 0,dims(0)-1
+        do i = 0,dims(1)-1
+            var_month(j,i) = toint(initmon(j)+i)
+        end do
+        end do
+        var_month = where(var_month.gt.12,var_month-12,var_month)
+        var_month = var_month -1 ;; for subscript
 
-            ;; wgt, desired region to cal
-            if(component.eq."atm")then ;; coordinate is attached on variable
-                lats = varall&lat
-                lons = varall&lon
-                wgt = conform_dim((/dimsizes(lats),dimsizes(lons)/),NormCosWgtGlobe(lats),0)
-            end if
-            if(component.eq."ocn")then ;; coordinate is stored in ocngridfile
-                area2d = varall@area2d
-                lat2d = varall@lat2d
-                lon2d = varall@lon2d
-                if(dimsizes(dimsizes(area2d)).eq.1)then
-                    area2d := onedtond(area2d,dims(ndim-2:))
-                    lon2d := onedtond(lon2d,dims(ndim-2:))
-                    lat2d := onedtond(lat2d,dims(ndim-2:))
-                end if
-                wgt = area2d
-            end if
-            
-            ;;; set wgt outside latbe,lonbe to zero
-            if(component.eq."atm")then ;; 
-                needwgt = wgt({min(latbe):max(latbe)},{min(lonbe):max(lonbe)})
-                wgt = 0.
-                wgt({min(latbe):max(latbe)},{min(lonbe):max(lonbe)}) = needwgt
-                delete(needwgt)
-            end if
-            if(component.eq."ocn")then ;; 
-                wgtmask = .not.ismissing(area2d)
-                wgtmask = wgtmask .and. lat2d.ge.min(latbe) .and. lat2d.le.max(latbe)
-                wgtmask = wgtmask .and. lon2d.ge.min(lonbe) .and. lon2d.le.max(lonbe)
-                wgt = where(wgtmask,wgt,0)
-            end if
-            wgt = wgt/sum(wgt)  ; normalize area as weight
+        ;;;; get climatology
+        clm12 = new(12,typeof(var_mean))
+        clm12  = 0
+        obsclm12 = clm12
+        nm12  = toint(clm12)
 
-            ;;; mean value of region
-            varall_mean = wgt_areaave2(varall,wgt,0) ;; forecast,member,time or forecast,member,time,lev
+        do j = 0,dims(0)-1
+        do i = 0,dims(1)-1
+            clm12(var_month(j,i)) = clm12(var_month(j,i)) + var_mean(j,i)
+            obsclm12(var_month(j,i)) = obsclm12(var_month(j,i)) + obs_mean(j,i)
+            nm12(var_month(j,i))  = nm12(var_month(j,i)) +1
+        end do
+        end do
+        clm12 = clm12/nm12
+        obsclm12 = obsclm12/nm12
 
-            ;; assume mem01(ind0) in each forecast is the true solution
-            ;;; cal correlation, result dim should be time (,lev)
-            ;;;; cor along the forecast time and members
-
-            varall_cor = new(dims(2),"float") ;; assume it is time depend
-
-            do t = 0,dims(2)-1
-                x = varall_mean(:,1:,t)
-                y = conform(x,varall_mean(:,0,t),0)
-                varall_cor(t) = escorc(ndtooned(x),ndtooned(y))
-                delete(x)
-                delete(y)
-            end do
-
-            ;;; cal RMSE, result dim should be time (,lev)
-            ;;;; cor along the forecast time and members
-
-            varall_rmse = new(dims(2),"float") ;; assume it is time depend, ignore lev now
-
-            do t = 0,dims(2)-1
-                x = varall_mean(:,1:,t)
-                y = conform(x,varall_mean(:,0,t),0)
-                dif = ndtooned(x-y)
-                varall_rmse(t) = avg(sqrt(dif*dif))
-                delete(x)
-                delete(y)
-                delete(dif)
-            end do
+        ;;;; remove climatology of var_mean and obs_mean
+        var_ano =  var_mean
+        obs_ano =  obs_mean
+        do j = 0,dims(0)-1
+        do i = 0,dims(1)-1
+            var_ano(j,i) = var_mean(j,i) - clm12(var_month(j,i))
+            obs_ano(j,i) = obs_mean(j,i) - obsclm12(var_month(j,i))
+        end do
+        end do
 
 
-            ;; get persistent prediction skill correlation and RMSE
-            ppCorRmse = persistent_prediction_skill_maskmean(varall(:,0,:,:,:),wgt)
+        do m = 0,plotmonths
+            ;; regrid obs data to model grid 
+            varcor(m) = escorc_n(obs_ano(:,m),var_ano(:,m),0,0) ;; ensemble ano correlation
+            varrmse(m) =sqrt(avg((var_ano(:,m)-obs_ano(:,m))^2))
 
-            system("rm -f "+cachefile)
-            f = addfile(cachefile,"c")
-            f->varall_rmse = varall_rmse
-            f->varall_cor = varall_cor
-            f->ppCor  = ppCorRmse(0,:)
-            f->ppRmse = ppCorRmse(1,:)
-            f->wgt = wgt
-            f->varall = varall
-            ppCor = ppCorRmse(0,:)
-            ppRmse = ppCorRmse(1,:)
-        end if
+            ;; persistence forecast
+            ppcor(m) = escorc(obs_ano(:,m),obs_ano(:,0))
+            pprmse(m) = sqrt(avg((obs_ano(:,m)-obs_ano(:,0))^2))
+        end do
 
+
+        ;; save cache file
+        f = addfile(cachefile,"c")
+        f->varcor = varcor
+        f->varrmse = varrmse 
+        f->ppcor = ppcor
+        f->pprmse = pprmse
+        f->wgt = wgt
+        f->obswgt = obswgt
+        f->obs_mean = obs_mean
+        f->var_mean = var_mean
+        f->obs_ano = obs_ano
+        f->var_ano = var_ano
     end if
 
     res = True
@@ -186,21 +204,31 @@ begin
         res@tiYAxisString = "r"
         res@tiMainString = "CORTITLE"
         
-        res@pmLegendDisplayMode = "Always"
-        res@pmLegendSide = "Top"
-        res@pmLegendWidthF = .15
-        res@pmLegendHeightF = .10
-        res@pmLegendParallelPosF = .8
-        res@pmLegendOrthogonalPosF = -.3
-        res@lgLabelFontHeightF  = .015
-        res@xyExplicitLegendLabels = (/"  Dynamical forecast","  Persistent"/)
-        res@lgPerimFill  = 0
+        res@xyLineColors = (/"black","red"/)
+        res@xyDashPattern = 0
+    nitems = 2
+    legend_labels = (/"  Ens. mean","  Persistance"/)
+    lgres = True
+        lgres@lgLineColors = (/"black","red"/)
+        lgres@lgLineThicknessF = res@xyLineThicknessF
+        lgres@lgItemType = "Lines"
+        lgres@vpWidthF =  0.20
+        lgres@vpHeightF =  0.1
+        lgres@lgLineLabelsOn  = False
+        lgres@lgLabelFontHeightF = 0.20
+        lgres@lgPerimOn = False
+        lgres@lgMonoDashIndex = True
+    amres = True
+        amres@amParallelPosF = -0.3
+        amres@amOrthogonalPosF =  0.3
+
+    pp = (/varcor,ppcor/)
 
     wks = gsn_open_wks("ps","CORFIGFILENAME")
-    plot = gsn_csm_y(wks,(/varall_cor,ppCor/),res)
-    print(wks)
-    print(plot)
-    print(res)
+    plot = gsn_csm_y(wks,pp,res)
+    lbid = gsn_create_legend(wks,nitems,legend_labels,lgres) ;; make legend
+    a = gsn_add_annotation(plot,lbid,amres)
+
     draw(plot)
     ;drawNDCGrid(wks)
 
@@ -209,8 +237,11 @@ begin
         res@pmLegendParallelPosF = .3
         res@tiYAxisString = "RMSE"
         res@tiMainString = "RMSETITLE"
+
+    pp = (/varrmse,pprmse/)
+
     wks = gsn_open_wks("ps","RMSEFIGFILENAME")
-    plot = gsn_csm_y(wks,(/varall_rmse,ppRmse/),res)
+    plot = gsn_csm_y(wks,pp,res)
     draw(plot)
     ;printVarSummary(varall_cor)
 

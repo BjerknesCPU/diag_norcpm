@@ -37,6 +37,26 @@ begin
         var@area2d = area
     end if
 end
+function get_latlon2d(fn,varname,ocngridfile)
+begin
+    ;; var can be empty with getfilevaratts()
+    f = addfile(fn,"r")
+    var = getfilevaratts(f,varname)
+    if(isatt(var,"coordinates"))then ;; ocn data
+        assign_ocn_grid(var,ocngridfile)
+        return var
+    end if
+    ;; atm data, lat/lon
+    lat = f->lat
+    lon = f->lon
+    dims = getfilevardimsizes(f,varname)
+    ndim = dimsizes(dims)
+    lat2d = conform_dims(dims,lat,ndim-2)
+    lon2d = conform_dims(dims,lon,ndim-1)
+    var@lat2d = lat2d
+    var@lon2d = lon2d
+    return var
+end
 undef("ls_monthly_nc_files")
 function ls_monthly_nc_files(path,component)
 begin
@@ -59,6 +79,53 @@ begin
     ;print(fns)
     ;exit
     return fns
+end
+
+undef("read_partial_file_by_2dmask")
+function read_partial_file_list_by_2dmask(f,varname[1]:string,i2dmask[*][*])
+local i
+begin
+    ;; read only part of variable from file list
+
+    if(isnumeric(i2dmask))then
+        l2dmask = i2dmask .ge.1
+    end if
+    if(islogical(i2dmask))then
+        l2dmask = i2dmask
+    end if
+
+    dims = getfilevardimsizes(f[0],varname)
+    ndim = dimsizes(dims)
+    if(dims(ndim-2:).ne.dimsizes(l2dmask))then
+        print("read_partial_file_by_2dmask(): i2dmask is not match to file "+varname)
+        exit
+    end if
+
+    ;; get minium square of l2dmask
+    i = ind_resolve(ind(l2dmask),dimsizes(l2dmask))
+    bs = min(i(:,0))
+    bn = max(i(:,0))
+    bw = min(i(:,1))
+    be = max(i(:,1))
+
+    ;; read data from file
+    if(ndim.eq.2)then
+        var = f[:]->$varname$(bs:bn,bw:be)
+    end if
+    if(ndim.eq.3)then
+        var = f[:]->$varname$(:,bs:bn,bw:be)
+    end if
+    if(ndim.eq.4)then
+        var = f[:]->$varname$(:,:,bs:bn,bw:be)
+    end if
+    if(ndim.eq.5)then
+        var = f[:]->$varname$(:,:,:,bs:bn,bw:be)
+    end if
+
+    ;; mask out the other than needs
+    var = where(conform(var,l2dmask(bs:bn,bw:be),(/ndim-2,ndim-1/)),var,var@_FillValue)
+    ;; lat2d and lon2d
+    return var
 end
 
 undef("read_all_files_var")
@@ -115,6 +182,78 @@ begin
     assign_ocn_grid(varall,ocngridfile)
     return varall
 end
+
+undef("read_norcpm_forecast_members_var_latbe_lonbe") 
+function read_norcpm_forecast_members_var_latbe_lonbe(forecastdir[1],component,varname,latbe,lonbe,ocngridfile)
+begin
+    ;; read members in forecastdir
+    memberdirs = systemfunc("ls -d "+forecastdir+"/*mem??")
+    nmember = dimsizes(memberdirs)
+    fns = ls_monthly_nc_files(memberdirs(0),component)
+    varatts  = get_latlon2d(fns(0),varname,ocngridfile)
+    l2dmask = .not.ismissing(varatts@lat2d)
+    l2dmask = l2dmask .and. (varatts@lat2d .ge. min(latbe)) .and. (varatts@lat2d .le. max(latbe))
+    l2dmask = l2dmask .and. (varatts@lon2d .ge. min(lonbe)) .and. (varatts@lon2d .le. max(lonbe))
+    fs = addfiles(fns,"r")
+    var1m = read_partial_file_by_2dmask(fs,varname,l2dmask)
+
+    if(typeof(var1m).eq."short")then
+        var1m := short2flt(var1m) ;; apply add_offset and scale_factor
+        delete(var1m@valid_range)
+        ;delete(var1m@actural_range)
+    end if
+    dim1m = dimsizes(var1m)
+    ndim1 = dimsizes(dim1m)
+
+    varall = conform_dims(array_append_record(nmember,dim1m,0),var1m,ispan(1,ndim1,1))
+    delete(fns)
+    delete(var1m)
+    delete(fs)
+
+    ;; read other members
+    do i = 1, nmember-1
+        fns = ls_monthly_nc_files(memberdirs(i),component)
+        if(any(ismissing(fns)))then
+            print("read_all_forecast_members_var(): no data file in "+memberdirs(i))
+            exit
+        end if
+
+        fs = addfiles(fns,"r")
+        var1m = read_partial_file_by_2dmask(fs,varname,l2dmask)
+        if(typeof(var1m).eq."short")then
+            var1m := short2flt(var1m) ;; apply add_offset and scale_factor
+            delete(var1m@valid_range)
+            ;delete(var1m@actural_range)
+        end if
+        if(any(dim1m.ne.dimsizes(var1m)))then
+            print("dims mismatch in "+memberdirs(i))
+            print("varall: "+str_join(dimsizes(varall),","))
+            print("var1m: "+str_join(dimsizes(var1m),","))
+        end if
+
+        if(ndim1.eq.3)then ;; t,y,x
+            varall(i,:,:,:) = var1m
+        end if
+        if(ndim1.eq.4)then ;; time,lev,y,x
+            varall(i,:,:,:,:) = var1m
+        end if
+
+        delete(fns)
+        delete(var1m)
+    end do
+
+    ;; assign lat2d/lon2d
+    bnd = ind_resolve(ind(l2dmask),dimsizes(l2dmask))
+    bs = min(bnd(:,0))
+    bn = max(bnd(:,0))
+    bw = min(bnd(:,1))
+    be = max(bnd(:,1))
+    varall@lat2d = varatts@lat2d(bs:bn,bw:be)
+    varall@lon2d = varatts@lon2d(bs:bn,bw:be)
+
+    return varall
+end
+
 undef("read_norcpm_forecast_members_var")
 function read_norcpm_forecast_members_var(forecastdir[1],component,varname,ocngridfile)
 begin
@@ -208,13 +347,6 @@ begin
         assign_ocn_grid(varall,ocngridfile)
     end if
     return varall
-end
-undef("read_norcpm_forecasts_members_wgt")
-function read_norcpm_forecasts_members_wgt(forecastdirs,component,varname,ocngridfile)
-begin
-    ;; not begin yet
-    ;; get weighting for area mean
-    ;; only forecastdir(0) will be use
 end
 
 undef("mod_date_and_to_cd_")
@@ -458,13 +590,13 @@ begin
     if(isatt(var,"lat2d"))then
         ; ocn use 2d area, lat and lon
         if(whichone.eq."wgt")then
-            varcod = var&area2d
+            varcod = var@area2d
         end if
         if(whichone.eq."lat")then
-            varcod = var&lat2d
+            varcod = var@lat2d
         end if
         if(whichone.eq."lon")then
-            varcod = var&lon2d
+            varcod = var@lon2d
         end if
         if(dimsizes(dimsizes(varcod)).eq.1)then ;; read from nc, 2d attitude is saved as 1d 
             dims = dimsizes(var)
@@ -474,16 +606,20 @@ begin
         return varcod
     else 
         ; atm use 1D lat and lon
-        lats = varall&lat
-        lons = varall&lon
+        ;; assume right most 2 dim is lat,lon
+        ndim = dimsizes(dimsizes(var))
+        latd = ndim-2
+        lond = ndim-1
+        lats = var&$var!latd$
+        lons = var&$var!lond$
         if(whichone.eq."wgt")then
-            varcod = conform_dim((/dimsizes(lats),dimsizes(lons)/),NormCosWgtGlobe(lats),0)
+            varcod = conform_dims((/dimsizes(lats),dimsizes(lons)/),NormCosWgtGlobe(lats),0)
         end if
         if(whichone.eq."lat")then
-            varcod = conform_dim((/dimsizes(lats),dimsizes(lons)/),lats,0)
+            varcod = conform_dims((/dimsizes(lats),dimsizes(lons)/),lats,0)
         end if
         if(whichone.eq."lon")then
-            varcod = conform_dim((/dimsizes(lats),dimsizes(lons)/),lons,0)
+            varcod = conform_dims((/dimsizes(lats),dimsizes(lons)/),lons,1)
         end if
         return varcod
     end if
@@ -505,7 +641,7 @@ begin
     dims = dimsizes(varens1m)
     dims(1) = nm ;; num of lead months
     ;ensall = conform_dims(dims,varens1m,(/0,2,3/)) ;; assume [forecast, time, lat, lon]
-    printVarSummary(varens1m)
+    ;printVarSummary(varens1m)
     ensall = new(dims,typeof(varens1m))
     ensall(:,0,:,:) = varens1m
     delete(var1m)
@@ -519,6 +655,9 @@ begin
     end do
     if(isatt(ensall,"valid_range"))then
         delete(ensall@valid_range)
+    end if
+    if(isatt(ensall,"actural_range"))then
+        delete(ensall@actural_range)
     end if
     return ensall
 end

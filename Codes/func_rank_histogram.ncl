@@ -16,7 +16,7 @@ begin ;; too less sample with single point
 
     do y = 0,ny-1
     do x = 0,nx-1
-        if(any(ismissing(ensmem(:,:,y,x))))then ;; if any missing 
+        if(any(ismissing(ensmem(:,:,y,x))).or.any(ismissing(obs(:,y,x))))then ;; if any missing 
             continue
         end if
         bins1p = new((/nmem+1/),"float") ;; count of 1 grid point

@@ -134,13 +134,14 @@ AllScripts = dict() ## store all generated scripts, {recipe1: [s1,s2,s3], recipe
 for recipe in Recipes:
     title = recipe.get("Title")
     desc = recipe.get('Description')
+    thumbnail = recipe.get("Thumbnail")
     scripts = recipe.get("Scripts")
     recipeName = recipe.get("recipeName")
     AllScripts[recipeName] = list()
     if not os.path.exists(outputDir+'/'+recipeName): os.makedirs(outputDir+'/'+recipeName)
  
     # write README
-    open(outputDir+'/'+recipeName+'/README',"w").write('Title: "'+title+'"\nDescription: "'+desc+'"\n')
+    open(outputDir+'/'+recipeName+'/README',"w").write('Title: "'+title+'"\nDescription: "'+desc+'"\nThumbnail: "'+thumbnail+'"\n')
 
     # get all capital in recipe
     baseDict = dict()
@@ -252,7 +253,7 @@ for i in subdirs:
     thumbnail = ''
     description = ''
     # try index.html
-    if isbs4: # if bs4 present and there is index.html in subdir
+    if isbs4: # if bs4 present and there is index.html in subdir, not done yet
         indexfile =  [ j for j in os.listdir(i) if re.match(".*index..*",j) ] [0]
         if indexfile:
             thumbnail = ''
@@ -264,6 +265,7 @@ for i in subdirs:
             readme = yaml.load(j,Loader=yaml.BaseLoader)
             if readme.get('Title'): title = readme.get('Title')
             if readme.get('Description'): description = readme.get('Description')
+            if readme.get('Thumbnail'): thumbnail = readme.get('Thumbnail')
         except:
             pass
 
@@ -308,7 +310,7 @@ for i in dirs:
     html += '<hr> \n'
 
 #### html footer
-html += '<p align="right"><small>by pgchiu</small></p> \n'
+html += '<p align="right"><small>by pgchiu (Ping-Gin.Chiu@uib.no)</small></p> \n'
 html += '</body> \n'
 html += '</html> \n'
 

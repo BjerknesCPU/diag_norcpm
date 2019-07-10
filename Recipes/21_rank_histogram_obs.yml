@@ -693,6 +693,88 @@ Scripts:
     CACHEFILENAME: sst_rank_freq_lead4_ASO  # cache is made global
     # for all forecast start from Oct
     FORECASTDIRS: BASEDIR/RUNPRE{1,2}???10??
+
+-  # side bins plot, lead1 FMA
+    plotScript: plot_rank_histogram_side_bins.ncl
+    FIGFILENAME: sst_rank_freq_bins_lead1_FMA
+    CACHEFILENAME: sst_rank_freq_lead1_FMA
+    CACHEVARNAME: rank_freq
+-  # side bins plot, lead1 MJJ
+    plotScript: plot_rank_histogram_side_bins.ncl
+    FIGFILENAME: sst_rank_freq_bins_lead1_MJJ
+    CACHEFILENAME: sst_rank_freq_lead1_MJJ
+    CACHEVARNAME: rank_freq
+-  # side bins plot, lead1 ASO
+    plotScript: plot_rank_histogram_side_bins.ncl
+    FIGFILENAME: sst_rank_freq_bins_lead1_ASO
+    CACHEFILENAME: sst_rank_freq_lead1_ASO
+    CACHEVARNAME: rank_freq
+-  # side bins plot, lead1 NDJ
+    plotScript: plot_rank_histogram_side_bins.ncl
+    FIGFILENAME: sst_rank_freq_bins_lead1_NDJ
+    CACHEFILENAME: sst_rank_freq_lead1_NDJ
+    CACHEVARNAME: rank_freq
+-  # side bins plot, lead2 FMA
+    plotScript: plot_rank_histogram_side_bins.ncl
+    FIGFILENAME: sst_rank_freq_bins_lead2_FMA
+    CACHEFILENAME: sst_rank_freq_lead2_FMA
+    CACHEVARNAME: rank_freq
+-  # side bins plot, lead2 MJJ
+    plotScript: plot_rank_histogram_side_bins.ncl
+    FIGFILENAME: sst_rank_freq_bins_lead2_MJJ
+    CACHEFILENAME: sst_rank_freq_lead2_MJJ
+    CACHEVARNAME: rank_freq
+-  # side bins plot, lead2 ASO
+    plotScript: plot_rank_histogram_side_bins.ncl
+    FIGFILENAME: sst_rank_freq_bins_lead2_ASO
+    CACHEFILENAME: sst_rank_freq_lead2_ASO
+    CACHEVARNAME: rank_freq
+-  # side bins plot, lead2 NDJ
+    plotScript: plot_rank_histogram_side_bins.ncl
+    FIGFILENAME: sst_rank_freq_bins_lead2_NDJ
+    CACHEFILENAME: sst_rank_freq_lead2_NDJ
+    CACHEVARNAME: rank_freq
+-  # side bins plot, lead3 FMA
+    plotScript: plot_rank_histogram_side_bins.ncl
+    FIGFILENAME: sst_rank_freq_bins_lead3_FMA
+    CACHEFILENAME: sst_rank_freq_lead3_FMA
+    CACHEVARNAME: rank_freq
+-  # side bins plot, lead3 MJJ
+    plotScript: plot_rank_histogram_side_bins.ncl
+    FIGFILENAME: sst_rank_freq_bins_lead3_MJJ
+    CACHEFILENAME: sst_rank_freq_lead3_MJJ
+    CACHEVARNAME: rank_freq
+-  # side bins plot, lead3 ASO
+    plotScript: plot_rank_histogram_side_bins.ncl
+    FIGFILENAME: sst_rank_freq_bins_lead3_ASO
+    CACHEFILENAME: sst_rank_freq_lead3_ASO
+    CACHEVARNAME: rank_freq
+-  # side bins plot, lead3 NDJ
+    plotScript: plot_rank_histogram_side_bins.ncl
+    FIGFILENAME: sst_rank_freq_bins_lead3_NDJ
+    CACHEFILENAME: sst_rank_freq_lead3_NDJ
+    CACHEVARNAME: rank_freq
+-  # side bins plot, lead4 FMA
+    plotScript: plot_rank_histogram_side_bins.ncl
+    FIGFILENAME: sst_rank_freq_bins_lead4_FMA
+    CACHEFILENAME: sst_rank_freq_lead4_FMA
+    CACHEVARNAME: rank_freq
+-  # side bins plot, lead4 MJJ
+    plotScript: plot_rank_histogram_side_bins.ncl
+    FIGFILENAME: sst_rank_freq_bins_lead4_MJJ
+    CACHEFILENAME: sst_rank_freq_lead4_MJJ
+    CACHEVARNAME: rank_freq
+-  # side bins plot, lead4 ASO
+    plotScript: plot_rank_histogram_side_bins.ncl
+    FIGFILENAME: sst_rank_freq_bins_lead4_ASO
+    CACHEFILENAME: sst_rank_freq_lead4_ASO
+    CACHEVARNAME: rank_freq
+-  # side bins plot, lead4 NDJ
+    plotScript: plot_rank_histogram_side_bins.ncl
+    FIGFILENAME: sst_rank_freq_bins_lead4_NDJ
+    CACHEFILENAME: sst_rank_freq_lead4_NDJ
+    CACHEVARNAME: rank_freq
+
 -  # mk html pages with figure filename
     plotScript: mk_html_page.sh
     FIGFILES:  |
@@ -712,6 +794,23 @@ Scripts:
         sst_global_rank_histogram_lead2_NDJ
         sst_global_rank_histogram_lead3_NDJ
         sst_global_rank_histogram_lead4_NDJ
+
+        sst_rank_freq_bins_lead1_FMA
+        sst_rank_freq_bins_lead1_MJJ
+        sst_rank_freq_bins_lead1_ASO
+        sst_rank_freq_bins_lead1_NDJ
+        sst_rank_freq_bins_lead2_FMA
+        sst_rank_freq_bins_lead2_MJJ
+        sst_rank_freq_bins_lead2_ASO
+        sst_rank_freq_bins_lead2_NDJ
+        sst_rank_freq_bins_lead3_FMA
+        sst_rank_freq_bins_lead3_MJJ
+        sst_rank_freq_bins_lead3_ASO
+        sst_rank_freq_bins_lead3_NDJ
+        sst_rank_freq_bins_lead4_FMA
+        sst_rank_freq_bins_lead4_MJJ
+        sst_rank_freq_bins_lead4_ASO
+        sst_rank_freq_bins_lead4_NDJ
 
         sst_NAtl_rank_histogram_lead1_FMA
         sst_NAtl_rank_histogram_lead2_FMA
@@ -746,7 +845,7 @@ Scripts:
         sst_WNPac_rank_histogram_lead2_NDJ
         sst_WNPac_rank_histogram_lead3_NDJ
         sst_WNPac_rank_histogram_lead4_NDJ
-    COLUMN: season leadSeason=1 leadSeason=2 leadSeason=3 leadSeason=4 '</tr><tr>' global '</tr><tr>' FMA 4 MJJ 4 ASO 4 NDJ 4 NAtl '</tr><tr>' FMA 4 MJJ 4 ASO 4 NDJ 4 WNPac '</tr><tr>' FMA 4 MJJ 4 ASO 4 NDJ 4
+    COLUMN: season leadSeason=1 leadSeason=2 leadSeason=3 leadSeason=4 '</tr><tr>' global '</tr><tr>' FMA 4 MJJ 4 ASO 4 NDJ 4 Sidebins '</tr><tr>' FMA 4 MJJ 4 ASO 4 NDJ 4 NAtl '</tr><tr>' FMA 4 MJJ 4 ASO 4 NDJ 4 WNPac '</tr><tr>' FMA 4 MJJ 4 ASO 4 NDJ 4
     COMMENT: |
         SST Rank histogram at global, NAtl(20-70N, 110W-40E) and WNPac(20-70N, 110E-180)
         HadISST as observation data.

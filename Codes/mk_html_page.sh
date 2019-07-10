@@ -18,6 +18,8 @@ column=(COLUMN)
     ## can be a array
 ncolarr=${#column[*]}
 
+export MAGICK_THREAD_LIMIT=1   ## avoid "libgomp: Thread creation failed"
+
 # html header
 echo ''
 echo '<!DOCTYPE html>'              >  "${htmlfn}"
@@ -66,8 +68,8 @@ for i in ${figs}; do
         gzip -f "${i}.ps"
     fi 
     if [ -f "${i}.png" ] ; then ## trim white edge and make thumbnail
-        convert ${i}.png  -trim tmp-${pid}.png 
-        mv tmp-${pid}.png ${i}.png
+        convert ${i}.png  -trim tmp-${i}-${pid}.png 
+        mv tmp-${i}-${pid}.png ${i}.png
         ## thumbnail
         convert -thumbnail 300 "${i}.png" "${i}_thumb.png"
     fi

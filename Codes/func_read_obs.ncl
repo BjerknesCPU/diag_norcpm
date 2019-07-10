@@ -239,6 +239,19 @@ begin
     ;end if
     return varall
 end
+function read_obs_months_years(obsdir[1]:string,idatadir[1]:string,varname[1]:string,years[*]:integer,months[*]:integer)
+begin
+    return read_nn9039k_obs_months_years(obsdir,idatadir,varname,years,months)
+end 
+
+function read_obs_months(obsdir[1]:string,idatadir[1]:string,varname[1]:string,iyears[*]:integer,imonths[*]:integer)
+begin
+    readmonths = imonths
+    readyears = iyears
+    readyears = where(readmonths .gt.12, readyears+1,readyears)
+    readmonths = where(readmonths .gt.12, readmonths-12,readmonths)
+    return read_nn9039k_obs_months(obsdir,idatadir,varname,readyears,readmonths)
+end
 
 ;; test
 ;var = read_nn9039k_obs_monthly("/cluster/projects/nn9039k/NorCPM/Obs","SST/NOAA","sst",(/1990,1991/))
