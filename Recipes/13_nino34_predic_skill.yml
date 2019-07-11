@@ -21,7 +21,7 @@ Scripts:
     CORFIGFILENAME: fig_cor_forecast_REG
     RMSEFIGFILENAME: fig_rmse_forecast_REG
     FORECASTDIRS: BASEDIR/RUNPRE????????
-    READSAMEMONTH: False
+    READSAMEMONTH: False # disable read month checking
 -  # this dash line is necessary for yaml parser, do not remove it.
     plotScript: plot_forecast_correlation.ncl
     CORTITLE: REG forecast correlation from Jan

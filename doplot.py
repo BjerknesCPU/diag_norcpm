@@ -71,10 +71,10 @@ print('plot recipes: '+','.join(plotRecipes))
 ## before process
 if not os.path.exists(outputDir): os.makedirs(outputDir)
 ## parse recipes
-Recipes = []
-for i in plotRecipes:
-    # i is the filename, it may be contain path, './', or just filename
-    # search dir order: '.', ''(absolute path), RecipeDir
+def parseRecipes(i):
+    ''' i is the filename, it may be contain path, './', or just filename
+        search dir order: '.', ''(absolute path), RecipeDir
+    '''
     thedir = RecipeDir
     if os.path.isfile(i): thedir = ''
     if os.path.isfile('./'+i): thedir = './'
@@ -125,23 +125,50 @@ for i in plotRecipes:
                             s.update({k:" ".join([i for i in ensDataDirs])})
                         else:
                             print('not sure how to express array in '+s.get('plotScript'))
-        Recipes.append(recipe)
+        return recipe
+
+Recipes = []
+for i in plotRecipes:
+    Recipes.append(parseRecipes(i))
+
+## check add dependency
+recipesName = [ i.get('recipeName') for i in Recipes ]
+depends = [i.get('Depends') for i in Recipes if i.get('Depends')]
+didit = True
+while didit: 
+    didit=False
+    for i in depends:
+        for j in re.split(' |,',i):
+            if not j.replace(".yml",'') in recipesName:
+                Recipes.append(parseRecipes(j))
+                print("add "+j)
+                didit = True
+    recipesName = [ k.get('recipeName') for k in Recipes ]
+        
+    
 
 ### generate run script use plotScript with variables
 #### Recipes: list of recipes
 #### [{title,desc,Depend,Scripts:[{script1},{script2}]},{},{}]
 AllScripts = dict() ## store all generated scripts, {recipe1: [s1,s2,s3], recipe2:[r1,r2],...}
+for r in Recipes:
+    print(r.get('recipeName'))
+    print(r)
+sys.exit()
 for recipe in Recipes:
     title = recipe.get("Title")
     desc = recipe.get('Description')
-    thumbnail = recipe.get("Thumbnail")
-    scripts = recipe.get("Scripts")
+    thumbnail = recipe.get("Thumbnail") 
     recipeName = recipe.get("recipeName")
+    depends = recipe.get("Depends")
+    scripts = recipe.get("Scripts")
     AllScripts[recipeName] = list()
     if not os.path.exists(outputDir+'/'+recipeName): os.makedirs(outputDir+'/'+recipeName)
  
     # write README
-    open(outputDir+'/'+recipeName+'/README',"w").write('Title: "'+title+'"\nDescription: "'+desc+'"\nThumbnail: "'+thumbnail+'"\n')
+    readmetext = 'Title: "'+title+'"\nDescription: "'+desc+'"\n'
+    if thumbnail: readmetext+='Thumbnail: "'+thumbnail+'"\n'
+    open(outputDir+'/'+recipeName+'/README',"w").write(readmetext)
 
     # get all capital in recipe
     baseDict = dict()
@@ -235,10 +262,14 @@ for r in AllScripts.keys():
     logfile = outputDir+'/'+r+'.log'
     workdir = outputDir+'/'+r
     p = Process(target=run_seq,args=(workdir,AllScripts[r],logfile))
-    p.start()
-    print('running '+r+' at pid='+str(p.pid))
+    p.name = r # name for identy
     procall.append(p)
     
+###### need rewrite to resolve dependency
+for p in procall:
+    p.start()
+    print('running '+r+' at pid='+str(p.pid))
+
 #### wait all  process done
 for p in procall:
     p.join()

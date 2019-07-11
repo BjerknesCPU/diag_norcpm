@@ -7,7 +7,7 @@
 #       var(initTime, member, time,lev,lat,lon)
 Title: SST homogeneous Anomaly Correlation(AC), 1-4 lead season
 Description: |
-    From <a href='http://doi.org/10.1175/JCLI-D-13-00597.1'>Becker etal 2014.</a> 1-4 lead seasonal forecast correlation.  </br>
+    Following <a href='http://doi.org/10.1175/JCLI-D-13-00597.1'>Becker et al. 2014.</a> approach, 1-4 lead seasonal forecast correlation.  </br>
     The correlation is between 1st member and ensemble mean of rest of members.</br>
 COMPONENT:  ocn
 VARIABLE:  sst
@@ -136,9 +136,9 @@ Scripts:
 -  # mk html pages with figure filename
     plotScript: mk_html_page.sh
     FIGFILES: ana_hindcasts_AC_sst_lead1_FMA ana_hindcasts_AC_sst_lead2_FMA ana_hindcasts_AC_sst_lead3_FMA ana_hindcasts_AC_sst_lead4_FMA ana_hindcasts_AC_sst_lead1_MJJ ana_hindcasts_AC_sst_lead2_MJJ ana_hindcasts_AC_sst_lead3_MJJ ana_hindcasts_AC_sst_lead4_MJJ ana_hindcasts_AC_sst_lead1_ASO ana_hindcasts_AC_sst_lead2_ASO ana_hindcasts_AC_sst_lead3_ASO ana_hindcasts_AC_sst_lead4_ASO ana_hindcasts_AC_sst_lead1_NDJ ana_hindcasts_AC_sst_lead2_NDJ ana_hindcasts_AC_sst_lead3_NDJ ana_hindcasts_AC_sst_lead4_NDJ 
-    COLUMN: season leadSeason=1 leadSeason=2 leadSeason=3 leadSeason=4 '</tr><tr>' FMA 4 MJJ 4 ASO 4 NDJ 4
+    COLUMN: season 'Lead Season = 1' 'Lead Season = 2' 'Lead Season = 3' 'Lead Season = 4' '</tr><tr>' 'Jan prediction' 4 'Apr prediction' 4 'Jul prediction' 4 'Oct prediction' 4
     COMMENT: |
-        From Becker etal 2014. ( 10.1175/JCLI-D-13-00597.1 ) 1-4 lead seasonal forecast correlation. 
+        Following Becker et al. 2014 approach ( 10.1175/JCLI-D-13-00597.1 ) 1-4 lead seasonal forecast correlation. 
         
         The correlation is between 1st member and ensemble mean of rest of members.
 
