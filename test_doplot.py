@@ -52,8 +52,8 @@ plotRecipes='20_rank_histogram.yml'
 plotRecipes='20_rank_histogram.yml,21_rank_histogram_obs.yml,22_rank_histogram_ano_obs.yml'
 plotRecipes='13_nino34_predic_skill.yml' # take ~1hr
 plotRecipes=''
-plotRecipes='testing/T01_topic.yml' # testing topical recipe
 plotRecipes='17_AnoCor_sst_alllead.yml,18_AnoCor_prec.yml,19_AnoCor_sst_obs.yml'
+plotRecipes='testing/T01_topic.yml' # testing topical recipe
 
 #--------------------------- case settings end -------------------------
 
@@ -99,4 +99,4 @@ echo "Case prefix: ${RUNPRE}"
 echo "outputDir:   ${outputDir}"
 echo '================================= '
 
-"$PYTHON" "${diag_norcpm_Root}/doplot.py"
+"$PYTHON" "${diag_norcpm_Root}/test_doplot.py"

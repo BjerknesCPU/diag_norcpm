@@ -838,7 +838,7 @@ Scripts:
         sst_WNPac_rank_histogram_lead2_NDJ
         sst_WNPac_rank_histogram_lead3_NDJ
         sst_WNPac_rank_histogram_lead4_NDJ
-    COLUMN: season leadSeason=1 leadSeason=2 leadSeason=3 leadSeason=4 '</tr><tr>' global '</tr><tr>' FMA 4 MJJ 4 ASO 4 NDJ 4 Sidebins '</tr><tr>' FMA 4 MJJ 4 ASO 4 NDJ 4 NAtl '</tr><tr>' FMA 4 MJJ 4 ASO 4 NDJ 4 WNPac '</tr><tr>' FMA 4 MJJ 4 ASO 4 NDJ 4
+    COLUMN: season leadSeason=1 leadSeason=2 leadSeason=3 leadSeason=4 '</tr><tr>' global '</tr><tr>' 'FMA' 4 'MJJ' 4 'ASO' 4 'NDJ' 4 Sidebins '</tr><tr>' 'FMA' 4 'MJJ' 4 'ASO' 4 'NDJ' 4 NAtl '</tr><tr>' 'FMA' 4 'MJJ' 4 'ASO' 4 'NDJ' 4 WNPac '</tr><tr>' 'FMA' 4 'MJJ' 4 'ASO' 4 'NDJ' 4
     COMMENT: |
         SST Rank histogram at global, NAtl(20-70N, 110W-40E) and WNPac(20-70N, 110E-180)
         The 1st member is the proxy observation. So it should be flat distribution every basin.

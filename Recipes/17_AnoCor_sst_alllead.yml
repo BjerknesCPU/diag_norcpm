@@ -135,7 +135,26 @@ Scripts:
 
 -  # mk html pages with figure filename
     plotScript: mk_html_page.sh
-    FIGFILES: ana_hindcasts_AC_sst_lead1_FMA ana_hindcasts_AC_sst_lead2_FMA ana_hindcasts_AC_sst_lead3_FMA ana_hindcasts_AC_sst_lead4_FMA ana_hindcasts_AC_sst_lead1_MJJ ana_hindcasts_AC_sst_lead2_MJJ ana_hindcasts_AC_sst_lead3_MJJ ana_hindcasts_AC_sst_lead4_MJJ ana_hindcasts_AC_sst_lead1_ASO ana_hindcasts_AC_sst_lead2_ASO ana_hindcasts_AC_sst_lead3_ASO ana_hindcasts_AC_sst_lead4_ASO ana_hindcasts_AC_sst_lead1_NDJ ana_hindcasts_AC_sst_lead2_NDJ ana_hindcasts_AC_sst_lead3_NDJ ana_hindcasts_AC_sst_lead4_NDJ 
+    FIGFILES: 
+        ana_hindcasts_AC_sst_lead1_FMA
+        ana_hindcasts_AC_sst_lead2_MJJ
+        ana_hindcasts_AC_sst_lead3_ASO
+        ana_hindcasts_AC_sst_lead4_NDJ
+
+        ana_hindcasts_AC_sst_lead1_MJJ
+        ana_hindcasts_AC_sst_lead2_ASO
+        ana_hindcasts_AC_sst_lead3_NDJ
+        ana_hindcasts_AC_sst_lead4_FMA
+
+        ana_hindcasts_AC_sst_lead1_ASO
+        ana_hindcasts_AC_sst_lead2_NDJ
+        ana_hindcasts_AC_sst_lead3_FMA
+        ana_hindcasts_AC_sst_lead4_MJJ
+
+        ana_hindcasts_AC_sst_lead1_NDJ
+        ana_hindcasts_AC_sst_lead2_FMA
+        ana_hindcasts_AC_sst_lead3_MJJ
+        ana_hindcasts_AC_sst_lead4_ASO
     COLUMN: season 'Lead Season = 1' 'Lead Season = 2' 'Lead Season = 3' 'Lead Season = 4' '</tr><tr>' 'Jan prediction' 4 'Apr prediction' 4 'Jul prediction' 4 'Oct prediction' 4
     COMMENT: |
         Following Becker et al. 2014 approach ( 10.1175/JCLI-D-13-00597.1 ) 1-4 lead seasonal forecast correlation. 

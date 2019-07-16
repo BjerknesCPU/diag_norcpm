@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import os,sys,re
+import os,sys,re,time
 import yaml
 import subprocess as sp
 from multiprocessing import Process
@@ -12,6 +12,7 @@ except:
     isbs4 = False
     
 
+dryrun = False
 # get envrionment variables
 plotCase            = os.environ.get('plotCase')
 #ensDataDirs         = os.environ.get('ensDataDirs').split()
@@ -98,6 +99,7 @@ def parseRecipes(i):
         #### {title,desc,Depend,Scripts:[{script1},{script2}]}
 
         recipe_name = os.path.splitext(os.path.basename(i))[0]
+        recipe_filename = os.path.splitext(os.path.basename(i))
 
         if type(recipe) == dict: ## if things look good
             pass
@@ -112,6 +114,7 @@ def parseRecipes(i):
         recipe.update({'BASEDIR':BASEDIR})
         recipe.update({'RUNPRE':RUNPRE})
         recipe.update({'recipeName':recipe_name})
+        recipe.update({'recipeFileName':recipe_filename})
 
         #### check array, change it to string
         if False : # v1 code, ensDataDirs is not used in v2
@@ -141,7 +144,7 @@ while didit:
         for j in re.split(' |,',i):
             if not j.replace(".yml",'') in recipesName:
                 Recipes.append(parseRecipes(j))
-                print("add "+j)
+                print("due to depends, add "+j)
                 didit = True
     recipesName = [ k.get('recipeName') for k in Recipes ]
         
@@ -151,10 +154,12 @@ while didit:
 #### Recipes: list of recipes
 #### [{title,desc,Depend,Scripts:[{script1},{script2}]},{},{}]
 AllScripts = dict() ## store all generated scripts, {recipe1: [s1,s2,s3], recipe2:[r1,r2],...}
-for r in Recipes:
-    print(r.get('recipeName'))
-    print(r)
-sys.exit()
+Depends = dict()
+#for r in Recipes:
+#    print(r.get('recipeName'))
+#    print(r)
+#print(type(Recipes))
+#sys.exit()
 for recipe in Recipes:
     title = recipe.get("Title")
     desc = recipe.get('Description')
@@ -163,6 +168,11 @@ for recipe in Recipes:
     depends = recipe.get("Depends")
     scripts = recipe.get("Scripts")
     AllScripts[recipeName] = list()
+    if depends:
+        Depends[recipeName] = re.split(' |,',depends)
+    else:
+        Depends[recipeName] = None
+
     if not os.path.exists(outputDir+'/'+recipeName): os.makedirs(outputDir+'/'+recipeName)
  
     # write README
@@ -253,7 +263,10 @@ def run_seq(workdir,scripts,logfile):
         print('    '+os.path.basename(workdir)+': '+fn)
         logf.write('>>>>>>>>>>>>>>>> running '+cmd+' '+fn+'\n')
         logf.flush()
-        sp.run([cmd,fn],stdout=logf,stderr=logf)
+        if dryrun:
+            print("        dryrun: "+cmd+" "+fn)
+        else:
+            sp.run([cmd,fn],stdout=logf,stderr=logf)
     logf.close()
 
 #### make and run process list
@@ -262,13 +275,53 @@ for r in AllScripts.keys():
     logfile = outputDir+'/'+r+'.log'
     workdir = outputDir+'/'+r
     p = Process(target=run_seq,args=(workdir,AllScripts[r],logfile))
-    p.name = r # name for identy
+    p.name = r # dependency
     procall.append(p)
     
 ###### need rewrite to resolve dependency
+###### run no depend first
+RunStart = list()
 for p in procall:
-    p.start()
-    print('running '+r+' at pid='+str(p.pid))
+    if not Depends[p.name]: 
+        p.start()
+        RunStart.append(p.name)
+        print('running '+r+' at pid='+str(p.pid))
+if not RunStart:
+    print("No recipe be able to run, exit.")
+    sys.exit()
+
+###### check process end, bad idea 
+RunDone = list()
+Running = 1
+while Running:
+    time.sleep(3)
+    Running = 0
+    for p in procall:
+        ## is in RunStart, is_alive
+        if p.name in RunStart and p.is_alive(): # running
+            Running = 1
+        elif p.name in RunStart : # run done
+            #print(p.name+" done")
+            RunDone.append(p.name)
+        elif not p.name in RunStart: # not start yet
+            ## check depends done or not
+            allDone = True
+            Running = 1
+            for i in Depends[p.name]: # there are file names in Depends 
+                if not os.path.splitext(i)[0] in RunDone: allDone = False
+            if allDone:
+                p.start()
+                RunStart.append(p.name)
+                print('running '+p.name+' at pid='+str(p.pid))
+        else:
+            print("Unexpected situtation, should not happen")
+            print("p.name:"+p.name)
+            print("RunStart:")
+            print(RunStart)
+            print("RunDone:")
+            print(RunDone)
+            sys.exit()
+        pass
 
 #### wait all  process done
 for p in procall:
