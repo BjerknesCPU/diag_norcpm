@@ -44,10 +44,10 @@ begin
     datadir = obsdir+"/"+idatadir
 
     ;; check datadir
-    if(.not. isfilepresent(datadir+"/"+years(0)+"_01.nc"))
-        print("read_nn9039k_obs_months(): obs data not found in "+datadir)
-        return False
-    end if
+    ;if(.not. isfilepresent(datadir+"/"+years(0)+"_01.nc"))
+    ;    print("read_nn9039k_obs_months(): obs data not found in "+datadir)
+    ;    return False
+    ;end if
 
     ;; check data files
     ;;;; file names
@@ -260,6 +260,6 @@ end
 ;var = read_nn9039k_obs_months_years("/cluster/projects/nn9039k/NorCPM/Obs","SST/HADISST","sst",ispan(2000,2003,1),ispan(2,4,1))
 ;var = read_nn9039k_obs_months("/cluster/projects/nn9039k/NorCPM/Obs","SST/HADISST","sst",ispan(2000,2003,1),ispan(2,5,1))
 ;var = read_obs_leadmonths("/cluster/projects/nn9039k/NorCPM/Obs","SST/HADISST","sst",2000,10,ispan(0,12,1))
-;var = read_obs_leadmonths("~/NS9560K/shared/Obs","PRECIP/GPCP","precip",2000,10,ispan(0,12,1))
-;printVarSummary(var)
-;print(cd_calendar(var&time,-1))
+var = read_obs_leadmonths("~/NS9560K/shared/Obs","PRECIP/GPCP","precip",2000,10,ispan(0,12,1))
+printVarSummary(var)
+print(cd_calendar(var&time,-1))

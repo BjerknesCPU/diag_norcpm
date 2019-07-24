@@ -37,7 +37,32 @@ begin
         var@area2d = area
     end if
 end
-function get_latlon2d(fn,varname,ocngridfile)
+function get_latlon2d(var,lat2dorlon2d)
+begin
+    ;; use var attitude or coordinate
+    if(isatt(var,lat2dorlon2d))then
+        return var@$lat2dorlon2d$
+    else
+        ;; get coordinate
+        dims = dimsizes(var)
+        ndim = dimsizes(dims)
+        if(lat2dorlon2d .eq."lat2d")then
+            src = var&lat
+            nn = ndim-2
+            dn = 0
+        end if
+        if(lat2dorlon2d .eq."lon2d")then
+            src = var&lon
+            nn = ndim-1
+            dn = 1
+        end if
+        src2d = conform_dims(dims(ndim-2:),src,dn)
+        return src2d
+    end if
+
+end
+
+function get_file_latlon2d(fn,varname,ocngridfile)
 begin
     ;; var can be empty with getfilevaratts()
     f = addfile(fn,"r")
@@ -81,7 +106,7 @@ begin
     return fns
 end
 
-undef("read_partial_file_by_2dmask")
+undef("read_partial_file_list_by_2dmask")
 function read_partial_file_list_by_2dmask(f,varname[1]:string,i2dmask[*][*])
 local i
 begin
@@ -97,7 +122,7 @@ begin
     dims = getfilevardimsizes(f[0],varname)
     ndim = dimsizes(dims)
     if(dims(ndim-2:).ne.dimsizes(l2dmask))then
-        print("read_partial_file_by_2dmask(): i2dmask is not match to file "+varname)
+        print("read_partial_file_list_by_2dmask(): i2dmask is not match to file "+varname)
         exit
     end if
 
@@ -190,7 +215,7 @@ begin
     memberdirs = systemfunc("ls -d "+forecastdir+"/*mem??")
     nmember = dimsizes(memberdirs)
     fns = ls_monthly_nc_files(memberdirs(0),component)
-    varatts  = get_latlon2d(fns(0),varname,ocngridfile)
+    varatts  = get_file_latlon2d(fns(0),varname,ocngridfile)
     l2dmask = .not.ismissing(varatts@lat2d)
     l2dmask = l2dmask .and. (varatts@lat2d .ge. min(latbe)) .and. (varatts@lat2d .le. max(latbe))
     l2dmask = l2dmask .and. (varatts@lon2d .ge. min(lonbe)) .and. (varatts@lon2d .le. max(lonbe))
@@ -360,8 +385,8 @@ begin
     end if
     return cd_calendar(tt,opt)
 end
-undef("read_noresm_members_leadmonths")
-function read_noresm_members_leadmonths(dirs,component,vn,lead_months,ocngridfile)
+undef("read_noresm_members_filevar_leadmonths")
+function read_noresm_members_filevar_leadmonths(dirs,component,vn,lead_months,ocngridfile)
 begin
     ;; read var in member dirs with lead_months
     ;; return varall(members, months,lev,y,x)
@@ -431,6 +456,7 @@ begin
     dims1 = getfilevardimsizes(f,vn)
 
     dims1(0) = ndmon ;; set t as dmonth
+    ;varall = new(array_append_record(nmember,dims1,0),where(vartype.eq."short","float",vartype))
     varall = new(array_append_record(nmember,dims1,0),where(vartype.eq."short","float",vartype))
     ndim = dimsizes(dims1) +1 ;; ndim of varall
 
@@ -483,6 +509,21 @@ begin
     assign_ocn_grid(varall,ocngridfile)
     
     return varall
+end
+load "/tos-project4/SCRATCH/pgchiu/diag_norcpm/Codes/func_ohc_integrate.ncl" ;; bad idea, need modify
+undef("read_noresm_members_leadmonths")
+function read_noresm_members_leadmonths(forecastDirs,component,vn,lead_months,ocngridfile)
+begin
+    ;;  frontend of read_noresm_forecasts_ens_filevar_leadmonths(),
+    ;;      used to insert varnames which need to calcute, not just in file
+    if(vn.eq."ohc")then ;; for ocean heat content
+        ;; read templvl and salnlvl
+        templvl = read_noresm_members_filevar_leadmonths(forecastDirs,component,"templvl",lead_months,ocngridfile)
+        salnlvl = read_noresm_members_filevar_leadmonths(forecastDirs,component,"salnlvl",lead_months,ocngridfile)
+        return cal_ohc_with_temp_salinity_MTZLL(templvl,salnlvl,100)
+    end if
+
+    return read_noresm_forecasts_ens_filevar_leadmonths(forecastDirs,component,vn,lead_months,ocngridfile)
 end
 undef("read_noresm_members_leadseason")
 function read_noresm_members_leadseason(dirs,component,vn,lead_season,ocngridfile)
@@ -662,6 +703,7 @@ begin
     return ensall
 end
 
+
 undef("read_noresm_forecasts_members_leadseason") ;; wait to be obsoleted using read_noresm_forecasts_members_leadmonths()
 function read_noresm_forecasts_members_leadseason(forecastDirs,component,vn,lead_season,ocngridfile)
 begin
@@ -669,70 +711,74 @@ begin
     ;; forecastDirs are directories contain forecast members subdir
     ;; ex. forecastDirs(0)+"/"+memberDirs(0)+"/ocn/hist/"+ncfile
 
-    ;; read data
-    nforecast = dimsizes(forecastDirs)
-    ;;;; 1st forecast
-    memDirs = systemfunc("ls -d "+forecastDirs(0)+"/*")
-    ;;;; check memDirs (TBD)
-    ;;;; read first forecast
-    varF1 = read_noresm_members_leadseason(memDirs,component,vn,lead_season,ocngridfile)
-    t0all = varF1@t0
-    t0all@units = varF1@t0units
-    dims1 = dimsizes(varF1)
-    dims = array_append_record(nforecast,dims1,0) 
-    ndim = dimsizes(dims)
-    varall = conform_dims(dims,varF1,ispan(1,ndim-1,1)) ;; f,m,dmon,z,y,x or f,m,dmon,y,x
-    readMM = varF1@readMM ;; the read months of var
-    sameReadMM = True
-
-    delete(varF1)
-    delete(memDirs)
-    
-    ;actual_range = varall@actual_range
-    ;vaild_range = varall@vaild_range
-    do f = 1,nforecast-1
-        memDirs = systemfunc("ls -d "+forecastDirs(f)+"/*")
+    lead_months = (lead_season-1)*3 +(/1,2,3/)
+    return read_noresm_forecasts_members_leadmonths(forecastDirs,component,vn,lead_months,ocngridfile)
+    if(False)then ;; obsolete
+        ;; read data
+        nforecast = dimsizes(forecastDirs)
+        ;;;; 1st forecast
+        memDirs = systemfunc("ls -d "+forecastDirs(0)+"/*")
+        ;;;; check memDirs (TBD)
+        ;;;; read first forecast
         varF1 = read_noresm_members_leadseason(memDirs,component,vn,lead_season,ocngridfile)
-        ;; check read months
-        if(any(readMM.ne.varF1@readMM))then
-            print("readMM is not consistant, maybe t0 is not at same month?")
-            print("1st  readMM: "+str_join(readMM,","))
-            print("this readMM: "+str_join(varF1@readMM,","))
-            sameReadMM = False
-        end if
-        ;if(isatt(varF1,"actual_range"))then
-        ;    actual_range(0) := min((/varF1@actual_range(0),actual_range(0)/))
-        ;    actual_range(1) := max((/varF1@actual_range(1),actual_range(1)/))
-        ;end if
-        ;if(isatt(varF1,"valid_range"))then
-        ;    valid_range(0) := min((/varF1@valid_range(0),valid_range(0)/))
-        ;    valid_range(1) := max((/varF1@valid_range(1),valid_range(1)/))
-        ;end if
-        if(ndim.eq.6);then
-            varall(f,:,:,:,:,:) = varF1
-        end if
-        if(ndim.eq.5);then
-            varall(f,:,:,:,:) = varF1
-        end if
-        t0all := array_append_record(t0all,varF1@t0,0)
+        t0all = varF1@t0
+        t0all@units = varF1@t0units
+        dims1 = dimsizes(varF1)
+        dims = array_append_record(nforecast,dims1,0) 
+        ndim = dimsizes(dims)
+        varall = conform_dims(dims,varF1,ispan(1,ndim-1,1)) ;; f,m,dmon,z,y,x or f,m,dmon,y,x
+        readMM = varF1@readMM ;; the read months of var
+        sameReadMM = True
+
         delete(varF1)
         delete(memDirs)
-    end do
-    t0all@calendar = "noleap"
-    varall!0 = "forecast"
-    varall&forecast = t0all
-    if(sameReadMM)then
-        varall@readMM = readMM
-    else
-        delete(varall@readMM)
-    end if
-    delete(varall@readYY)
-    delete(varall@t0)
-    delete(varall@t0units)
+        
+        ;actual_range = varall@actual_range
+        ;vaild_range = varall@vaild_range
+        do f = 1,nforecast-1
+            memDirs = systemfunc("ls -d "+forecastDirs(f)+"/*")
+            varF1 = read_noresm_members_leadseason(memDirs,component,vn,lead_season,ocngridfile)
+            ;; check read months
+            if(any(readMM.ne.varF1@readMM))then
+                print("readMM is not consistant, maybe t0 is not at same month?")
+                print("1st  readMM: "+str_join(readMM,","))
+                print("this readMM: "+str_join(varF1@readMM,","))
+                sameReadMM = False
+            end if
+            ;if(isatt(varF1,"actual_range"))then
+            ;    actual_range(0) := min((/varF1@actual_range(0),actual_range(0)/))
+            ;    actual_range(1) := max((/varF1@actual_range(1),actual_range(1)/))
+            ;end if
+            ;if(isatt(varF1,"valid_range"))then
+            ;    valid_range(0) := min((/varF1@valid_range(0),valid_range(0)/))
+            ;    valid_range(1) := max((/varF1@valid_range(1),valid_range(1)/))
+            ;end if
+            if(ndim.eq.6);then
+                varall(f,:,:,:,:,:) = varF1
+            end if
+            if(ndim.eq.5);then
+                varall(f,:,:,:,:) = varF1
+            end if
+            t0all := array_append_record(t0all,varF1@t0,0)
+            delete(varF1)
+            delete(memDirs)
+        end do
+        t0all@calendar = "noleap"
+        varall!0 = "forecast"
+        varall&forecast = t0all
+        if(sameReadMM)then
+            varall@readMM = readMM
+        else
+            delete(varall@readMM)
+        end if
+        delete(varall@readYY)
+        delete(varall@t0)
+        delete(varall@t0units)
 
-    ;varall@actural_range = actural_range
-    ;varall@valid_range = valid_range
-    return varall
+        ;varall@actural_range = actural_range
+        ;varall@valid_range = valid_range
+        return varall
+    end if
 end
 
 
