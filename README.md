@@ -1,6 +1,9 @@
 # What's it
     diag_norcpm is a diagnostic package to plot the output data of NorCPM.
 
+# Demo site
+    http://158.39.77.150/index2.html
+
 # Acceptable data structure and usage
     example:
         if data path is 
