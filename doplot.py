@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import os,sys,re,time
+import os,sys,re,time,traceback
 import yaml
 import subprocess as sp
 from multiprocessing import Process
@@ -92,7 +92,7 @@ def parseRecipes(i):
                 sys.exit()
 
         except:
-                print(exc)
+                traceback.print_exc()
                 sys.exit()
             
         #### check data structure, should be:
@@ -394,7 +394,7 @@ for i in dirs:
     html += '<hr> \n'
 
 #### html footer
-html += '<p align="right"><small>by pgchiu (Ping-Gin.Chiu@uib.no)</small></p> \n'
+html += '<p align="right"><small>contact: pgchiu (Ping-Gin.Chiu_at_uib.no)</small></p> \n'
 html += '</body> \n'
 html += '</html> \n'
 

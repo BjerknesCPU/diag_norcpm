@@ -26,6 +26,7 @@
 
 load "CODEDIR/func_read_all_members.ncl"
 load "CODEDIR/func_read_obs.ncl"
+load "CODEDIR/func_read_framework.ncl"
 load "CODEDIR/func_areamean.ncl"
 load "CODEDIR/func_rank_histogram.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/esmf/ESMF_regridding.ncl"
@@ -124,8 +125,8 @@ begin
 
             opt = True ;; for esmf regrid
                 ;; assume lat2d, need to add fix lat/lon support
-                opt@DstGridLat = varSea_mem@lat2d
-                opt@DstGridLon = varSea_mem@lon2d
+                opt@DstGridLat = get_latlon2d(varSea_mem,"lat2d")
+                opt@DstGridLon = get_latlon2d(varSea_mem,"lon2d")
                 opt@DstGridMask = where(ismissing(varSea_mem(0,0,:,:)),0,1)
                 ;opt@ForceOverwrite = True
                 ;opt@Overwrite = True
@@ -136,7 +137,8 @@ begin
                 inityear  = toint(inita(t,0))
                 initmonth = toint(inita(t,1))
                 ;; multi-year 1season
-                var1 = dim_avg_n_Wrap(read_obs_leadmonths(obsdir,obsdataset,obsvn,inityear,initmonth,leadmonths),0)
+                ;var1 = dim_avg_n_Wrap(read_obs_leadmonths(obsdir,obsdataset,obsvn,inityear,initmonth,leadmonths),0)
+                var1 = dim_avg_n_Wrap(read_obs_framework_leadmonths(obsdir,obsdataset,obsvn,inityear,initmonth,leadmonths,-1,(/-90.,90./),(/0.,360./)),0)
                 if(obsvn.eq."sst")then ;; remove too small data
                     var1 = where(var1.lt.0.,var1@_FillValue,var1)
                 end if

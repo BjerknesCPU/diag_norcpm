@@ -84,6 +84,7 @@ begin
                 if(isfilepresent(fns(i)))then
                     continue
                 end if
+                print("cdo --silent -t echam6 -f nc "+cdoop+" -select,name="+varname+" "+dailyfn(i)+" 'tmp_"+fns(i)+"' && mv 'tmp_"+fns(i)+"'  '"+fns(i)+"'")
                 system("cdo --silent -t echam6 -f nc "+cdoop+" -select,name="+varname+" "+dailyfn(i)+" 'tmp_"+fns(i)+"' && mv 'tmp_"+fns(i)+"'  '"+fns(i)+"'")
             end do
             return fns
@@ -310,3 +311,7 @@ begin
     var1y@years = years
     return var1y
 end
+
+;; test
+;a = read_mpiexm_season_mean_ZLL("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",ispan(1060,1062,1),(/4,5,6/),1)
+;printVarSummary(a)

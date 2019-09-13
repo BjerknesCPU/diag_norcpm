@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { box-sizing: broder-box; }
+    .column {
+        float: left;
+        padding: 5px;
+        border-style: solid;
+        border-width: 1px;
+        }
+
+</style>
+</head>
+<body>
+    
+    <script>
+        var j = 0
+        var dirs=[ "NorCPM-Anomaly_coupled"
+            , "NorCPM_V1-ana_19800115_me_hindcasts"
+            , "NorCPM_V1b-ana_19800115_me_hindcasts"
+            , "NorCPM_V1c-ana_19800115_me_hindcasts"
+            , "NorCPM_V2-SeasHind_ana_me_ICEC-SST-S-T-1985-2010"
+            , "NorCPM_V2a-hindcast"
+            , "True_Obs-1980-2000-ana_19800115_me_hindcasts" ]; 
+        var sampledir="NorCPM_V1c-ana_19800115_me_hindcasts";
+        var recipes = [];
+        var figs=[];
+
+        //function change(...selIds){
+        function change(){
+            var i;
+            var selVal=[];
+            selIds=sels;
+            for (j=0; j<selIds.length; j++){
+                e = document.getElementById(selIds[j]);
+                selVal.push(e.options[e.selectedIndex].value);
+
+                };
+            e = document.getElementById('recipe');
+            recipe = e.options[e.selectedIndex].value;
+            switch (selVal.length){
+                case 1:
+                    figsel = figs[selVal[0]];
+                    break;
+                case 2:
+                    figsel = figs[selVal[0]][selVal[1]];
+                    break;
+                case 3:
+                    figsel = figs[selVal[0]][selVal[1]][selVal[2]];
+                    break;
+                };
+
+            figthumb = figsel.replace(/\.[^/.]+$/, '')+'_thumb.png';
+            figselpng = figsel+'.png';
+            for (i=0; i<dirs.length; i++) {
+                document.getElementById(dirs[i]).innerHTML = '<a href="'+dirs[i]+'/'+recipe+'/'+figselpng+'"><img src='+dirs[i]+'/'+recipe+'/'+figthumb+'></a>';
+                }
+            }
+        function update_recipe(){
+            var i;
+            var recipes;
+            e = document.getElementById('recipe');
+            fetch('jsons/recipes.json',{cache: "reload"})
+                .then(response => {
+                    return response.json()
+                    })
+                .then(data => {
+                    recipes = data;
+                    e.innerHTML += '<option>Select plot set</option>';
+                    for (i=0; i<recipes.length; i++) {
+                        e.innerHTML += '<option value="'+recipes[i]+'">'+recipes[i]+'</option>';
+                        };
+                })
+            }
+        function update_figloc(){
+            e = document.getElementById('recipe');
+            recipe = e.options[e.selectedIndex].value;
+            fetch(sampledir+'/'+recipe+'/'+recipe+'.json',{cache: "reload"})
+                .then(response => { return response.json()})
+                .then(data => { 
+                    figs = data.figures;
+                    sels = data.selectOrder;
+                    var selectText = '\n';
+                    for (i=0; i<sels.length; i++) {
+                        //selectText  += '<select id="'+sels[i]+'" onchange=change('+sels.join(', ')+')>';
+                        selectText  += '<select id="'+sels[i]+'" onchange=change()>';
+                        selectText  += '<option> Select '+sels[i]+'</option>\n'
+                        for (j=0; j<data.select[sels[i]].length; j++) {
+                            selectText += '<option value='+j+'>'+data.select[sels[i]][j]+'</option> \n';
+                        };
+                        selectText  += '</select>\n';
+                    }
+                    document.getElementById('selects').innerHTML = selectText;
+                })
+            }
+    </script>
+
+    <select id='recipe' onchange=update_figloc()>
+    </select>
+    <div id='selects'>
+    </div>
+    <!-- <button onclick="change()"> show js change() </button> -->
+
+    <div>
+    <div class="column">
+        <center><a href='True_Obs-1980-2000-ana_19800115_me_hindcasts/'><h4>seas-hind-V0</h4></a></center>
+        <div class="fig" id="True_Obs-1980-2000-ana_19800115_me_hindcasts">[Figure]</div>
+    </div>
+    <div class="column">
+        <center><a href='NorCPM_V1-ana_19800115_me_hindcasts'><h4>seas-hind-V1a</h4></a></center>
+        <div class="fig" id='NorCPM_V1-ana_19800115_me_hindcasts'>[Figure]</div>
+    </div>
+    <div class="column">
+        <center><a href='NorCPM_V1b-ana_19800115_me_hindcasts'><h4>seas-hind-V1b</h4></a></center>
+        <div class="fig" id="NorCPM_V1b-ana_19800115_me_hindcasts">[Figure]</div>
+    </div>
+    <div class="column">
+        <center><a href='NorCPM_V1c-ana_19800115_me_hindcasts'><h4>seas-hind-V1c</h4></a></center>
+        <div class="fig" id="NorCPM_V1c-ana_19800115_me_hindcasts">[Figure]</div>
+    </div>
+    <div class="column">
+        <center><a href='NorCPM_V2-SeasHind_ana_me_ICEC-SST-S-T-1985-2010'><h4>seas-hind-V2F</h4></a></center>
+        <div class="fig" id="NorCPM_V2-SeasHind_ana_me_ICEC-SST-S-T-1985-2010">[Figure]</div>
+    </div>
+    <div class="column">
+        <center><a href='NorCPM_V2a-hindcast'><h4>seas-hind-V2a</h4></a></center>
+        <div class="fig" id="NorCPM_V2a-hindcast">[Figure]</div>
+    </div>
+    <div class="column">
+        <center><a href='NorCPM-Anomaly_coupled'><h4>seas-hind-acpl</h4></a></center>
+        <div class="fig" id='NorCPM-Anomaly_coupled'>[Figure]</div>
+    </div>
+    </div>
+
+    <script>
+        update_recipe();
+        //update_figloc();
+    </script>
+
+<!--
+<script>
+fetch('jsons/recipes.json')
+    .then(res => res.json())
+    .then((out) => {
+        console.log('Output: ', out);
+}).catch(err => console.error(err));
+</script>
+<script>
+recipes = fetch('jsons/recipes.json');
+</script>
+-->
+</body>
+</html>
+

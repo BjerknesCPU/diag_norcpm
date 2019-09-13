@@ -35,7 +35,7 @@ begin
     ;;;; rightmost 2 dim: dims(ndim-2:ndim-1)
 
     ;; make weighting array
-    wgt = new(dims(ndim-2:ndim-1),"float")
+    ;wgt = new(dims(ndim-2:ndim-1),"float")
 
     ;;;; lat based weighting
     if(isatt(var,"lat2d"))then
@@ -49,10 +49,10 @@ begin
     else ;; coordinate
         lats = var&lat ;; need modify to a more flexiable form
         lons = var&lon
-        lat2d = conform_dim(dims(ndim-2:ndim-1),lats,0)
-        lat2d = conform_dim(dims(ndim-2:ndim-1),lons,1)
+        lat2d = conform_dims(dims(ndim-2:ndim-1),lats,0)
+        lon2d = conform_dims(dims(ndim-2:ndim-1),lons,1)
 
-        wgt = conform_dim(dims(ndim-2:ndim-1),NormCosWgtGlobe(lats),0)
+        wgt = conform_dims(dims(ndim-2:ndim-1),NormCosWgtGlobe(lats),0)
         wgt!0 = "lat"
         wgt!1 = "lon"
         wgt&lat = lats

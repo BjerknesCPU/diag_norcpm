@@ -60,3 +60,22 @@ Scripts:
     COLUMN: 5
     COMMENT: nino3.4 prediction skill, compare with persistence prediction.
                              
+-  # mk figures json for inter-version comparison
+    plotScript: mk_index_json.sh
+    JSONFILE: 13_nino34_predic_skill.json
+    FIGURES: 
+        fig_cor_forecast_REG 
+        fig_cor_forecast_REG_from_Jan
+        fig_cor_forecast_REG_from_Apr
+        fig_cor_forecast_REG_from_Jul
+        fig_cor_forecast_REG_from_Oct
+
+        fig_rmse_forecast_REG
+        fig_rmse_forecast_REG_from_Jan
+        fig_rmse_forecast_REG_from_Apr
+        fig_rmse_forecast_REG_from_Jul
+        fig_rmse_forecast_REG_from_Oct
+    SHAPE: 2 5
+    SELECTS: '"Corr. or RMSE"  "Initial month"'
+    OPTIONS: '"Correlation" "RMSE" "All forecast" "Jan" "Apr" "Jul" "Oct"'
+

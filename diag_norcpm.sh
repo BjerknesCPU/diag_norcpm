@@ -34,6 +34,7 @@ if [ -z "$(ls $BASEDIR/$RUNPRE* 2>/dev/null)" ]; then # if not, take first forec
 echo $RUNPRE
     RUNPRE=$(basename $RUNPRE 2>/dev/null | sed "s/[0-9]\{8\}$//")
 fi
+
 # plotRecipes: figures you want to plot, if none or empty means *.yml in Recipes/, Split with comma
 plotRecipes='mpiexm/A01_mpiexm_annualvar.yml'
 plotRecipes='16_AnoCor_seaice_frac.yml'
@@ -48,15 +49,26 @@ plotRecipes='testing/14_AtlNino_predic_skill.yml'
 plotRecipes='mpiexm/A01_mpiexm_annualvar.yml,mpiexm/A03_dif_tsurf.yml'
 plotRecipes='mpiexm/A01_mpiexm_annualvar.yml'
 plotRecipes='mpiexm/A04_annualvar_global.yml'
-plotRecipes='20_rank_histogram.yml'
 plotRecipes='20_rank_histogram.yml,21_rank_histogram_obs.yml,22_rank_histogram_ano_obs.yml'
-plotRecipes='13_nino34_predic_skill.yml' # take ~1hr
 plotRecipes='testing/T01_topic.yml' # testing topical recipe
 plotRecipes='17_AnoCor_sst_alllead.yml,18_AnoCor_prec.yml,14_AnoCor_sst_obs.yml'
-plotRecipes=''
-plotRecipes='14_AnoCor_sst_obs.yml,15_AnoCor_prec_obs.yml'
+plotRecipes='23_rank_histo_ts_ano.yml'
+plotRecipes='1A_AnoCor_z700_obs.yml'
+plotRecipes='mpiexm/A04_annualvar_global.yml'
+plotRecipes='mpiexm/A04b_ctl_annualvar_global.yml'
+plotRecipes='mpiexm/A04a_ctl_annualvar_global.yml'
+plotRecipes='mpiexm/A04c_ctl_annualvar_global.yml'
+plotRecipes='24_rank_histo_z700_ano.yml'
+plotRecipes='19_AnoCor_tsfc_obs.yml'
 plotRecipes='16_AnoCor_ohc_obs.yml'
-
+plotRecipes='13_nino34_predic_skill.yml' # take ~1hr
+plotRecipes='14_AnoCor_sst_obs.yml,15_AnoCor_prec_obs.yml'
+plotRecipes='20_rank_histogram.yml'
+plotRecipes=''
+plotRecipes='mpiexm/A04d_ctl_annualvar_global.yml'
+plotRecipes='mpiexm/A05d_dif_sst.yml'
+plotRecipes='mpiexm/A10_clidif_zmld.yml'
+plotRecipes='mpiexm/A20_varvar_zmld.yml'
 #--------------------------- case settings end -------------------------
 
 

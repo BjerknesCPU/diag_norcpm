@@ -46,12 +46,6 @@ begin
         end if
     end if
 
-    fvarnames = getfilevarnames(f)
-    if(.not.any(fvarnames.eq.varname))then
-        print("read_file_with_ranges(): "+varname+" not found in file ")
-        print(""+fvarnames)
-        exit
-    end if
     dims = getfilevardimsizes(f,varname)
     ndim = dimsizes(dims)
     dimnames = getfilevardims(f,varname)
@@ -83,7 +77,7 @@ begin
         end if
 
         reorder_dim_var(var)
-        return short2flt(var)
+        return var
     end if
     if(COORDed .and. (.not.COORD0time) .and. ndim.eq.3)then ;; assume lev is the first
         if(MultiFile)then
@@ -97,7 +91,7 @@ begin
             var = f->$varname$({levs},{min(ybe):max(ybe)},{min(xbe):max(xbe)})
         end if
         reorder_dim_var(var)
-        return short2flt(var)
+        return var
     end if
     if(COORDed .and. COORD0time        .and. ndim.eq.4)then ;; assume time is the first
         if(MultiFile)then
@@ -111,7 +105,7 @@ begin
             var = f->$varname$(indtime,{levs},{min(ybe):max(ybe)},{min(xbe):max(xbe)})
         end if
         reorder_dim_var(var)
-        return short2flt(var)
+        return var
     end if
     if(COORDed)then
         print("read_file_with_ranges(): not supported ndim: "+ndim)
@@ -177,7 +171,7 @@ begin
             var = f->$varname$(indtime,bs:bn,bw:be)
         end if
         reorder_dim_var(var)
-        return short2flt(var)
+        return var
     end if
     if(ndim .eq. 4)then
         if(MultiFile)then ;; t,z,y,x
@@ -195,7 +189,7 @@ begin
             end if
         end if
         reorder_dim_var(var)
-        return short2flt(var)
+        return var
     end if
 
     print("read_file_with_ranges(): unknow error")
@@ -228,7 +222,7 @@ begin
     do t = 0, nt-1
         fn = str_sub_str(fFmt,"{YYYY}",""+years(t))
         fn = str_sub_str(fn,"{MM}",sprinti("%2.2d",months(t)))
-        fns := array_append_record(fns,dataroot+"/"+dataset+"/"+fn,0)
+        fns := array_append_record(fns,fn,0)
     end do
     fns := fns(1:)
     ;; not done yet
@@ -327,23 +321,6 @@ begin
         end if
         return read_data_profile_03(dataroot, dataset, varname, years, months, lev, latbe, lonbe, opt)
     end if
-    if(dataroot.eq."~/NS9560K/shared/Obs" .and. str_match_bool_ic(dataset,"SSH/CLS"))then
-        ;; one month per file
-        opt = True
-            opt@filenameFmt = "{YYYY}_{MM}.nc"
-        return read_data_profile_01(dataroot, dataset, varname, years, months, lev, latbe, lonbe, opt)
-    end if
-    if(dataroot.eq."~/NS9560K/shared/Obs" .and. str_match_bool_ic(dataset,"HGT/ERA5"))then
-        ;; one file with all data
-        opt = True
-            opt@datafilename = "HGT/ERA5/era5_hgt.mon.mean_1979-2018.nc"
-        if(.not.ismissing(str_match_ic_regex(varname,"^z[0-9][0-9]*")))then
-            vn = "z"
-            vnlev = stringtoint(str_sub_str(varname,"z",""))
-            return read_data_profile_03(dataroot, dataset, vn, years, months, vnlev, latbe, lonbe, opt)
-        end if
-        return read_data_profile_03(dataroot, dataset, varname, years, months, lev, latbe, lonbe, opt)
-    end if
     if(dataroot.eq."~/NS9560K/shared/Obs" .and. str_match_bool_ic(dataset,"GISS"))then
         ;; one file with all data
         opt = True
@@ -428,50 +405,18 @@ end
     ;;    f = addfile("tmp.nc","c")
     ;;    f->a = a
 ;;
-    ;;    dataroot = "~/NS9560K/shared/Obs" ;;/PRECIP/GPCP.precip.mon.mean.nc"
-    ;;    dataset = "HGT/NCEP"
-    ;;    varname = "hgt"
-    ;;    years = (/1989,1990,1991,1992/)
-    ;;    months = years
-    ;;    months = 1
-    ;;    lev = 700
-    ;;    latbe = (/-90.,90./)
-    ;;    lonbe = (/0.,360./)
-    ;;    a = read_obs_framework_months(dataroot, dataset, varname, years, months, lev, latbe, lonbe)
-    ;;    printVarSummary(a)
-    ;;    printMinMax(a,0)
-    ;;    system("rm -f tmp.nc")
-    ;;    f = addfile("tmp.nc","c")
-    ;;    f->a = a
-;;
-    ;;    dataroot = "~/NS9560K/shared/Obs" ;;/PRECIP/GPCP.precip.mon.mean.nc"
-    ;;    dataset = "HGT/ERA5"
-    ;;    varname = "z"
-    ;;    years = (/1989,1990,1991,1992/)
-    ;;    months = years
-    ;;    months = 1
-    ;;    lev = 700
-    ;;    latbe = (/-90.,90./)
-    ;;    lonbe = (/0.,360./)
-    ;;    a = read_obs_framework_months(dataroot, dataset, varname, years, months, lev, latbe, lonbe)
-    ;;    printVarSummary(a)
-    ;;    printMinMax(a,0)
-    ;;    system("rm -f tmp.nc")
-    ;;    f = addfile("tmp.nc","c")
-    ;;    f->a = a
-;;
-    ;;    dataroot = "~/NS9560K/shared/Obs" 
-    ;;    dataset = "SSH/CLS"
-    ;;    varname = "zo"
-    ;;    years = (/1999,2000,2001,2002/)
-    ;;    months = years
-    ;;    months = 1
-    ;;    lev = -1
-    ;;    latbe = (/-90.,90./)
-    ;;    lonbe = (/0.,360./)
-    ;;    a = read_obs_framework_months(dataroot, dataset, varname, years, months, lev, latbe, lonbe)
-    ;;    printVarSummary(a)
-    ;;    printMinMax(a,0)
-    ;;    system("rm -f tmp.nc")
-    ;;    f = addfile("tmp.nc","c")
-    ;;    f->a = a
+    dataroot = "~/NS9560K/shared/Obs" ;;/PRECIP/GPCP.precip.mon.mean.nc"
+    dataset = "HGT/NCEP"
+    varname = "hgt850"
+    years = (/1989,1990,1991,1992/)
+    months = years
+    months = 1
+    lev = 0
+    latbe = (/-90.,90./)
+    lonbe = (/0.,360./)
+    a = read_obs_framework_months(dataroot, dataset, varname, years, months, lev, latbe, lonbe)
+    printVarSummary(a)
+    printMinMax(a,0)
+    system("rm -f tmp.nc")
+    f = addfile("tmp.nc","c")
+    f->a = a

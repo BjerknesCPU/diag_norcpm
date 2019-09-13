@@ -779,73 +779,73 @@ Scripts:
     plotScript: mk_html_page.sh
     FIGFILES:  |
         sst_global_rank_histogram_lead1_FMA
-        sst_global_rank_histogram_lead2_FMA
-        sst_global_rank_histogram_lead3_FMA
-        sst_global_rank_histogram_lead4_FMA
-        sst_global_rank_histogram_lead1_MJJ
         sst_global_rank_histogram_lead2_MJJ
-        sst_global_rank_histogram_lead3_MJJ
-        sst_global_rank_histogram_lead4_MJJ
-        sst_global_rank_histogram_lead1_ASO
-        sst_global_rank_histogram_lead2_ASO
         sst_global_rank_histogram_lead3_ASO
-        sst_global_rank_histogram_lead4_ASO
-        sst_global_rank_histogram_lead1_NDJ
-        sst_global_rank_histogram_lead2_NDJ
-        sst_global_rank_histogram_lead3_NDJ
         sst_global_rank_histogram_lead4_NDJ
+        sst_global_rank_histogram_lead1_MJJ
+        sst_global_rank_histogram_lead2_ASO
+        sst_global_rank_histogram_lead3_NDJ
+        sst_global_rank_histogram_lead4_FMA
+        sst_global_rank_histogram_lead1_ASO
+        sst_global_rank_histogram_lead2_NDJ
+        sst_global_rank_histogram_lead3_FMA
+        sst_global_rank_histogram_lead4_MJJ
+        sst_global_rank_histogram_lead1_NDJ
+        sst_global_rank_histogram_lead2_FMA
+        sst_global_rank_histogram_lead3_MJJ
+        sst_global_rank_histogram_lead4_ASO
 
         sst_rank_freq_bins_lead1_FMA
-        sst_rank_freq_bins_lead1_MJJ
-        sst_rank_freq_bins_lead1_ASO
-        sst_rank_freq_bins_lead1_NDJ
-        sst_rank_freq_bins_lead2_FMA
         sst_rank_freq_bins_lead2_MJJ
-        sst_rank_freq_bins_lead2_ASO
-        sst_rank_freq_bins_lead2_NDJ
-        sst_rank_freq_bins_lead3_FMA
-        sst_rank_freq_bins_lead3_MJJ
         sst_rank_freq_bins_lead3_ASO
+        sst_rank_freq_bins_lead4_NDJ
+        sst_rank_freq_bins_lead1_MJJ
+        sst_rank_freq_bins_lead2_ASO
         sst_rank_freq_bins_lead3_NDJ
         sst_rank_freq_bins_lead4_FMA
+        sst_rank_freq_bins_lead1_ASO
+        sst_rank_freq_bins_lead2_NDJ
+        sst_rank_freq_bins_lead3_FMA
         sst_rank_freq_bins_lead4_MJJ
+        sst_rank_freq_bins_lead1_NDJ
+        sst_rank_freq_bins_lead2_FMA
+        sst_rank_freq_bins_lead3_MJJ
         sst_rank_freq_bins_lead4_ASO
-        sst_rank_freq_bins_lead4_NDJ
 
         sst_NAtl_rank_histogram_lead1_FMA
-        sst_NAtl_rank_histogram_lead2_FMA
-        sst_NAtl_rank_histogram_lead3_FMA
-        sst_NAtl_rank_histogram_lead4_FMA
-        sst_NAtl_rank_histogram_lead1_MJJ
         sst_NAtl_rank_histogram_lead2_MJJ
-        sst_NAtl_rank_histogram_lead3_MJJ
-        sst_NAtl_rank_histogram_lead4_MJJ
-        sst_NAtl_rank_histogram_lead1_ASO
-        sst_NAtl_rank_histogram_lead2_ASO
         sst_NAtl_rank_histogram_lead3_ASO
-        sst_NAtl_rank_histogram_lead4_ASO
-        sst_NAtl_rank_histogram_lead1_NDJ
-        sst_NAtl_rank_histogram_lead2_NDJ
-        sst_NAtl_rank_histogram_lead3_NDJ
         sst_NAtl_rank_histogram_lead4_NDJ
+        sst_NAtl_rank_histogram_lead1_MJJ
+        sst_NAtl_rank_histogram_lead2_ASO
+        sst_NAtl_rank_histogram_lead3_NDJ
+        sst_NAtl_rank_histogram_lead4_FMA
+        sst_NAtl_rank_histogram_lead1_ASO
+        sst_NAtl_rank_histogram_lead2_NDJ
+        sst_NAtl_rank_histogram_lead3_FMA
+        sst_NAtl_rank_histogram_lead4_MJJ
+        sst_NAtl_rank_histogram_lead1_NDJ
+        sst_NAtl_rank_histogram_lead2_FMA
+        sst_NAtl_rank_histogram_lead3_MJJ
+        sst_NAtl_rank_histogram_lead4_ASO
 
         sst_WNPac_rank_histogram_lead1_FMA
-        sst_WNPac_rank_histogram_lead2_FMA
-        sst_WNPac_rank_histogram_lead3_FMA
-        sst_WNPac_rank_histogram_lead4_FMA
-        sst_WNPac_rank_histogram_lead1_MJJ
         sst_WNPac_rank_histogram_lead2_MJJ
-        sst_WNPac_rank_histogram_lead3_MJJ
-        sst_WNPac_rank_histogram_lead4_MJJ
-        sst_WNPac_rank_histogram_lead1_ASO
-        sst_WNPac_rank_histogram_lead2_ASO
         sst_WNPac_rank_histogram_lead3_ASO
-        sst_WNPac_rank_histogram_lead4_ASO
-        sst_WNPac_rank_histogram_lead1_NDJ
-        sst_WNPac_rank_histogram_lead2_NDJ
-        sst_WNPac_rank_histogram_lead3_NDJ
         sst_WNPac_rank_histogram_lead4_NDJ
-    COLUMN: season leadSeason=1 leadSeason=2 leadSeason=3 leadSeason=4 '</tr><tr>' global '</tr><tr>' FMA 4 MJJ 4 ASO 4 NDJ 4 Sidebins '</tr><tr>' FMA 4 MJJ 4 ASO 4 NDJ 4 NAtl '</tr><tr>' FMA 4 MJJ 4 ASO 4 NDJ 4 WNPac '</tr><tr>' FMA 4 MJJ 4 ASO 4 NDJ 4
+        sst_WNPac_rank_histogram_lead1_MJJ
+        sst_WNPac_rank_histogram_lead2_ASO
+        sst_WNPac_rank_histogram_lead3_NDJ
+        sst_WNPac_rank_histogram_lead4_FMA
+        sst_WNPac_rank_histogram_lead1_ASO
+        sst_WNPac_rank_histogram_lead2_NDJ
+        sst_WNPac_rank_histogram_lead3_FMA
+        sst_WNPac_rank_histogram_lead4_MJJ
+        sst_WNPac_rank_histogram_lead1_NDJ
+        sst_WNPac_rank_histogram_lead2_FMA
+        sst_WNPac_rank_histogram_lead3_MJJ
+        sst_WNPac_rank_histogram_lead4_ASO
+    COLUMN: season leadSeason=1 leadSeason=2 leadSeason=3 leadSeason=4 '</tr><tr>' global '</tr><tr>' 'fromJan' 4 'fromApr' 4 'fromJul' 4 'fromOct' 4 Sidebins '</tr><tr>' 'fromJan' 4 'fromApr' 4 'fromJul' 4 'fromOct' 4 NAtl '</tr><tr>' 'fromJan' 4 'fromApr' 4 'fromJul' 4 'fromOct' 4 WNPac '</tr><tr>' 'fromJan' 4 'fromApr' 4 'fromJul' 4 'fromOct' 4
     COMMENT: |
         SST anomaly Rank histogram at global, NAtl(20-70N, 110W-40E) and WNPac(20-70N, 110E-180)
         HadISST as observation data.
@@ -855,3 +855,78 @@ Scripts:
         Large at most left bin  -> model members are underestimate.
         Bell shape -> model simulation is too diverse.
         Inverted bell shape -> model simulation is too concentrated.
+
+-  # mk figures json for inter-version comparison
+    plotScript: mk_index_json.sh
+    JSONFILE: 22_rank_histogram_ano_obs.json
+    SHAPE: 4 4 4
+    SELECTS: '"Region/type" "Initial Time" "Forecast Months"'
+    OPTIONS: '"Global" "SideBins" "NAtl" "WNPac" "from Jan" "from Apr" "from Jul" "from Oct" "1-3" "4-6" "7-9" "10-12"'
+    FIGURES: 
+        sst_global_rank_histogram_lead1_FMA
+        sst_global_rank_histogram_lead2_MJJ
+        sst_global_rank_histogram_lead3_ASO
+        sst_global_rank_histogram_lead4_NDJ
+        sst_global_rank_histogram_lead1_MJJ
+        sst_global_rank_histogram_lead2_ASO
+        sst_global_rank_histogram_lead3_NDJ
+        sst_global_rank_histogram_lead4_FMA
+        sst_global_rank_histogram_lead1_ASO
+        sst_global_rank_histogram_lead2_NDJ
+        sst_global_rank_histogram_lead3_FMA
+        sst_global_rank_histogram_lead4_MJJ
+        sst_global_rank_histogram_lead1_NDJ
+        sst_global_rank_histogram_lead2_FMA
+        sst_global_rank_histogram_lead3_MJJ
+        sst_global_rank_histogram_lead4_ASO
+
+        sst_rank_freq_bins_lead1_FMA
+        sst_rank_freq_bins_lead2_MJJ
+        sst_rank_freq_bins_lead3_ASO
+        sst_rank_freq_bins_lead4_NDJ
+        sst_rank_freq_bins_lead1_MJJ
+        sst_rank_freq_bins_lead2_ASO
+        sst_rank_freq_bins_lead3_NDJ
+        sst_rank_freq_bins_lead4_FMA
+        sst_rank_freq_bins_lead1_ASO
+        sst_rank_freq_bins_lead2_NDJ
+        sst_rank_freq_bins_lead3_FMA
+        sst_rank_freq_bins_lead4_MJJ
+        sst_rank_freq_bins_lead1_NDJ
+        sst_rank_freq_bins_lead2_FMA
+        sst_rank_freq_bins_lead3_MJJ
+        sst_rank_freq_bins_lead4_ASO
+
+        sst_NAtl_rank_histogram_lead1_FMA
+        sst_NAtl_rank_histogram_lead2_MJJ
+        sst_NAtl_rank_histogram_lead3_ASO
+        sst_NAtl_rank_histogram_lead4_NDJ
+        sst_NAtl_rank_histogram_lead1_MJJ
+        sst_NAtl_rank_histogram_lead2_ASO
+        sst_NAtl_rank_histogram_lead3_NDJ
+        sst_NAtl_rank_histogram_lead4_FMA
+        sst_NAtl_rank_histogram_lead1_ASO
+        sst_NAtl_rank_histogram_lead2_NDJ
+        sst_NAtl_rank_histogram_lead3_FMA
+        sst_NAtl_rank_histogram_lead4_MJJ
+        sst_NAtl_rank_histogram_lead1_NDJ
+        sst_NAtl_rank_histogram_lead2_FMA
+        sst_NAtl_rank_histogram_lead3_MJJ
+        sst_NAtl_rank_histogram_lead4_ASO
+
+        sst_WNPac_rank_histogram_lead1_FMA
+        sst_WNPac_rank_histogram_lead2_MJJ
+        sst_WNPac_rank_histogram_lead3_ASO
+        sst_WNPac_rank_histogram_lead4_NDJ
+        sst_WNPac_rank_histogram_lead1_MJJ
+        sst_WNPac_rank_histogram_lead2_ASO
+        sst_WNPac_rank_histogram_lead3_NDJ
+        sst_WNPac_rank_histogram_lead4_FMA
+        sst_WNPac_rank_histogram_lead1_ASO
+        sst_WNPac_rank_histogram_lead2_NDJ
+        sst_WNPac_rank_histogram_lead3_FMA
+        sst_WNPac_rank_histogram_lead4_MJJ
+        sst_WNPac_rank_histogram_lead1_NDJ
+        sst_WNPac_rank_histogram_lead2_FMA
+        sst_WNPac_rank_histogram_lead3_MJJ
+        sst_WNPac_rank_histogram_lead4_ASO

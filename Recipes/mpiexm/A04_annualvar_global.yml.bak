@@ -1,16 +1,18 @@
 # plot data variance in mpiexm
 # mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
 
-Title: IEsam and IEave SST Annual variance ratio with control run
+Title: Sampling and average exp
 Description: 
     Case plot for mpiexm compare
 COMPONENT:  mpiom
 VARIABLE:  sst
 PLOTRES: |
-    res@mpMinLatF = 20.
-    res@mpMaxLatF = 70.
-    res@mpMinLonF = -110.
-    res@mpMaxLonF =   40.
+    res@mpLimitMode = "LatLon"
+    res@mpMinLatF = -90.
+    res@mpMaxLatF = 90.
+    res@mpMinLonF = -330.
+    res@mpMaxLonF =   30.
+    res@mpCenterLonF =   -150.
     res@cnLinesOn = False
     res@cnFillOn = True
     res@lbOrientation = "Vertical"
@@ -21,7 +23,7 @@ PLOTRES: |
     res@cnLevelSelectionMode = "ExplicitLevels"
     ;res@cnLevels = (/.2,1,2,3,4,5/)
     res@cnLevels = (/.2,.4,.6,.8,1.,1.2/)
-    res@gsnRightString = "1"
+    res@gsnRightString = "non-dimensional"
 
     lres@cnLineColor = "Red"
     lres@cnLinesOn = True
@@ -33,247 +35,237 @@ PLOTRES: |
 
 CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
     ## CASE define later
-CCASE: f07_1AGCM
-CONTROLDIR: /tos-project4/NS9207K/pgchiu/CCASE
-CONTROLYEARBE: 1051,1150
-NYC: 100
-
-CAA: f07_5AGCMs_NASPG_average
-CNA: IEave
-YBEA: 1051,1100
-NYA: 50
-CAS: f07_5AGCMs_NASPG_sample
-CNS: IEsam
-YBES: 1051,1100
-NYS: 50
-
+CCASE: f05_1AGCM
+CONTROLDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CCASE
+CONTROLYEARBE: 1950,2050
 
 Scripts:
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
-    CASE: CAA
-    YEARBE: YBEA
-    TITLE: "yearly SST variance ratio CNA/Control (nyear: IE=NYA, CTL=NYC)"
+    CASE: f06_5AGCMs_NASPG_average_pgchiu
+    YEARBE: 1950,2050
+    TITLE: "yearly SST variance ratio IEave/Control (nyear: IE=101, CTL=101)"
     FIGFILENAME: sst_var_ratio_average_case
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
-    CASE: CAS
-    YEARBE: YBES
-    TITLE: "yearly SST variance ratio CNS/Control (nyear: IE=NYS, CTL=NYC)"
+    CASE: f06_5AGCMs_NASPG_sample
+    YEARBE: 2050,2140
+    TITLE: "yearly SST variance ratio IEsam/Control (nyear: IE=91, CTL=101)"
     FIGFILENAME: sst_var_ratio_sample_case
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
-    CASE: CAS
-    YEARBE: YBES
+    CASE: f06_5AGCMs_NASPG_sample
+    YEARBE: 2050,2140
     MONTHS: 12,1,2
-    TITLE: "yearly SST variance ratio CNS/Control DJF (nyear: IE=NYS, CTL=NYC)"
+    TITLE: "yearly SST variance ratio IEsam/Control DJF (nyear: IE=91, CTL=101)"
     FIGFILENAME: sst_var_ratio_sample_case_DJF
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
-    CASE: CAA
-    YEARBE: YBEA
+    CASE: f06_5AGCMs_NASPG_average_pgchiu
+    YEARBE: 1950,2050
     MONTHS: 12,1,2
-    TITLE: "yearly SST variance ratio CNA/Control DJF (nyear: IE=NYA, CTL=NYC)"
+    TITLE: "yearly SST variance ratio IEave/Control DJF (nyear: IE=101, CTL=101)"
     FIGFILENAME: sst_var_ratio_average_case_DJF
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
-    CASE: CAS
-    YEARBE: YBES
+    CASE: f06_5AGCMs_NASPG_sample
+    YEARBE: 2050,2140
     MONTHS: 3,4,5
-    TITLE: "yearly SST variance ratio CNS/Control MAM (nyear: IE=NYS, CTL=NYC)"
+    TITLE: "yearly SST variance ratio IEsam/Control MAM (nyear: IE=91, CTL=101)"
     FIGFILENAME: sst_var_ratio_sample_case_MAM
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
-    CASE: CAA
-    YEARBE: YBEA
+    CASE: f06_5AGCMs_NASPG_average_pgchiu
+    YEARBE: 1950,2050
     MONTHS: 3,4,5
-    TITLE: "yearly SST variance ratio CNA/Control MAM (nyear: IE=NYA, CTL=NYC)"
+    TITLE: "yearly SST variance ratio IEave/Control MAM (nyear: IE=101, CTL=101)"
     FIGFILENAME: sst_var_ratio_average_case_MAM
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
-    CASE: CAS
-    YEARBE: YBES
+    CASE: f06_5AGCMs_NASPG_sample
+    YEARBE: 2050,2140
     MONTHS: 6,7,8
-    TITLE: "yearly SST variance ratio CNS/Control JJA (nyear: IE=NYS, CTL=NYC)"
+    TITLE: "yearly SST variance ratio IEsam/Control JJA (nyear: IE=91, CTL=101)"
     FIGFILENAME: sst_var_ratio_sample_case_JJA
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
-    CASE: CAA
-    YEARBE: YBEA
+    CASE: f06_5AGCMs_NASPG_average_pgchiu
+    YEARBE: 1950,2050
     MONTHS: 6,7,8
-    TITLE: "yearly SST variance ratio CNA/Control JJA (nyear: IE=NYA, CTL=NYC)"
+    TITLE: "yearly SST variance ratio IEave/Control JJA (nyear: IE=101, CTL=101)"
     FIGFILENAME: sst_var_ratio_average_case_JJA
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
-    CASE: CAS
-    YEARBE: YBES
+    CASE: f06_5AGCMs_NASPG_sample
+    YEARBE: 2050,2140
     MONTHS: 9,10,11
-    TITLE: "yearly SST variance ratio CNS/Control SON (nyear: IE=NYS, CTL=NYC)"
+    TITLE: "yearly SST variance ratio IEsam/Control SON (nyear: IE=91, CTL=101)"
     FIGFILENAME: sst_var_ratio_sample_case_SON
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
-    CASE: CAA
-    YEARBE: YBEA
+    CASE: f06_5AGCMs_NASPG_average_pgchiu
+    YEARBE: 1950,2050
     MONTHS: 9,10,11
-    TITLE: "yearly SST variance ratio CNA/Control SON (nyear: IE=NYA, CTL=NYC)"
+    TITLE: SST variance ratio IEave/Control SON (myear:1950-2050,ctl:1950-2050)
+    TITLE: "yearly SST variance ratio IEave/Control SON (nyear: IE=101, CTL=101)"
     FIGFILENAME: sst_var_ratio_average_case_SON
 
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
-    CASE: CAS
-    YEARBE: YBES
+    CASE: f06_5AGCMs_NASPG_sample
+    YEARBE: 2050,2140
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CNS 50N-60N,40W-10W
+    TITLE: SST ts IEsam 50N-60N,40W-10W
     FIGFILENAME: sst_ts_sample_case
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
-    CASE: CAA
-    YEARBE: YBEA
+    CASE: f06_5AGCMs_NASPG_average_pgchiu
+    YEARBE: 1950,2050
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CNA 50N-60N,40W-10W
+    TITLE: SST ts IEave 50N-60N,40W-10W
     FIGFILENAME: sst_ts_average_case
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
     CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
-    YEARBE: YBEA
+    YEARBE: 1950,2050
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CASE 50N-60N,40W-10W
+    TITLE: SST ts Control 50N-60N,40W-10W
     FIGFILENAME: sst_ts_control_case
 
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
-    CASE: CAS
-    YEARBE: YBES
+    CASE: f06_5AGCMs_NASPG_sample
+    YEARBE: 2050,2140
     MONTHS: 12,1,2
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CNS DJF 50N-60N,40W-10W
+    TITLE: SST ts IEsam DJF 50N-60N,40W-10W
     FIGFILENAME: sst_ts_sample_case_DJF
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
-    CASE: CAA
-    YEARBE: YBEA
+    CASE: f06_5AGCMs_NASPG_average_pgchiu
+    YEARBE: 1950,2050
     MONTHS: 12,1,2
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CNA DJF 50N-60N,40W-10W
+    TITLE: SST ts IEave DJF 50N-60N,40W-10W
     FIGFILENAME: sst_ts_average_case_DJF
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
     CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
-    YEARBE: YBEA
+    YEARBE: 1950,2050
     MONTHS: 12,1,2
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CASE DJF 50N-60N,40W-10W
+    TITLE: SST ts Control DJF 50N-60N,40W-10W
     FIGFILENAME: sst_ts_control_case_DJF
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
-    CASE: CAS
-    YEARBE: YBES
+    CASE: f06_5AGCMs_NASPG_sample
+    YEARBE: 2050,2140
     MONTHS: 3,4,5
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CNS MAM 50N-60N,40W-10W
+    TITLE: SST ts IEsam MAM 50N-60N,40W-10W
     FIGFILENAME: sst_ts_sample_case_MAM
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
-    CASE: CAA
-    YEARBE: YBEA
+    CASE: f06_5AGCMs_NASPG_average_pgchiu
+    YEARBE: 1950,2050
     MONTHS: 3,4,5
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CNA MAM 50N-60N,40W-10W
+    TITLE: SST ts IEave MAM 50N-60N,40W-10W
     FIGFILENAME: sst_ts_average_case_MAM
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
     CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
-    YEARBE: YBEA
+    YEARBE: 1950,2050
     MONTHS: 3,4,5
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CASE MAM 50N-60N,40W-10W
+    TITLE: SST ts Control MAM 50N-60N,40W-10W
     FIGFILENAME: sst_ts_control_case_MAM
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
-    CASE: CAS
-    YEARBE: YBES
+    CASE: f06_5AGCMs_NASPG_sample
+    YEARBE: 2050,2140
     MONTHS: 6,7,8
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CNS JJA 50N-60N,40W-10W
+    TITLE: SST ts IEsam JJA 50N-60N,40W-10W
     FIGFILENAME: sst_ts_sample_case_JJA
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
-    CASE: CAA
-    YEARBE: YBEA
+    CASE: f06_5AGCMs_NASPG_average_pgchiu
+    YEARBE: 1950,2050
     MONTHS: 6,7,8
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CNA JJA 50N-60N,40W-10W
+    TITLE: SST ts IEave JJA 50N-60N,40W-10W
     FIGFILENAME: sst_ts_average_case_JJA
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
     CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
-    YEARBE: YBEA
+    YEARBE: 1950,2050
     MONTHS: 6,7,8
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CASE JJA 50N-60N,40W-10W
+    TITLE: SST ts Control JJA 50N-60N,40W-10W
     FIGFILENAME: sst_ts_control_case_JJA
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
-    CASE: CAS
-    YEARBE: YBES
+    CASE: f06_5AGCMs_NASPG_sample
+    YEARBE: 2050,2140
     MONTHS: 9,10,11
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CNS SON 50N-60N,40W-10W
+    TITLE: SST ts IEsam SON 50N-60N,40W-10W
     FIGFILENAME: sst_ts_sample_case_SON
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
-    CASE: CAA
-    YEARBE: YBEA
+    CASE: f06_5AGCMs_NASPG_average_pgchiu
+    YEARBE: 1950,2050
     MONTHS: 9,10,11
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CNA SON 50N-60N,40W-10W
+    TITLE: SST ts IEave SON 50N-60N,40W-10W
     FIGFILENAME: sst_ts_average_case_SON
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
     CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
-    YEARBE: YBEA
+    YEARBE: 1950,2050
     MONTHS: 9,10,11
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CASE SON 50N-60N,40W-10W
+    TITLE: SST ts Control SON 50N-60N,40W-10W
     FIGFILENAME: sst_ts_control_case_SON
 
 -  
     plotScript: mk_html_page.sh
     FIGFILES: sst_var_ratio_sample_case sst_var_ratio_average_case sst_ts_sample_case sst_ts_average_case sst_ts_control_case sst_var_ratio_sample_case_DJF sst_var_ratio_average_case_DJF sst_var_ratio_sample_case_MAM sst_var_ratio_average_case_MAM sst_var_ratio_sample_case_JJA sst_var_ratio_average_case_JJA sst_var_ratio_sample_case_SON sst_var_ratio_average_case_SON sst_ts_sample_case_DJF sst_ts_average_case_DJF sst_ts_control_case_DJF sst_ts_sample_case_MAM sst_ts_average_case_MAM sst_ts_control_case_MAM sst_ts_sample_case_JJA sst_ts_average_case_JJA sst_ts_control_case_JJA sst_ts_sample_case_SON sst_ts_average_case_SON sst_ts_control_case_SON 
-    COLUMN: figs CNS CNA Control '</tr><tr>' ANN 2 ANN 3 DJF 2 MAM 2 JJA 2 SON 2 DJF 3 MAM 3 JJA 3 SON 3
+    COLUMN: figs IEsam IEave Control '</tr><tr>' ANN 2 ANN 3 DJF 2 MAM 2 JJA 2 SON 2 DJF 3 MAM 3 JJA 3 SON 3
     COMMENT: SST variance ratio to control run #, and annual anomaly time series.

@@ -26,20 +26,16 @@ begin
     modelns = MODELN  ;; if use echam6
     nmodel = dimsizes(modelns)
 
-    ccase = "CCASE"
-    controldir = "CONTROLDIR"
-    cybe = (/CONTROLYEARBE/)
-
     ;; get case ensemble
     if(isfilepresent(cachefile))then
         f = addfile(cachefile,"r")
-        vardif = f->vardif
-        if(isatt(vardif,"lat2d"))then ;; netcdf cannot save 2d attitude
-            dims = dimsizes(vardif)
+        varens = f->varens
+        if(isatt(varens,"lat2d"))then ;; netcdf cannot save 2d attitude
+            dims = dimsizes(varens)
             ndim = dimsizes(dims)
             dims := dims(ndim-2:)
-            vardif@lat2d := onedtond(vardif@lat2d,dims)
-            vardif@lon2d := onedtond(vardif@lon2d,dims)
+            varens@lat2d := onedtond(varens@lat2d,dims)
+            varens@lon2d := onedtond(varens@lon2d,dims)
             delete(dims)
             delete(ndim)
         end if
@@ -51,19 +47,14 @@ begin
         end do
 
         ;print("reading control ")
-        ;; get control data, assume only 1 model 
-        varcon = read_mpiexm_season_mean_ZLL(ccase,controldir,component,varname,ispan(min(cybe),max(cybe),1),months,0)
-
-        vardif = varens  ;; get coordinate
-        vardif = varens - varcon
 
         f = addfile(cachefile,"c")
-        f->vardif = vardif
+        f->varens = varens
     end if
 
-    dims = dimsizes(vardif)
+    dims = dimsizes(varens)
     if(dims(0).eq.1)then ;; if only 1 level
-        vardif := vardif(0,:,:) ;; 
+        varens := varens(0,:,:) ;; 
     end if
 
     res = True
@@ -71,6 +62,6 @@ begin
     PLOTRES
 
     wks = gsn_open_wks("ps",figfn)
-    plot = gsn_csm_contour_map(wks,vardif,res)
+    plot = gsn_csm_contour_map(wks,varens,res)
     
 end

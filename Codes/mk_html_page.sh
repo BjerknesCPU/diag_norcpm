@@ -4,8 +4,8 @@
     # figure files name "without suffix"
     # should be ps or png file
 #;DIAG_NORCPM; HTMLFILENAME: index.html
-#;DIAG_NORCPM; COMMENT: COMMENT here
 #;DIAG_NORCPM; TITLE: TITLE here
+#;DIAG_NORCPM; COMMENT: COMMENT here
 #;DIAG_NORCPM; COLUMN: 1
 
 # parameters
@@ -21,19 +21,19 @@ ncolarr=${#column[*]}
 export MAGICK_THREAD_LIMIT=1   ## avoid "libgomp: Thread creation failed"
 
 # html header
-echo ''
-echo '<!DOCTYPE html>'              >  "${htmlfn}"
-echo '<html>'                       >> "${htmlfn}"
-echo '<body>'                       >> "${htmlfn}"
+text=$'\n'
+text+=$'<!DOCTYPE html>\n'
+text+=$'<html>\n'
+text+=$'<body>\n'
 
 # put comment on top
-echo '<div id=comment>'             >> "${htmlfn}"
-echo '<p>'                          >> "${htmlfn}"
-echo '<pre>'                        >> "${htmlfn}"
-echo "$comment"                     >> "${htmlfn}"
-echo '</pre>'                       >> "${htmlfn}"
-#echo '</p>'                         >> "${htmlfn}"
-echo '</div>'                       >> "${htmlfn}"
+text+=$'<div id=comment>\n'
+text+=$'<p>\n'
+text+=$'<pre>\n'
+text+="$comment"
+text+=$'</pre>\n'
+#text+=$'</p>\n'
+text+=$'</div>\n'
 
 
 # convert ps to png and output entry to html
@@ -42,8 +42,8 @@ row=1
 icol=0
 
 
-echo "<table>"    >> "${htmlfn}"
-echo "<tr>"       >> "${htmlfn}"
+text+="<table>"$'\n'
+text+="<tr>"$'\n'
 
 # if column start with non integer
 while [ ! -z "${column[$icol]}" ] ; do
@@ -51,9 +51,9 @@ while [ ! -z "${column[$icol]}" ] ; do
         break
     else
         if [ "${column[$icol]}" = '</tr><tr>' ]; then
-            echo "${column[$icol]}"             >> "${htmlfn}"
+            text+="${column[$icol]}"$'\n'
         else
-            echo "<th>${column[$icol]}</th>"    >> "${htmlfn}"
+            text+="<th>${column[$icol]}</th>"$'\n'
         fi
         icol=$(expr $icol + 1)
     fi
@@ -75,16 +75,16 @@ for i in ${figs}; do
     fi
 
     ## fig entry
-    echo "<th><a href='${i}.png'><img src='${i}_thumb.png'></a></th>"    >> "${htmlfn}"
+    text+="<th><a href='${i}.png'><img src='${i}_thumb.png'></a></th>"$'\n'
     if [ $row -ge $col ];then
-        echo '</tr>' >> "${htmlfn}"
-        echo '<tr>' >> "${htmlfn}"
+        text+=$'</tr>\n'
+        text+=$'<tr>\n'
         icol=$(expr $icol + 1)
         while [ ! -z "${column[$icol]}" ] ; do
             if [[ "${column[$icol]}" =~ ^[0-9]+$ ]] ; then
                 break
             else
-                echo "<th><b>${column[$icol]}</b></th>"    >> "${htmlfn}"
+                text+="<th><b>${column[$icol]}</b></th>"$'\n'
                 icol=$(expr $icol + 1)
             fi
         done
@@ -97,9 +97,12 @@ for i in ${figs}; do
         row=$(expr $row + 1)
     fi
 done
-echo "</tr>"       >> "${htmlfn}"
-echo "</table>"    >> "${htmlfn}"
+text+="</tr>"$'\n'
+text+="</table>"$'\n'
 
 # html footer
-echo '</body>'  >>"${htmlfn}"
-echo '</html> '  >>"${htmlfn}"
+text+=$'</body>\n'
+text+=$'</html> \n'
+
+# output to html file
+echo "${text}" >  "${htmlfn}"

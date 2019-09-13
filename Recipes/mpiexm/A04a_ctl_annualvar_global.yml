@@ -1,16 +1,18 @@
 # plot data variance in mpiexm
 # mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
 
-Title: IEsam and IEave SST Annual variance ratio with control run
+Title: SST Annual variance ratio of 2 control run
 Description: 
     Case plot for mpiexm compare
 COMPONENT:  mpiom
 VARIABLE:  sst
 PLOTRES: |
-    res@mpMinLatF = 20.
-    res@mpMaxLatF = 70.
-    res@mpMinLonF = -110.
-    res@mpMaxLonF =   40.
+    res@mpLimitMode = "LatLon"
+    res@mpMinLatF = -90.
+    res@mpMaxLatF = 90.
+    res@mpMinLonF = -330.
+    res@mpMaxLonF =   30.
+    res@mpCenterLonF =   -150.
     res@cnLinesOn = False
     res@cnFillOn = True
     res@lbOrientation = "Vertical"
@@ -33,19 +35,20 @@ PLOTRES: |
 
 CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
     ## CASE define later
-CCASE: f07_1AGCM
-CONTROLDIR: /tos-project4/NS9207K/pgchiu/CCASE
-CONTROLYEARBE: 1051,1150
+
+CCASE: f05_1AGCM
+CONTROLDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CCASE
+CONTROLYEARBE: 1951,2050
 NYC: 100
 
-CAA: f07_5AGCMs_NASPG_average
-CNA: IEave
-YBEA: 1051,1100
-NYA: 50
-CAS: f07_5AGCMs_NASPG_sample
-CNS: IEsam
-YBES: 1051,1100
-NYS: 50
+CAA: f07_1AGCM
+CNA: f07_early
+YBEA: 1051,1150
+NYA: 100 
+CAS: f07_1AGCM
+CNS: f07_later
+YBES: 1134,1233
+NYS: 100
 
 
 Scripts:
@@ -140,11 +143,11 @@ Scripts:
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
     CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
-    YEARBE: YBEA
+    YEARBE: 1951,2050
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CASE 50N-60N,40W-10W
+    TITLE: SST ts Control 50N-60N,40W-10W
     FIGFILENAME: sst_ts_control_case
 
 -  
@@ -171,12 +174,12 @@ Scripts:
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
     CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
-    YEARBE: YBEA
+    YEARBE: 1951,2050
     MONTHS: 12,1,2
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CASE DJF 50N-60N,40W-10W
+    TITLE: SST ts Control DJF 50N-60N,40W-10W
     FIGFILENAME: sst_ts_control_case_DJF
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
@@ -202,12 +205,12 @@ Scripts:
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
     CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
-    YEARBE: YBEA
+    YEARBE: 1951,2050
     MONTHS: 3,4,5
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CASE MAM 50N-60N,40W-10W
+    TITLE: SST ts Control MAM 50N-60N,40W-10W
     FIGFILENAME: sst_ts_control_case_MAM
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
@@ -233,12 +236,12 @@ Scripts:
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
     CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
-    YEARBE: YBEA
+    YEARBE: 1951,2050
     MONTHS: 6,7,8
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CASE JJA 50N-60N,40W-10W
+    TITLE: SST ts Control JJA 50N-60N,40W-10W
     FIGFILENAME: sst_ts_control_case_JJA
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
@@ -264,12 +267,12 @@ Scripts:
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
     CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
-    YEARBE: YBEA
+    YEARBE: 1951,2050
     MONTHS: 9,10,11
     LATBE: 50.,60.
     LONBE: -40.,-10.
     PLOTRES:
-    TITLE: SST ts CASE SON 50N-60N,40W-10W
+    TITLE: SST ts Control SON 50N-60N,40W-10W
     FIGFILENAME: sst_ts_control_case_SON
 
 -  

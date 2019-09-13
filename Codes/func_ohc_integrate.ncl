@@ -1,7 +1,7 @@
-
-function cal_ohc_with_temp_salinity_TZLL(temp[*][*][*][*],salinity[*][*][*][*],to_depth)
+function cal_ohc_sal_with_temp_salinity_TZLL(temp[*][*][*][*],salinity[*][*][*][*],to_depth,ohcorsal)
 begin
     ;;  cal ohc with temperature(degC) and salinity(PSU or g/kg)
+    ;;          or vertical integrated salinity
     ;;      cal density first: use rho_mwjf(t2d,s2d,depth) 
     ;;  to_depth: integrate from surface to depth
     ;;  return ohc(T,L,L)
@@ -10,6 +10,7 @@ begin
     datadepths = temp&$temp!1$
 
     datanz = dimsizes(datadepths)
+    ;print("cal_ohc_with_temp_salinity_TZLL(): "+datanz+"depth levels")
     if(isatt(temp,"depth_bnds"))then
         depth_bnds = temp@depth_bnds
         if(dimsizes(dimsizes(depth_bnds)).eq.1)then
@@ -67,7 +68,7 @@ begin
     ;; set Cp = 4.00000, need modify(http://web.mit.edu/seawater/)(low pr.)
     Cp = 4.00000
 
-    ohc = temp(:,0,:,:) ;; create array
+    ohc = temp(:,0,:,:) ;; create array, ohc or salinity
     ohc = 0. ;;ohc@_FillValue
     ohc@long_name  = "Ocean heat content"
     ohc@units = "J/m2"
@@ -77,15 +78,25 @@ begin
     
     do z = 0, nz-1
         dz = tofloat(min((/depth_bnds(z,1),to_depth/))-depth_bnds(z,0))
-        ohc = ohc + rho(:,z,:,:) * Cp * tempc(:,z,:,:) * dz
+        if(ohcorsal.eq."ohc")then
+            ohc = ohc + rho(:,z,:,:) * Cp * tempc(:,z,:,:) * dz
+        else
+            ohc = ohc + rho(:,z,:,:) * salinity(:,z,:,:) * dz
+        end if
     end do
     if(isatt(ohc,"actual_range"))then
         delete(ohc@actual_range)
     end if
     return ohc
 end
+
+function cal_ohc_with_temp_salinity_TZLL(temp[*][*][*][*],salinity[*][*][*][*],to_depth)
+begin
+    return cal_ohc_sal_with_temp_salinity_TZLL(temp,salinity,to_depth,"ohc")
+end
 function cal_ohc_with_temp_salinity_MTZLL(temp[*][*][*][*][*],salinity[*][*][*][*][*],to_depth)
 begin
+    ;; for member,time,z,y,x
     dims = dimsizes(temp)
     nmember = dims(0)
     ohc = temp(:,:,0,:,:) ;; create array
@@ -97,4 +108,20 @@ begin
         ohc(m,:,:,:) = cal_ohc_with_temp_salinity_TZLL(temp(m,:,:,:,:),salinity(m,:,:,:,:),to_depth)
     end do
     return ohc
+end
+function cal_salinity_with_temp_salinity_MTZLL(temp[*][*][*][*][*],salinity[*][*][*][*][*],to_depth)
+begin
+    ;; for member,time,z,y,x
+    dims = dimsizes(temp)
+    nmember = dims(0)
+    mean_sal = temp(:,:,0,:,:) ;; create array
+    mean_sal = 0. ;;ohc@_FillValue
+    mean_sal@long_name  = "vertical mean salinity"
+    mean_sal@units = "g/kg"
+    mean_sal@thckness = to_depth
+    do m = 0, nmember-1
+        mean_sal(m,:,:,:) = cal_ohc_sal_with_temp_salinity_TZLL(temp(m,:,:,:,:),salinity(m,:,:,:,:),to_depth,"salinity")
+    end do
+    mean_sal = mean_sal/to_depth
+    return mean_sal
 end

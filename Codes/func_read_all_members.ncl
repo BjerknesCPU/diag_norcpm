@@ -514,7 +514,7 @@ load "/tos-project4/SCRATCH/pgchiu/diag_norcpm/Codes/func_ohc_integrate.ncl" ;; 
 undef("read_noresm_members_leadmonths")
 function read_noresm_members_leadmonths(forecastDirs,component,vn,lead_months,ocngridfile)
 begin
-    ;;  frontend of read_noresm_forecasts_ens_filevar_leadmonths(),
+    ;;  frontend of read_noresm_members_filevar_leadmonths(),
     ;;      used to insert varnames which need to calcute, not just in file
     if(vn.eq."ohc")then ;; for ocean heat content
         ;; read templvl and salnlvl
@@ -523,7 +523,7 @@ begin
         return cal_ohc_with_temp_salinity_MTZLL(templvl,salnlvl,100)
     end if
 
-    return read_noresm_forecasts_ens_filevar_leadmonths(forecastDirs,component,vn,lead_months,ocngridfile)
+    return read_noresm_members_filevar_leadmonths(forecastDirs,component,vn,lead_months,ocngridfile)
 end
 undef("read_noresm_members_leadseason")
 function read_noresm_members_leadseason(dirs,component,vn,lead_season,ocngridfile)

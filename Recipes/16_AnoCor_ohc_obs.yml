@@ -5,10 +5,10 @@
 #   data ex.  NorCPM_V1c/ana_19800115_me_hindcasts/
 #       104 forecasts with 4 runs per year, 9 members, 13 month simulation
 #       var(initTime, member, time,lev,lat,lon)
-Title: SST heterogeneous Anomaly Correlation(AC), 1-4 lead season
+Title: Ocean Heat Content heterogeneous Anomaly Correlation(AC), 1-4 lead season
 Description: |
     Following <a href='http://doi.org/10.1175/JCLI-D-13-00597.1'>Becker et al. 2014</a> approach, 1-4 lead seasonal forecast correlation.  </br>
-    The correlation is between EN4 4.2.1 and ensemble mean.</br>
+    The correlation is 100m OHC100 between EN4 4.2.1 and ensemble mean.</br>
 COMPONENT:  ocn
 VARIABLE:  ohc
 BEFOREPLOT: |
@@ -23,28 +23,28 @@ Scripts:
 # proc section
 -  # lead season 1, init Jan
     plotScript: plot_anomaly_correlation.ncl
-    TITLE: OHC heterogeneous Anomaly Correlation
+    TITLE: OHC100 heterogeneous Anomaly Correlation
     FIGFILENAME: ana_hindcasts_AC_ohc_lead1_FMA
     LEADSEASON: 1
     # for all forecast start from Jan
     FORECASTDIRS: BASEDIR/RUNPRE{1,2}???01??
 -  # lead season 1, init Apr
     plotScript: plot_anomaly_correlation.ncl
-    TITLE: OHC heterogeneous Anomaly Correlation
+    TITLE: OHC100 heterogeneous Anomaly Correlation
     FIGFILENAME: ana_hindcasts_AC_ohc_lead1_MJJ
     LEADSEASON: 1
     # for all forecast start from Apr
     FORECASTDIRS: BASEDIR/RUNPRE{1,2}???04??
 -  # lead season 1, init Jul
     plotScript: plot_anomaly_correlation.ncl
-    TITLE: OHC heterogeneous Anomaly Correlation
+    TITLE: OHC100 heterogeneous Anomaly Correlation
     FIGFILENAME: ana_hindcasts_AC_ohc_lead1_ASO
     LEADSEASON: 1
     # for all forecast start from Jul
     FORECASTDIRS: BASEDIR/RUNPRE{1,2}???07??
 -  # lead season 1, init Oct
     plotScript: plot_anomaly_correlation.ncl
-    TITLE: OHC heterogeneous Anomaly Correlation
+    TITLE: OHC100 heterogeneous Anomaly Correlation
     FIGFILENAME: ana_hindcasts_AC_ohc_lead1_NDJ
     LEADSEASON: 1
     # for all forecast start from Oct
@@ -52,28 +52,28 @@ Scripts:
 
 -  # lead season 2, init Jan
     plotScript: plot_anomaly_correlation.ncl
-    TITLE: OHC heterogeneous Anomaly Correlation
+    TITLE: OHC100 heterogeneous Anomaly Correlation
     FIGFILENAME: ana_hindcasts_AC_ohc_lead2_MJJ
     LEADSEASON: 2
     # for all forecast start from Jan
     FORECASTDIRS: BASEDIR/RUNPRE{1,2}???01??
 -  # lead season 2, init Apr
     plotScript: plot_anomaly_correlation.ncl
-    TITLE: OHC Anomaly Correlation
+    TITLE: OHC100 heterogeneous Anomaly Correlation
     FIGFILENAME: ana_hindcasts_AC_ohc_lead2_ASO
     LEADSEASON: 2
     # for all forecast start from Apr
     FORECASTDIRS: BASEDIR/RUNPRE{1,2}???04??
 -  # lead season 2, init Jul
     plotScript: plot_anomaly_correlation.ncl
-    TITLE: OHC heterogeneous Anomaly Correlation
+    TITLE: OHC100 heterogeneous Anomaly Correlation
     FIGFILENAME: ana_hindcasts_AC_ohc_lead2_NDJ
     LEADSEASON: 2
     # for all forecast start from Jul
     FORECASTDIRS: BASEDIR/RUNPRE{1,2}???07??
 -  # lead season 2, init Oct
     plotScript: plot_anomaly_correlation.ncl
-    TITLE: OHC heterogeneous Anomaly Correlation
+    TITLE: OHC100 heterogeneous Anomaly Correlation
     FIGFILENAME: ana_hindcasts_AC_ohc_lead2_FMA
     LEADSEASON: 2
     # for all forecast start from Oct
@@ -81,28 +81,28 @@ Scripts:
 
 -  # lead season 3, init Jan
     plotScript: plot_anomaly_correlation.ncl
-    TITLE: OHC heterogeneous Anomaly Correlation
+    TITLE: OHC100 heterogeneous Anomaly Correlation
     FIGFILENAME: ana_hindcasts_AC_ohc_lead3_ASO
     LEADSEASON: 3
     # for all forecast start from Jan
     FORECASTDIRS: BASEDIR/RUNPRE{1,2}???01??
 -  # lead season 3, init Apr
     plotScript: plot_anomaly_correlation.ncl
-    TITLE: OHC Anomaly Correlation
+    TITLE: OHC100 heterogeneous Anomaly Correlation
     FIGFILENAME: ana_hindcasts_AC_ohc_lead3_NDJ
     LEADSEASON: 3
     # for all forecast start from Apr
     FORECASTDIRS: BASEDIR/RUNPRE{1,2}???04??
 -  # lead season 3, init Jul
     plotScript: plot_anomaly_correlation.ncl
-    TITLE: OHC heterogeneous Anomaly Correlation
+    TITLE: OHC100 heterogeneous Anomaly Correlation
     FIGFILENAME: ana_hindcasts_AC_ohc_lead3_FMA
     LEADSEASON: 3
     # for all forecast start from Jul
     FORECASTDIRS: BASEDIR/RUNPRE{1,2}???07??
 -  # lead season 3, init Oct
     plotScript: plot_anomaly_correlation.ncl
-    TITLE: OHC heterogeneous Anomaly Correlation
+    TITLE: OHC100 heterogeneous Anomaly Correlation
     FIGFILENAME: ana_hindcasts_AC_ohc_lead3_MJJ
     LEADSEASON: 3
     # for all forecast start from Oct
@@ -110,28 +110,28 @@ Scripts:
 
 -  # lead season 4, init Jan
     plotScript: plot_anomaly_correlation.ncl
-    TITLE: OHC heterogeneous Anomaly Correlation
+    TITLE: OHC100 heterogeneous Anomaly Correlation
     FIGFILENAME: ana_hindcasts_AC_ohc_lead4_NDJ
     LEADSEASON: 4
     # for all forecast start from Jan
     FORECASTDIRS: BASEDIR/RUNPRE{1,2}???01??
 -  # lead season 4, init Apr
     plotScript: plot_anomaly_correlation.ncl
-    TITLE: OHC Anomaly Correlation
+    TITLE: OHC100 heterogeneous Anomaly Correlation
     FIGFILENAME: ana_hindcasts_AC_ohc_lead4_FMA
     LEADSEASON: 4
     # for all forecast start from Apr
     FORECASTDIRS: BASEDIR/RUNPRE{1,2}???04??
 -  # lead season 4, init Jul
     plotScript: plot_anomaly_correlation.ncl
-    TITLE: OHC heterogeneous Anomaly Correlation
+    TITLE: OHC100 heterogeneous Anomaly Correlation
     FIGFILENAME: ana_hindcasts_AC_ohc_lead4_MJJ
     LEADSEASON: 4
     # for all forecast start from Jul
     FORECASTDIRS: BASEDIR/RUNPRE{1,2}???07??
 -  # lead season 4, init Oct
     plotScript: plot_anomaly_correlation.ncl
-    TITLE: OHC heterogeneous Anomaly Correlation
+    TITLE: OHC100 heterogeneous Anomaly Correlation
     FIGFILENAME: ana_hindcasts_AC_ohc_lead4_ASO
     LEADSEASON: 4
     # for all forecast start from Oct
@@ -164,5 +164,32 @@ Scripts:
     COMMENT: |
         Following Becker et al. 2014 approach ( 10.1175/JCLI-D-13-00597.1 ) 1-4 lead seasonal forecast correlation. 
         
-        The correlation is between EN4 4.2.1 analysis and ensemble mean of simulation members.
+        The correlation is 100m OHC between EN4 4.2.1 analysis and ensemble mean of simulation members.
+
+-  # mk figures json for inter-version comparison
+    plotScript: mk_index_json.sh
+    JSONFILE: 16_AnoCor_ohc_obs.json
+    FIGURES: 
+        ana_hindcasts_AC_ohc_lead1_FMA
+        ana_hindcasts_AC_ohc_lead2_MJJ
+        ana_hindcasts_AC_ohc_lead3_ASO
+        ana_hindcasts_AC_ohc_lead4_NDJ
+
+        ana_hindcasts_AC_ohc_lead1_MJJ
+        ana_hindcasts_AC_ohc_lead2_ASO
+        ana_hindcasts_AC_ohc_lead3_NDJ
+        ana_hindcasts_AC_ohc_lead4_FMA
+
+        ana_hindcasts_AC_ohc_lead1_ASO
+        ana_hindcasts_AC_ohc_lead2_NDJ
+        ana_hindcasts_AC_ohc_lead3_FMA
+        ana_hindcasts_AC_ohc_lead4_MJJ
+
+        ana_hindcasts_AC_ohc_lead1_NDJ
+        ana_hindcasts_AC_ohc_lead2_FMA
+        ana_hindcasts_AC_ohc_lead3_MJJ
+        ana_hindcasts_AC_ohc_lead4_ASO
+    SHAPE: 4 4
+    SELECTS: '"Initial Time"  "Forecast Months"'
+    OPTIONS: '"from Jan" "from Apr" "from Jul" "from Oct" "1-3" "4-6" "7-9" "10-12"'
 

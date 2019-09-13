@@ -250,7 +250,7 @@ begin
             res@gsnLeftString = "TITLELEFT"
         end if
         if("TITLERIGHT" .eq. "")then
-            res@gsnRightString = "Confidence="+siglevel+"%, leadSeason="+lead_season
+            res@gsnRightString = "Confidence="+siglevel+"%, Lead Season="+lead_season
         else
             res@gsnRightString = "TITLERIGHT"
         end if
