@@ -1,11 +1,12 @@
 # plot data variance in mpiexm
 # mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
 
-Title: SST Annual variance ratio
+Title: Monthly mean daily max mixing layer depth, annual variance ratio of control run
 Description: 
     Case plot for mpiexm compare
+Thumbnail: maxML_var_ratio_average_case_thumb.png
 COMPONENT:  mpiom
-VARIABLE:  sst
+VARIABLE:  amld
 PLOTRES: |
     res@mpLimitMode = "LatLon"
     res@mpMinLatF = -90.
@@ -15,6 +16,7 @@ PLOTRES: |
     res@mpCenterLonF =   -150.
     res@cnLinesOn = False
     res@cnFillOn = True
+    res@cnFillMode = "CellFill"
     res@lbOrientation = "Vertical"
     res@pmLabelBarWidthF = 0.1
     res@pmLabelBarOrthogonalPosF   = 0.01
@@ -32,6 +34,9 @@ PLOTRES: |
     lres@cnLevels := (/.2/)
     lres@cnLineLabelsOn = False
     lres@cnInfoLabelOn = False
+TSRES: |
+    res@trYMinF = -100.
+    res@trYMaxF =  100.
 
 CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
     ## CASE define later
@@ -59,70 +64,70 @@ Scripts:
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAA
     YEARBE: YBEA
-    TITLE: "yearly SST variance ratio CNA/CTL (nyear: IE=NYA, CTL=NYC)"
-    FIGFILENAME: sst_var_ratio_average_case
+    TITLE: "yearly maxMLayer variance ratio CNA/CTL (nyear: IE=NYA, CTL=NYC)"
+    FIGFILENAME: maxML_var_ratio_average_case
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAS
     YEARBE: YBES
-    TITLE: "yearly SST variance ratio CNS/CTL (nyear: IE=NYS, CTL=NYC)"
-    FIGFILENAME: sst_var_ratio_sample_case
+    TITLE: "yearly maxMLayer variance ratio CNS/CTL (nyear: IE=NYS, CTL=NYC)"
+    FIGFILENAME: maxML_var_ratio_sample_case
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAS
     YEARBE: YBES
     MONTHS: 12,1,2
-    TITLE: "yearly SST variance ratio CNS/CTL DJF (nyear: IE=NYS, CTL=NYC)"
-    FIGFILENAME: sst_var_ratio_sample_case_DJF
+    TITLE: "yearly maxMLayer variance ratio CNS/CTL DJF (nyear: IE=NYS, CTL=NYC)"
+    FIGFILENAME: maxML_var_ratio_sample_case_DJF
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAA
     YEARBE: YBEA
     MONTHS: 12,1,2
-    TITLE: "yearly SST variance ratio CNA/CTL DJF (nyear: IE=NYA, CTL=NYC)"
-    FIGFILENAME: sst_var_ratio_average_case_DJF
+    TITLE: "yearly maxMLayer variance ratio CNA/CTL DJF (nyear: IE=NYA, CTL=NYC)"
+    FIGFILENAME: maxML_var_ratio_average_case_DJF
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAS
     YEARBE: YBES
     MONTHS: 3,4,5
-    TITLE: "yearly SST variance ratio CNS/CTL MAM (nyear: IE=NYS, CTL=NYC)"
-    FIGFILENAME: sst_var_ratio_sample_case_MAM
+    TITLE: "yearly maxMLayer variance ratio CNS/CTL MAM (nyear: IE=NYS, CTL=NYC)"
+    FIGFILENAME: maxML_var_ratio_sample_case_MAM
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAA
     YEARBE: YBEA
     MONTHS: 3,4,5
-    TITLE: "yearly SST variance ratio CNA/CTL MAM (nyear: IE=NYA, CTL=NYC)"
-    FIGFILENAME: sst_var_ratio_average_case_MAM
+    TITLE: "yearly maxMLayer variance ratio CNA/CTL MAM (nyear: IE=NYA, CTL=NYC)"
+    FIGFILENAME: maxML_var_ratio_average_case_MAM
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAS
     YEARBE: YBES
     MONTHS: 6,7,8
-    TITLE: "yearly SST variance ratio CNS/CTL JJA (nyear: IE=NYS, CTL=NYC)"
-    FIGFILENAME: sst_var_ratio_sample_case_JJA
+    TITLE: "yearly maxMLayer variance ratio CNS/CTL JJA (nyear: IE=NYS, CTL=NYC)"
+    FIGFILENAME: maxML_var_ratio_sample_case_JJA
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAA
     YEARBE: YBEA
     MONTHS: 6,7,8
-    TITLE: "yearly SST variance ratio CNA/CTL JJA (nyear: IE=NYA, CTL=NYC)"
-    FIGFILENAME: sst_var_ratio_average_case_JJA
+    TITLE: "yearly maxMLayer variance ratio CNA/CTL JJA (nyear: IE=NYA, CTL=NYC)"
+    FIGFILENAME: maxML_var_ratio_average_case_JJA
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAS
     YEARBE: YBES
     MONTHS: 9,10,11
-    TITLE: "yearly SST variance ratio CNS/CTL SON (nyear: IE=NYS, CTL=NYC)"
-    FIGFILENAME: sst_var_ratio_sample_case_SON
+    TITLE: "yearly maxMLayer variance ratio CNS/CTL SON (nyear: IE=NYS, CTL=NYC)"
+    FIGFILENAME: maxML_var_ratio_sample_case_SON
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAA
     YEARBE: YBEA
     MONTHS: 9,10,11
-    TITLE: "yearly SST variance ratio CNA/CTL SON (nyear: IE=NYA, CTL=NYC)"
-    FIGFILENAME: sst_var_ratio_average_case_SON
+    TITLE: "yearly maxMLayer variance ratio CNA/CTL SON (nyear: IE=NYA, CTL=NYC)"
+    FIGFILENAME: maxML_var_ratio_average_case_SON
 
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
@@ -130,27 +135,27 @@ Scripts:
     YEARBE: YBES
     LATBE: 50.,60.
     LONBE: -40.,-10.
-    PLOTRES:
-    TITLE: SST ts CNS 50N-60N,40W-10W
-    FIGFILENAME: sst_ts_sample_case
+    PLOTRES: TSRES
+    TITLE: max mixing layer ts CNS 50N-60N,40W-10W
+    FIGFILENAME: maxML_ts_sample_case
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: CAA
     YEARBE: YBEA
     LATBE: 50.,60.
     LONBE: -40.,-10.
-    PLOTRES:
-    TITLE: SST ts CNA 50N-60N,40W-10W
-    FIGFILENAME: sst_ts_average_case
+    PLOTRES: TSRES
+    TITLE: max mixing layer ts CNA 50N-60N,40W-10W
+    FIGFILENAME: maxML_ts_average_case
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: CTN
     YEARBE: YBEC
     LATBE: 50.,60.
     LONBE: -40.,-10.
-    PLOTRES:
-    TITLE: SST ts CTL 50N-60N,40W-10W
-    FIGFILENAME: sst_ts_control_case
+    PLOTRES: TSRES
+    TITLE: max mixing layer ts CTL 50N-60N,40W-10W
+    FIGFILENAME: maxML_ts_control_case
 
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
@@ -159,9 +164,9 @@ Scripts:
     MONTHS: 12,1,2
     LATBE: 50.,60.
     LONBE: -40.,-10.
-    PLOTRES:
-    TITLE: SST ts CNS DJF 50N-60N,40W-10W
-    FIGFILENAME: sst_ts_sample_case_DJF
+    PLOTRES: TSRES
+    TITLE: max mixing layer ts CNS DJF 50N-60N,40W-10W
+    FIGFILENAME: maxML_ts_sample_case_DJF
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: CAA
@@ -169,9 +174,9 @@ Scripts:
     MONTHS: 12,1,2
     LATBE: 50.,60.
     LONBE: -40.,-10.
-    PLOTRES:
-    TITLE: SST ts CNA DJF 50N-60N,40W-10W
-    FIGFILENAME: sst_ts_average_case_DJF
+    PLOTRES: TSRES
+    TITLE: max mixing layer ts CNA DJF 50N-60N,40W-10W
+    FIGFILENAME: maxML_ts_average_case_DJF
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: CTN
@@ -179,9 +184,9 @@ Scripts:
     MONTHS: 12,1,2
     LATBE: 50.,60.
     LONBE: -40.,-10.
-    PLOTRES:
-    TITLE: SST ts CTL DJF 50N-60N,40W-10W
-    FIGFILENAME: sst_ts_control_case_DJF
+    PLOTRES: TSRES
+    TITLE: max mixing layer ts CTL DJF 50N-60N,40W-10W
+    FIGFILENAME: maxML_ts_control_case_DJF
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: CAS
@@ -189,9 +194,9 @@ Scripts:
     MONTHS: 3,4,5
     LATBE: 50.,60.
     LONBE: -40.,-10.
-    PLOTRES:
-    TITLE: SST ts CNS MAM 50N-60N,40W-10W
-    FIGFILENAME: sst_ts_sample_case_MAM
+    PLOTRES: TSRES
+    TITLE: max mixing layer ts CNS MAM 50N-60N,40W-10W
+    FIGFILENAME: maxML_ts_sample_case_MAM
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: CAA
@@ -199,9 +204,9 @@ Scripts:
     MONTHS: 3,4,5
     LATBE: 50.,60.
     LONBE: -40.,-10.
-    PLOTRES:
-    TITLE: SST ts CNA MAM 50N-60N,40W-10W
-    FIGFILENAME: sst_ts_average_case_MAM
+    PLOTRES: TSRES
+    TITLE: max mixing layer ts CNA MAM 50N-60N,40W-10W
+    FIGFILENAME: maxML_ts_average_case_MAM
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: CTN
@@ -209,9 +214,9 @@ Scripts:
     MONTHS: 3,4,5
     LATBE: 50.,60.
     LONBE: -40.,-10.
-    PLOTRES:
-    TITLE: SST ts CTL MAM 50N-60N,40W-10W
-    FIGFILENAME: sst_ts_control_case_MAM
+    PLOTRES: TSRES
+    TITLE: max mixing layer ts CTL MAM 50N-60N,40W-10W
+    FIGFILENAME: maxML_ts_control_case_MAM
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: CAS
@@ -219,9 +224,9 @@ Scripts:
     MONTHS: 6,7,8
     LATBE: 50.,60.
     LONBE: -40.,-10.
-    PLOTRES:
-    TITLE: SST ts CNS JJA 50N-60N,40W-10W
-    FIGFILENAME: sst_ts_sample_case_JJA
+    PLOTRES: TSRES
+    TITLE: max mixing layer ts CNS JJA 50N-60N,40W-10W
+    FIGFILENAME: maxML_ts_sample_case_JJA
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: CAA
@@ -229,9 +234,9 @@ Scripts:
     MONTHS: 6,7,8
     LATBE: 50.,60.
     LONBE: -40.,-10.
-    PLOTRES:
-    TITLE: SST ts CNA JJA 50N-60N,40W-10W
-    FIGFILENAME: sst_ts_average_case_JJA
+    PLOTRES: TSRES
+    TITLE: max mixing layer ts CNA JJA 50N-60N,40W-10W
+    FIGFILENAME: maxML_ts_average_case_JJA
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: CTN
@@ -239,9 +244,9 @@ Scripts:
     MONTHS: 6,7,8
     LATBE: 50.,60.
     LONBE: -40.,-10.
-    PLOTRES:
-    TITLE: SST ts CTL JJA 50N-60N,40W-10W
-    FIGFILENAME: sst_ts_control_case_JJA
+    PLOTRES: TSRES
+    TITLE: max mixing layer ts CTL JJA 50N-60N,40W-10W
+    FIGFILENAME: maxML_ts_control_case_JJA
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: CAS
@@ -249,9 +254,9 @@ Scripts:
     MONTHS: 9,10,11
     LATBE: 50.,60.
     LONBE: -40.,-10.
-    PLOTRES:
-    TITLE: SST ts CNS SON 50N-60N,40W-10W
-    FIGFILENAME: sst_ts_sample_case_SON
+    PLOTRES: TSRES
+    TITLE: max mixing layer ts CNS SON 50N-60N,40W-10W
+    FIGFILENAME: maxML_ts_sample_case_SON
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: CAA
@@ -259,9 +264,9 @@ Scripts:
     MONTHS: 9,10,11
     LATBE: 50.,60.
     LONBE: -40.,-10.
-    PLOTRES:
-    TITLE: SST ts CNA SON 50N-60N,40W-10W
-    FIGFILENAME: sst_ts_average_case_SON
+    PLOTRES: TSRES
+    TITLE: max mixing layer ts CNA SON 50N-60N,40W-10W
+    FIGFILENAME: maxML_ts_average_case_SON
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: CTN
@@ -269,12 +274,12 @@ Scripts:
     MONTHS: 9,10,11
     LATBE: 50.,60.
     LONBE: -40.,-10.
-    PLOTRES:
-    TITLE: SST ts CTL SON 50N-60N,40W-10W
-    FIGFILENAME: sst_ts_control_case_SON
+    PLOTRES: TSRES
+    TITLE: max mixing layer ts CTL SON 50N-60N,40W-10W
+    FIGFILENAME: maxML_ts_control_case_SON
 
 -  
     plotScript: mk_html_page.sh
-    FIGFILES: sst_var_ratio_sample_case sst_var_ratio_average_case sst_ts_sample_case sst_ts_average_case sst_ts_control_case sst_var_ratio_sample_case_DJF sst_var_ratio_average_case_DJF sst_var_ratio_sample_case_MAM sst_var_ratio_average_case_MAM sst_var_ratio_sample_case_JJA sst_var_ratio_average_case_JJA sst_var_ratio_sample_case_SON sst_var_ratio_average_case_SON sst_ts_sample_case_DJF sst_ts_average_case_DJF sst_ts_control_case_DJF sst_ts_sample_case_MAM sst_ts_average_case_MAM sst_ts_control_case_MAM sst_ts_sample_case_JJA sst_ts_average_case_JJA sst_ts_control_case_JJA sst_ts_sample_case_SON sst_ts_average_case_SON sst_ts_control_case_SON 
+    FIGFILES: maxML_var_ratio_sample_case maxML_var_ratio_average_case maxML_ts_sample_case maxML_ts_average_case maxML_ts_control_case maxML_var_ratio_sample_case_DJF maxML_var_ratio_average_case_DJF maxML_var_ratio_sample_case_MAM maxML_var_ratio_average_case_MAM maxML_var_ratio_sample_case_JJA maxML_var_ratio_average_case_JJA maxML_var_ratio_sample_case_SON maxML_var_ratio_average_case_SON maxML_ts_sample_case_DJF maxML_ts_average_case_DJF maxML_ts_control_case_DJF maxML_ts_sample_case_MAM maxML_ts_average_case_MAM maxML_ts_control_case_MAM maxML_ts_sample_case_JJA maxML_ts_average_case_JJA maxML_ts_control_case_JJA maxML_ts_sample_case_SON maxML_ts_average_case_SON maxML_ts_control_case_SON 
     COLUMN: figs CNS CNA Control '</tr><tr>' ANN 2 ANN 3 DJF 2 MAM 2 JJA 2 SON 2 DJF 3 MAM 3 JJA 3 SON 3
-    COMMENT: SST variance ratio to control run #, and annual anomaly time series.
+    COMMENT: Mixing layer variance ratio to control run #, and annual anomaly time series.

@@ -1,15 +1,15 @@
 # plot data difference in mpiexm
 # mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
 
-Title: Mixed layer thickness (zmld) difference
+Title: Monthly mean daily max mixed layer thickness (amld) difference
 Description: 
-    Mixed layer thickness of Cases minus control run
-COMMENT: Mixed layer thickness diference between interactive ensemble and control run.
+    Monthly mean daily max mixed layer thickness of Cases minus control run
+COMMENT: Monthly mean daily max mixed layer thickness diference between interactive ensemble and control run.
 COMPONENT:  mpiom
 MODELN: 1
-VARI: zmld
+VARI: amld
 VARIABLE: VARI
-VN: MixedLayer
+VN: MaxMixedLayer
 PLOTRES: |
     res@mpLimitMode = "LatLon"
     res@mpMinLatF = -90.
@@ -19,7 +19,6 @@ PLOTRES: |
     res@mpCenterLonF =   -150.
     res@cnLinesOn = False
     res@cnFillOn = True
-    res@cnFillMode = "CellFill"
     res@lbOrientation = "Vertical"
     res@cnLevelSelectionMode = "ExplicitLevels"
     res@cnLevels = fspan(-10.,10.,21)
@@ -33,7 +32,6 @@ CRES: |
     res@mpCenterLonF =   -150.
     res@cnLinesOn = False
     res@cnFillOn = True
-    res@cnFillMode = "CellFill"
     res@cnFillPalette = "WhBlGrYeRe"
     res@lbOrientation = "Vertical"
     res@cnLevelSelectionMode = "ExplicitLevels"
@@ -190,4 +188,4 @@ Scripts:
         dif_VARI_sample_case_SON
         dif_VARI_average_case_SON
         
-    COLUMN: figures CTN CNS CNA '</tr><tr>' ANN 3 DJF 3 MAM 3 JJA 3 SON 3
+    COLUMN: figures CTL CNS CNA '</tr><tr>' ANN 3 DJF 3 MAM 3 JJA 3 SON 3

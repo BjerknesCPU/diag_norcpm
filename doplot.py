@@ -142,7 +142,7 @@ while didit:
     didit=False
     for i in depends:
         for j in re.split(' |,',i):
-            if not j.replace(".yml",'') in recipesName:
+            if not re.sub(".*/","",j.replace(".yml",'')) in recipesName:
                 Recipes.append(parseRecipes(j))
                 print("due to depends, add "+j)
                 didit = True
@@ -285,7 +285,7 @@ for p in procall:
     if not Depends[p.name]: 
         p.start()
         RunStart.append(p.name)
-        print('running '+r+' at pid='+str(p.pid))
+        print('running '+p.name+' at pid='+str(p.pid))
 if not RunStart:
     print("No recipe be able to run, exit.")
     sys.exit()
@@ -308,7 +308,7 @@ while Running:
             allDone = True
             Running = 1
             for i in Depends[p.name]: # there are file names in Depends 
-                if not os.path.splitext(i)[0] in RunDone: allDone = False
+                if not re.sub('^.*/','',os.path.splitext(i)[0]) in RunDone: allDone = False
             if allDone:
                 p.start()
                 RunStart.append(p.name)
@@ -369,6 +369,7 @@ for i in subdirs:
     # store it
     recipeInfo.update({i:{'title': title, 'thumb': thumbnail, 'desc': description}})
 
+print("All Recieps compelete, making index page...")
 #### html header
 html = ''
 html += '<!DOCTYPE html> \n'
@@ -380,6 +381,7 @@ html += '<h3>diag_norcpm:</h3><h1>'+plotCase+'</h1>\n'
 html += '<hr>\n'
 #### recipe items
 dirs = recipeInfo.keys()
+sorted(dirs)
 for i in dirs:
     r = recipeInfo[i]
     html += "<span style='display:inline-block'>"
@@ -401,3 +403,4 @@ html += '</html> \n'
 #### write index html
 open("index.html",'w').write(html)
 
+print("Index page done")

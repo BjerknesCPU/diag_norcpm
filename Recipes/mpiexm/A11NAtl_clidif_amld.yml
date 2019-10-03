@@ -1,43 +1,47 @@
 # plot data difference in mpiexm
 # mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
 
-Title: Mixed layer thickness (zmld) difference
+Title: Monthly mean daily max mixed layer thickness (amld) difference
 Description: 
-    Mixed layer thickness of Cases minus control run
-COMMENT: Mixed layer thickness diference between interactive ensemble and control run.
+    Monthly mean daily max mixed layer thickness of Cases minus control run
+COMMENT: Monthly mean daily max mixed layer thickness diference between interactive ensemble and control run.
 COMPONENT:  mpiom
 MODELN: 1
-VARI: zmld
+VARI: amld
 VARIABLE: VARI
-VN: MixedLayer
-PLOTRES: |
+VN: MaxMixedLayer
+RG: |
     res@mpLimitMode = "LatLon"
-    res@mpMinLatF = -90.
-    res@mpMaxLatF = 90.
-    res@mpMinLonF = -330.
-    res@mpMaxLonF =   30.
-    res@mpCenterLonF =   -150.
+    res@mpMinLatF = 20.
+    res@mpMaxLatF = 70.
+    res@mpMinLonF = -80.
+    res@mpMaxLonF =  10.
+    res@mpCenterLatF = 50.
+    res@mpCenterLonF =  -35.
+    res@mpProjection = "LambertConformal"
+    res@mpGridAndLimbOn = True
+    res@gsnMaskLambertConformal = True
+    res@gsnRightString = "~F34~0~F~C"
+PLOTRES: |
+    RG
     res@cnLinesOn = False
     res@cnFillOn = True
-    res@cnFillMode = "CellFill"
     res@lbOrientation = "Vertical"
     res@cnLevelSelectionMode = "ExplicitLevels"
     res@cnLevels = fspan(-10.,10.,21)
     res@cnFillPalette = "BlAqGrWh2YeOrReVi22"
 CRES: |
-    res@mpLimitMode = "LatLon"
-    res@mpMinLatF = -90.
-    res@mpMaxLatF = 90.
-    res@mpMinLonF = -330.
-    res@mpMaxLonF =   30.
-    res@mpCenterLonF =   -150.
+    RG
     res@cnLinesOn = False
     res@cnFillOn = True
-    res@cnFillMode = "CellFill"
-    res@cnFillPalette = "WhBlGrYeRe"
     res@lbOrientation = "Vertical"
     res@cnLevelSelectionMode = "ExplicitLevels"
     res@cnLevels = fspan(0.,300,31)
+    ;; colormap
+    cmap       = read_colormap_file("ncl_default")
+    cmap(0,:) = 1. ;; change first to white
+    res@cnFillPalette = cmap
+    delete(cmap)
 
 
 

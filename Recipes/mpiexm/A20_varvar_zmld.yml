@@ -4,6 +4,7 @@
 Title: Mixing Layer Depth Annual variance ratio of control run
 Description: 
     Case plot for mpiexm compare
+Thumbnail: mixL_var_ratio_average_case_thumb.png
 COMPONENT:  mpiom
 VARIABLE:  zmld
 PLOTRES: |
@@ -15,6 +16,7 @@ PLOTRES: |
     res@mpCenterLonF =   -150.
     res@cnLinesOn = False
     res@cnFillOn = True
+    res@cnFillMode = "CellFill"
     res@lbOrientation = "Vertical"
     res@pmLabelBarWidthF = 0.1
     res@pmLabelBarOrthogonalPosF   = 0.01

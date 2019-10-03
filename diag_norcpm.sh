@@ -69,6 +69,21 @@ plotRecipes='mpiexm/A04d_ctl_annualvar_global.yml'
 plotRecipes='mpiexm/A05d_dif_sst.yml'
 plotRecipes='mpiexm/A10_clidif_zmld.yml'
 plotRecipes='mpiexm/A20_varvar_zmld.yml'
+plotRecipes='mpiexm/A10NAtl_clidif_zmld.yml,mpiexm/A20NAtl_varvar_zmld.yml'
+plotRecipes='mpiexm/A05d_dif_sst.yml,mpiexm/A10_clidif_zmld.yml,mpiexm/A10NAtl_clidif_zmld.yml,mpiexm/A20NAtl_varvar_zmld.yml,mpiexm/A04d_ctl_annualvar_NAtl.yml,mpiexm/A06d_dif_sst_NAtl.yml'
+plotRecipes='mpiexm/A11_clidif_amld.yml,mpiexm/A11NAtl_clidif_amld.yml,mpiexm/A21NAtl_varvar_amld.yml,mpiexm/A21_varvar_amld.yml,mpiexm/A20_varvar_zmld.yml'
+plotRecipes='mpiexm/A20NAtl_varvar_zmld.yml'
+plotRecipes='mpiexm/A12_clidif_amld_var.yml,mpiexm/A12NAtl_clidif_amld_var.yml'
+plotRecipes='mpiexm/A13_clidif_ohc.yml,mpiexm/A13NAtl_clidif_ohc.yml'
+plotRecipes='mpiexm/A13NAtl_clidif_ohc.yml'
+plotRecipes='mpiexm/A05d_dif_sst.yml,mpiexm/A06d_dif_sst_NAtl.yml'
+plotRecipes='mpiexm/A06d_dif_sst_NAtl.yml'
+plotRecipes='mpiexm/A14_clidif_ohc200.yml,mpiexm/A15_clidif_ohc500.yml'
+plotRecipes='mpiexm/A04d_ctl_annualvar_NAtl.yml'
+plotRecipes='mpiexm/A06d_dif_sst_NAtl.yml,mpiexm/A10NAtl_clidif_zmld.yml,mpiexm/A11_clidif_amld.yml,mpiexm/A11NAtl_clidif_amld.yml,mpiexm/A12_clidif_amld_var.yml,mpiexm/A12NAtl_clidif_amld_var.yml,mpiexm/A13NAtl_clidif_ohc.yml,mpiexm/A20NAtl_varvar_zmld.yml,mpiexm/A21NAtl_varvar_amld.yml,mpiexm/A14NAtl_clidif_ohc200.yml,mpiexm/A15NAtl_clidif_ohc500.yml'
+plotRecipes='mpiexm/A23_varvar_ohc.yml'
+
+
 #--------------------------- case settings end -------------------------
 
 

@@ -61,7 +61,19 @@ begin
         res@gsnLeftString = title
     PLOTRES
 
+    if(isatt(res,"gsnMaskLambertConformal").and. res@gsnMaskLambertConformal)then
+        res@gsnDraw  = False
+        res@gsnFrame = False
+    end if
+
     wks = gsn_open_wks("ps",figfn)
     plot = gsn_csm_contour_map(wks,varens,res)
     
+    ;; if use mask Lambert Conformal projection
+    ;; add lat/lon ticmarks by add_lc_labels()
+    if(isatt(res,"gsnMaskLambertConformal").and. res@gsnMaskLambertConformal)then
+        add_lc_labels(wks,plot,res@mpMinLatF,res@mpMaxLatF,res@mpMinLonF,res@mpMaxLonF)
+        draw(plot)
+        frame(wks)
+    end if
 end

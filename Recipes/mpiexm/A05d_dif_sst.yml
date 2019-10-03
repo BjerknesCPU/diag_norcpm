@@ -6,7 +6,7 @@ Description:
     SST of Cases minus control run
 COMPONENT:  mpiom
 MODELN: 1
-VARI: sst
+VARI: SSTC
 VARIABLE: VARI
 VN: SST
 PLOTRES: |
@@ -21,6 +21,7 @@ PLOTRES: |
     res@lbOrientation = "Vertical"
     res@cnLevelSelectionMode = "ExplicitLevels"
     res@cnLevels = fspan(-.6,.6,13)
+    res@cnFillPalette = "BlAqGrWh2YeOrReVi22"
 CRES: |
     res@mpLimitMode = "LatLon"
     res@mpMinLatF = -90.
@@ -32,28 +33,27 @@ CRES: |
     res@cnFillOn = True
     res@lbOrientation = "Vertical"
     res@cnLevelSelectionMode = "ExplicitLevels"
-    res@cnLevels = fspan(272.,302.,31)
-
+    res@cnLevels = fspan(2.,30.,29)
 
 
 CTN: f08_1AGCM
     ## proxy of CCASE 'control case'
 CCASE: CTN
 CONTROLDIR: /tos-project4/NS9207K/pgchiu/CCASE
-YBEC: 1051,1250
+YBEC: 1101,1250
 CONTROLYEARBE: YBEC
-NYC: 200
+NYC: 150
 
 CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
     ## CASE define later
 CAA: f08_5AGCMs_NASPG_average
 CNA: IEave
-YBEA: 1051,1250
-NYA: 200 
+YBEA: 1101,1250
+NYA: 150 
 CAS: f08_5AGCMs_NASPG_sample
 CNS: IEsam
-YBES: 1051,1250
-NYS: 200
+YBES: 1101,1250
+NYS: 150
 
 
 Scripts:
@@ -61,7 +61,7 @@ Scripts:
     plotScript: mpiexm/plot_mpiexm_climatology.ncl
     CASE: CTN
     YEARBE: YBEC
-    TITLE: "VN cli. CTN (nyear: NYC)"
+    TITLE: "VN cli. CTL (nyear: NYC)"
     FIGFILENAME: cli_VARI_CTN
     PLOTRES: CRES
 -  
@@ -82,7 +82,7 @@ Scripts:
     CASE: CTN
     YEARBE: YBEC
     MONTHS: "12,1,2"
-    TITLE: "DJF VN cli. CTN (nyear: NYC)"
+    TITLE: "DJF VN cli. CTL (nyear: NYC)"
     FIGFILENAME: cli_VARI_CTN_DJF
     PLOTRES: CRES
 -  
@@ -104,7 +104,7 @@ Scripts:
     CASE: CTN
     YEARBE: YBEC
     MONTHS: "3,4,5"
-    TITLE: "MAM VN cli. CTN (nyear: NYC)"
+    TITLE: "MAM VN cli. CTL (nyear: NYC)"
     FIGFILENAME: cli_VARI_CTN_MAM
     PLOTRES: CRES
 -
@@ -126,7 +126,7 @@ Scripts:
     CASE: CTN
     YEARBE: YBEC
     MONTHS: "6,7,8"
-    TITLE: "JJA VN cli. CTN (nyear: NYC)"
+    TITLE: "JJA VN cli. CTL (nyear: NYC)"
     FIGFILENAME: cli_VARI_CTN_JJA
     PLOTRES: CRES
 -
@@ -148,7 +148,7 @@ Scripts:
     CASE: CTN
     YEARBE: YBEC
     MONTHS: "9,10,11"
-    TITLE: "SON VN cli. CTN (nyear: NYC)"
+    TITLE: "SON VN cli. CTL (nyear: NYC)"
     FIGFILENAME: cli_VARI_CTN_SON
     PLOTRES: CRES
 - 

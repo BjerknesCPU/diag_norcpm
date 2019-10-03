@@ -68,7 +68,7 @@ for i in ${figs}; do
         gzip -f "${i}.ps"
     fi 
     if [ -f "${i}.png" ] ; then ## trim white edge and make thumbnail
-        convert ${i}.png  -trim tmp-${i}-${pid}.png 
+        convert ${i}.png -fuzz 1% -trim +repage tmp-${i}-${pid}.png 
         mv tmp-${i}-${pid}.png ${i}.png
         ## thumbnail
         convert -thumbnail 300 "${i}.png" "${i}_thumb.png"
