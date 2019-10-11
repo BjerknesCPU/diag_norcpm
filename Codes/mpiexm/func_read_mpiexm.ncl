@@ -9,6 +9,7 @@ procedure add_lc_labels(wks,map,minlat,maxlat,minlon,maxlon)
       PI         = 3.14159
       RAD_TO_DEG = 180./PI
       dlon = 15
+      dlat = 15
 
     ;---Determine whether we are in northern or southern hemisphere
       if(minlat.ge.0.and.maxlat.gt.0) then
@@ -18,7 +19,9 @@ procedure add_lc_labels(wks,map,minlat,maxlat,minlon,maxlon)
       end if
 
     ;---Pick some "nice" values for the latitude labels.
-      lat_values = ispan(toint(minlat),toint(maxlat),10) * 1.
+      ;lat_values = ispan(toint(minlat),toint(maxlat),dlat) * 1.
+      all_lat_values = ispan(-90,90,dlat)
+      lat_values = all_lat_values(ind(all_lat_values.ge.minlat .and. all_lat_values.le.maxlat))
       nlat       = dimsizes(lat_values)
     ;
     ; We need to get the slope of the left and right min/max longitude lines.
@@ -28,12 +31,11 @@ procedure add_lc_labels(wks,map,minlat,maxlat,minlon,maxlon)
       lon1_ndc = new(1,float)
       lat2_ndc = new(1,float)
       lon2_ndc = new(1,float)
-      datatondc(map,minlon,lat_values(0),lon1_ndc,lat1_ndc)
-      datatondc(map,minlon,lat_values(nlat-1),lon2_ndc,lat2_ndc)
+      datatondc(map,minlon,lat_values(0)*1.,lon1_ndc,lat1_ndc)
+      datatondc(map,minlon,lat_values(nlat-1)*1.,lon2_ndc,lat2_ndc)
       slope_lft = (lat2_ndc-lat1_ndc)/(lon2_ndc-lon1_ndc)
-
-      datatondc(map,maxlon,lat_values(0),lon1_ndc,lat1_ndc)
-      datatondc(map,maxlon,lat_values(nlat-1),lon2_ndc,lat2_ndc)
+      datatondc(map,maxlon,lat_values(0)*1.,lon1_ndc,lat1_ndc)
+      datatondc(map,maxlon,lat_values(nlat-1)*1.,lon2_ndc,lat2_ndc)
       slope_rgt = (lat2_ndc-lat1_ndc)/(lon2_ndc-lon1_ndc)
 
     ;---Set some text resources
@@ -86,7 +88,6 @@ procedure add_lc_labels(wks,map,minlat,maxlat,minlon,maxlon)
     ;
       delete(txres@txPosXF)
       txres@txPosYF = -5.0
-
     ;---Pick some "nice" values for the longitude labels.
       lon_values = ispan(toint(minlon-dlon),toint(maxlon+dlon),dlon) * 1.
       lon_values = lon_values - mod(lon_values,dlon)
@@ -253,15 +254,41 @@ begin
             lat = gf->qlat
             area= gf->qarea
         end if
-        if(coords .eq. "lon lat")then ;; p cell
+        if(coords .eq. "lon lat")then ;; 
             lon = gf->lon
             lat = gf->lat
             ;area= gf->area
+        end if
+        if(coords .eq. "lon_2 lat_2")then ;; in 3d_dm
+            lon = gf->lon_2
+            lat = gf->lat_2
+        end if
+        if(coords .eq. "lon_3 lat_3")then ;; in 3d_dm
+            lon = gf->lon_3
+            lat = gf->lat_3
+        end if
+        if(.not.isvar("lon"))then
+            print("no coordinate assigned: "+coords)
+            exit
         end if
         var@lat2d = lat
         var@lon2d = lon
         ;var@area2d = area
     end if
+end
+procedure onedto2d_grid(var)
+begin
+    ;; re-assign lat2d/lon2d from 1d to 2d
+    if (.not.isatt(var,"coordinates"))then 
+        return
+    end if
+    dims = dimsizes(var)
+    ndim = dimsizes(dims)
+
+    sdim = dims(ndim-2:) ;; right most 2 dim is lat/lon
+    var@lat2d := onedtond(var@lat2d,sdim)
+    var@lon2d := onedtond(var@lon2d,sdim)
+
 end
 
 procedure reorder_dim_var(var)
@@ -374,17 +401,31 @@ begin
         dailyfn = casedir+"/outdata/"+component+"/"+case+sprinti("%2.2d",modeln)+"_"+component+"_echam_"+yyyymm+".nc"
     end if
     if (component.eq."mpiom")then
-        ;; "_data_2d_dm_", "_data_2d_mm_", "_data_3du_mm_", "_data_3dw_mm_", "_monitorig_ym_", "_timeser_dm_"
-        dailyfn = casedir+"/outdata/"+component+"/"+case+"_"+component+"_data_2d_dm_"+year+"0101_"+year+"1231.nc"
+            ;; "_data_2d_dm_", "_data_2d_mm_", "_data_3du_mm_", "_data_3dw_mm_", "_monitorig_ym_", "_timeser_dm_"
+            ;;dailyfn = casedir+"/outdata/"+component+"/"+case+"_"+component+"_data_2d_dm_"+year+"0101_"+year+"1231.nc"
+        dailyfn = fn_mpiexm(case, casedir,component,varname,year,month,modeln)
+        f = addfile(dailyfn,"r")
+        dims = getfilevardimsizes(f,"time")
+        if(dims.eq.12 .or. dims.eq.1)then
+            print("file is not daily file, check your variable.")
+            print(dailyfn+" "+varname)
+            print(dims)
+            exit
+        end if
+        return dailyfn
     end if
     return dailyfn
 end
 function read_mpiexm_filevar_1day(case, casedir,component,varname,year,month,day,modeln)
 begin
-    ;; not done yet, donot use it, TBD
     ;; read one day data
     fn = mpiexm_daily_fn(case, casedir,component,varname,year,month,day,modeln)
     f = addfile(fn,"r")
+    filevarnames = getfilevarnames(f)
+    if(.not.any(filevarnames.eq.varname))then
+        print(varname+" is not in "+fn)
+        exit
+    end if
     time = f->time
     ndim = dimsizes(getfilevardimsizes(f,varname))
 
@@ -401,6 +442,9 @@ begin
 
     ;; itime: index of time
     ;; ndim: number of dims of variable in file
+    if(ndim.le.2)then
+        var = f->$varname$
+    end if
     if(ndim.eq.3)then
         var = f->$varname$(itime,:,:)
     end if
@@ -412,13 +456,61 @@ begin
         print("read_mpiexm_filevar_1d(): "+fn)
         exit
     end if
-    printVarSummary(var) ;; need assign lat lon for mpiom data
     assign_ocn_grid(var,f)
-    printVarSummary(var) ;; need assign lat lon for mpiom data
-    exit
+    dims = dimsizes(var)
+    if(dims(0).eq.1)then
+        if(ndim.eq.4)then
+            vartmp = var(0,:,:)
+            delete(var)
+            var = vartmp
+        end if
+    end if
     reorder_dim_var(var)
     return var
 end
+function read_mpiexm_var_1day(case, casedir,component,varname,year,month,day,modeln)
+begin
+    ;; frontend of read_mpiexm_filevar_1day()
+    ;; for extended variables(daily)
+    extvars = (/"Q_FLUX_SFC"/)
+    if(.not.any(varname .eq.extvars))then
+        return read_mpiexm_filevar_1day(case, casedir,component,varname,year,month,day,modeln)
+    end if
+    if(varname .eq. "Q_FLUX_SFC")then
+        ;; surface heat flux, downward is negative , sum of 
+            ;; surface sensible heat flux
+            ;; surface latent heat flux
+            ;; short wave radiation
+            ;; long wave radiation
+        shf = read_mpiexm_filevar_1day(case, casedir,component,"ahfs",year,month,day,modeln)
+        lhf = read_mpiexm_filevar_1day(case, casedir,component,"ahfl",year,month,day,modeln)
+        swr = read_mpiexm_filevar_1day(case, casedir,component,"srads",year,month,day,modeln)
+        lwr = read_mpiexm_filevar_1day(case, casedir,component,"trads",year,month,day,modeln)
+        qflux = shf
+        qflux = shf+lhf+swr+lwr
+        qflux@long_name = "net heat flux at surface"
+        reorder_dim_var(qflux)
+        return qflux
+    end if
+end
+function read_mpiexm_1day_modeln(case, casedir,component,varname,year,month,day,modeln)
+begin
+    ;; frontend of read_mpiexm_filevar_1day()
+    ;; mean it if modeln is array
+    nmodel = dimsizes(modeln)
+    if(nmodel .eq. 1)then
+        return read_mpiexm_var_1day(case, casedir,component,varname,year,month,day,modeln)
+    end if
+    m = read_mpiexm_var_1day(case, casedir,component,varname,year,month,day,modeln(0))
+    do i = 1,nmodel -1
+        m1 = read_mpiexm_var_1day(case, casedir,component,varname,year,month,day,modeln(i))
+        m = m+m1
+        delete(m1)
+    end do
+    m = m/nmodel
+    return m
+end 
+
 function read_mpiexm_filevar_daily_1m(case, casedir,component,varname,year,month,modeln)
 begin
     ;; read daily data 1 month
@@ -554,10 +646,8 @@ begin
 end
 function read_mpiexm_extvar_season_1y(case, casedir,component,varname,year,month,modeln)
 begin
-    ;; not done yet, TBD
-    ;; take too much memory, not sure why.
     ;; calculate extended variable from file variables
-    ;; only for OHC now
+    ;; modify the list in function read_mpiexm_season_1y()
 
     ;; split variable name and lev(number), ex. "OHC-100" -> OHC , 100
     if(.not.ismissing(str_match(varname,"-")))then
@@ -594,7 +684,7 @@ end
 
 function read_mpiexm_season_1y(case, casedir,component,varname,year,months,modeln)
 begin
-    ext_varnames = (/"OHC","SSTC"/)
+    ext_varnames = (/"OHC","SSTC","HEATFLUX"/)
     isextvar = False
     do i = 0, dimsizes(ext_varnames)-1
         if(.not.ismissing(str_match_regex(varname,"^"+ext_varnames(i))))then
@@ -814,3 +904,6 @@ end
 ;f =addfile("tmp.nc","c")
 ;f->var = a
 
+;a = read_mpiexm_filevar_1day("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",1060,04,30,1)
+;a = read_mpiexm_filevar_1day("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","relhums",1060,04,30,1)
+;printVarSummary(a)

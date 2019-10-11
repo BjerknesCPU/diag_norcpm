@@ -3,6 +3,7 @@
 ;;DIAG_NORCPM; PLOTRES: ;; PLOTRES
 ;;DIAG_NORCPM; TITLE: title
 ;;DIAG_NORCPM; MONTHS: 0
+;;DIAG_NORCPM; MODELN: 1
 
 load "CODEDIR/mpiexm/func_read_mpiexm.ncl"
 begin
@@ -13,6 +14,7 @@ begin
     component = "COMPONENT"
     latbe = (/LATBE/)
     lonbe = (/LONBE/)
+    modeln = MODELN
 
     case = "CASE"
     casedir = "CASEDIR"
@@ -25,14 +27,22 @@ begin
         varts = f->varts
     else
         ;varall = read_mpiexm_YZLL(case,casedir,component,varname,years,1)
-        varall = read_mpiexm_season_YZLL(case,casedir,component,varname,ispan(min(ybe),max(ybe),1),months,1)
+        varall = read_mpiexm_season_YZLL(case,casedir,component,varname,ispan(min(ybe),max(ybe),1),months,modeln)
+        dims = dimsizes(varall)
+        ndim = dimsizes(dims)
 
         ;; make time series
         if(component.eq."mpiom")then
             ;; lat2d/lon2d
             lat2d = varall@lat2d
             lon2d = varall@lon2d
-            tmask = .not.ismissing(varall(0,0,:,:))  ;; 
+            if(ndim .eq.4)then
+                tmask = .not.ismissing(varall(0,0,:,:))  ;; 
+            end if
+            if(ndim .eq.3)then
+                tmask = .not.ismissing(varall(0,:,:))  ;; 
+            end if
+
             tmask = tmask .and. (lat2d.ge.min(latbe) .and. lat2d.le.max(latbe))
             tmask = tmask .and. (lon2d.ge.min(lonbe) .and. lon2d.le.max(lonbe))
             pi = atan(1.)*4
@@ -55,7 +65,15 @@ begin
         f->varts = varts 
     end if
 
-    varstd = stddev(varts(:,0))
+    tsdim = dimsizes(varts)
+    ntsdim = dimsizes(tsdim)
+    if(ntsdim.eq.2)then
+        varstd = stddev(varts(:,0))
+        vartsano = varts(:,0) - avg(varts)
+    else
+        varstd = stddev(varts)
+        vartsano = varts - avg(varts)
+    end if
     res = True
         res@gsnLeftString = title
         res@trYMaxF =  0.85
@@ -81,7 +99,6 @@ begin
 
     wks = gsn_open_wks("ps",figfn)
 
-    vartsano = varts(:,0) - avg(varts)
     plot = gsn_csm_xy(wks,years,vartsano,res)
     gsn_text(wks,plot,"stddev="+sprintf("%2.2f",varstd),years(0)+1,varstd+0.05,textres)
 

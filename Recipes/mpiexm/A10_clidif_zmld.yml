@@ -190,4 +190,4 @@ Scripts:
         dif_VARI_sample_case_SON
         dif_VARI_average_case_SON
         
-    COLUMN: figures CTN CNS CNA '</tr><tr>' ANN 3 DJF 3 MAM 3 JJA 3 SON 3
+    COLUMN: figures CTL CNS CNA '</tr><tr>' ANN 3 DJF 3 MAM 3 JJA 3 SON 3

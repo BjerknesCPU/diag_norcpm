@@ -2,7 +2,7 @@
 # mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
 
 Title: Monthly mean daily variance of max mixed layer thickness (amld) difference
-Description: 
+Description:  |
     Monthly mean daily max mixed layer thickness of Cases minus control run
     daily max mixed layer -> variance (daily) -> avgerage (monthly) -> average (seasonal) -> average (yearly)
 Depends: A12_clidif_amld_var.yml

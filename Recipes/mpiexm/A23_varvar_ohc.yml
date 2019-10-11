@@ -1,10 +1,10 @@
 # plot data variance in mpiexm
 # mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
 
-Title: Mixing Layer Depth Annual variance ratio of control run
+Title: Ocean Heat Content 100m Annual variance ratio of control run
 Description: 
     Case plot for mpiexm compare
-Thumbnail: VN_var_ratio_average_case_thumb.png
+Thumbnail: OHC100_var_ratio_average_case_thumb.png
 COMPONENT:  mpiom
 VARIABLE:  OHC-100
     # reading data
@@ -12,7 +12,7 @@ VN: OHC100
     # for filename
 VNT: OHC 100m
     # for title
-RG:
+RG: |
     res@mpLimitMode = "LatLon"
     res@mpMinLatF = -90.
     res@mpMaxLatF = 90.
@@ -27,10 +27,10 @@ PLOTRES: |
     res@lbOrientation = "Vertical"
     res@pmLabelBarWidthF = 0.1
     res@pmLabelBarOrthogonalPosF   = 0.01
-    res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/253,152,153/),(/255,118,33/),(/254,254,0/)/)
+    res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/203,204,254/),(/255,255,255/),(/255,255,255/),(/255,118,33/),(/254,254,0/)/)
     res@cnFillColors   := res@cnFillColors/255. 
     res@cnLevelSelectionMode = "ExplicitLevels"
-    res@cnLevels = (/.2,.4,.6,.8,1.,1.2/)
+    res@cnLevels = (/.2,.4,.6,.8,.9,1.,1.1,1.2/)
     res@gsnRightString = "1"
 
     lres@cnLineColor = "Red"
@@ -70,69 +70,69 @@ Scripts:
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAA
     YEARBE: YBEA
-    TITLE: "yearly VNT variance ratio CNA/CTL (nyear: IE=NYA, CTL=NYC)"
+    TITLE: "yearly VNT vari. ratio CNA/CTL (nyear: IE=NYA, CTL=NYC)"
     FIGFILENAME: VN_var_ratio_average_case
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAS
     YEARBE: YBES
-    TITLE: "yearly VNT variance ratio CNS/CTL (nyear: IE=NYS, CTL=NYC)"
+    TITLE: "yearly VNT vari. ratio CNS/CTL (nyear: IE=NYS, CTL=NYC)"
     FIGFILENAME: VN_var_ratio_sample_case
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAS
     YEARBE: YBES
     MONTHS: 12,1,2
-    TITLE: "yearly VNT variance ratio CNS/CTL DJF (nyear: IE=NYS, CTL=NYC)"
+    TITLE: "yearly VNT vari. ratio CNS/CTL DJF (nyear: IE=NYS, CTL=NYC)"
     FIGFILENAME: VN_var_ratio_sample_case_DJF
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAA
     YEARBE: YBEA
     MONTHS: 12,1,2
-    TITLE: "yearly VNT variance ratio CNA/CTL DJF (nyear: IE=NYA, CTL=NYC)"
+    TITLE: "yearly VNT vari. ratio CNA/CTL DJF (nyear: IE=NYA, CTL=NYC)"
     FIGFILENAME: VN_var_ratio_average_case_DJF
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAS
     YEARBE: YBES
     MONTHS: 3,4,5
-    TITLE: "yearly VNT variance ratio CNS/CTL MAM (nyear: IE=NYS, CTL=NYC)"
+    TITLE: "yearly VNT vari. ratio CNS/CTL MAM (nyear: IE=NYS, CTL=NYC)"
     FIGFILENAME: VN_var_ratio_sample_case_MAM
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAA
     YEARBE: YBEA
     MONTHS: 3,4,5
-    TITLE: "yearly VNT variance ratio CNA/CTL MAM (nyear: IE=NYA, CTL=NYC)"
+    TITLE: "yearly VNT vari. ratio CNA/CTL MAM (nyear: IE=NYA, CTL=NYC)"
     FIGFILENAME: VN_var_ratio_average_case_MAM
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAS
     YEARBE: YBES
     MONTHS: 6,7,8
-    TITLE: "yearly VNT variance ratio CNS/CTL JJA (nyear: IE=NYS, CTL=NYC)"
+    TITLE: "yearly VNT vari. ratio CNS/CTL JJA (nyear: IE=NYS, CTL=NYC)"
     FIGFILENAME: VN_var_ratio_sample_case_JJA
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAA
     YEARBE: YBEA
     MONTHS: 6,7,8
-    TITLE: "yearly VNT variance ratio CNA/CTL JJA (nyear: IE=NYA, CTL=NYC)"
+    TITLE: "yearly VNT vari. ratio CNA/CTL JJA (nyear: IE=NYA, CTL=NYC)"
     FIGFILENAME: VN_var_ratio_average_case_JJA
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAS
     YEARBE: YBES
     MONTHS: 9,10,11
-    TITLE: "yearly VNT variance ratio CNS/CTL SON (nyear: IE=NYS, CTL=NYC)"
+    TITLE: "yearly VNT vari. ratio CNS/CTL SON (nyear: IE=NYS, CTL=NYC)"
     FIGFILENAME: VN_var_ratio_sample_case_SON
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
     CASE: CAA
     YEARBE: YBEA
     MONTHS: 9,10,11
-    TITLE: "yearly VNT variance ratio CNA/CTL SON (nyear: IE=NYA, CTL=NYC)"
+    TITLE: "yearly VNT vari. ratio CNA/CTL SON (nyear: IE=NYA, CTL=NYC)"
     FIGFILENAME: VN_var_ratio_average_case_SON
 
 -  

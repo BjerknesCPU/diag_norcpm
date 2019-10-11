@@ -1,0 +1,12 @@
+# Depends daily weather plot
+# mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
+
+Title: QFlux and OLR meta recipe f08_5AGCMs_NASPG_average at 1080-01
+Description:  |
+    Just a meta recipe. Ignore me please.
+Depends: mpiexm/A99/A99E_f08_5AGCMs_NASPG_average_1080_01_01.yml,mpiexm/A99/A99E_f08_5AGCMs_NASPG_average_1080_01_02.yml,mpiexm/A99/A99E_f08_5AGCMs_NASPG_average_1080_01_03.yml,mpiexm/A99/A99E_f08_5AGCMs_NASPG_average_1080_01_04.yml,mpiexm/A99/A99E_f08_5AGCMs_NASPG_average_1080_01_05.yml
+
+Scripts:
+-  
+    plotScript: mpiexm/mk_daily_ani.sh
+    

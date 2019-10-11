@@ -40,8 +40,20 @@ begin
         varall = read_mpiexm_season_YZLL(case,casedir,component,varname,ispan(min(ybe),max(ybe),1),months,1)
         varcon = read_mpiexm_season_YZLL(ccase,controldir,component,varname,ispan(min(cybe),max(cybe),1),months,1)
 
-        varvar = dim_variance_n_Wrap(varall(:,0,:,:),0)
-        convar = dim_variance_n_Wrap(varcon(:,0,:,:),0)
+        dims = dimsizes(varall)
+        ndim = dimsizes(dims)
+        if(ndim .eq. 3)then
+            varvar = dim_variance_n_Wrap(varall(:,:,:),0)
+            convar = dim_variance_n_Wrap(varcon(:,:,:),0)
+        end if
+        if(ndim .eq. 4)then ;; 
+            if(dims(1).ne.1)then
+                print("Warning, not only one z axis")
+                print("    plot first layer")
+            end if
+            varvar = dim_variance_n_Wrap(varall(:,0,:,:),0)
+            convar = dim_variance_n_Wrap(varcon(:,0,:,:),0)
+        end if
         dvar = varvar
         dvar = varvar / where(convar.eq.0,convar@_FillValue,convar)
 

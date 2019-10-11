@@ -18,11 +18,12 @@ PLOTRES: |
     res@lbOrientation = "Vertical"
     res@pmLabelBarWidthF = 0.1
     res@pmLabelBarOrthogonalPosF   = 0.01
-    res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/253,152,153/),(/255,118,33/),(/254,254,0/)/)
+    ;;res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/253,152,153/),(/255,118,33/),(/254,254,0/)/)
+    res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/203,204,254/),(/255,255,255/),(/255,255,255/),(/255,118,33/),(/254,254,0/)/)
     res@cnFillColors   := res@cnFillColors/255. 
     res@cnLevelSelectionMode = "ExplicitLevels"
     ;res@cnLevels = (/.2,1,2,3,4,5/)
-    res@cnLevels = (/.2,.4,.6,.8,1.,1.2/)
+    res@cnLevels = (/.2,.4,.6,.8,.9,1.,1.1,1.2/)
     res@gsnRightString = "1"
 
     lres@cnLineColor = "Red"

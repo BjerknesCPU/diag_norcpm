@@ -239,6 +239,14 @@ open('runall.sh','w').write(runallTxt)
 updateTxt  = 'cd .. \n'
 updateTxt += diag_norcpm_Root+'/diag_norcpm.sh '+BASEDIR+'\n'
 open('update.sh','w').write(updateTxt)
+makefileTxt = '''
+replot:
+	time sh update.sh 
+upload:
+	cd ../ ; ~/exec/public work-STERCP ; cd -
+all: replot upload
+'''
+open('Makefile','w').write(makefileTxt)
 
 
 ### run all (parallel)
@@ -389,7 +397,7 @@ for i in dirs:
     html += '<h4>'+r['title']+'</h4>'
     if r.get('thumb'): html += ''+'<img  ALIGN="left" src="'+i+'/'+r['thumb']+'">'
     html += '</a>\n'
-    html += '<p>'+r['desc']+'</p>'
+    html += '<pre>'+r['desc']+'</pre>'
     html += '</br> \n'
     html += '</span>\n'
     html += '</br> \n'

@@ -1,47 +1,40 @@
 # plot data difference in mpiexm
 # mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
 
-Title: Monthly mean daily max mixed layer thickness (amld) difference
+Title: Ocean heat content 1000m
 Description: 
-    Monthly mean daily max mixed layer thickness of Cases minus control run
-COMMENT: Monthly mean daily max mixed layer thickness diference between interactive ensemble and control run.
+    Monthly mean ocean heat conetnt 1000m
+COMMENT: Monthly mean ocean heat conetnt 1000m
 COMPONENT:  mpiom
 MODELN: 1
-VARI: amld
+VARI: OHC-1000
 VARIABLE: VARI
-VN: MaxMixedLayer
-RG: |
+VN: OHC 1000m
+RG:  |
     res@mpLimitMode = "LatLon"
-    res@mpMinLatF = 20.
-    res@mpMaxLatF = 70.
-    res@mpMinLonF = -80.
-    res@mpMaxLonF =  10.
-    res@mpCenterLatF = 50.
-    res@mpCenterLonF =  -35.
-    res@mpProjection = "LambertConformal"
-    res@mpGridAndLimbOn = True
-    res@gsnMaskLambertConformal = True
-    res@gsnRightString = "~F34~0~F~C"
-PLOTRES: |
+    res@mpMinLatF = -90.
+    res@mpMaxLatF = 90.
+    res@mpMinLonF = -330.
+    res@mpMaxLonF =   30.
+    res@mpCenterLonF =   -150.
+PLOTRES:  |
     RG
     res@cnLinesOn = False
     res@cnFillOn = True
+    res@cnFillMode = "CellFill"
     res@lbOrientation = "Vertical"
     res@cnLevelSelectionMode = "ExplicitLevels"
-    res@cnLevels = fspan(-10.,10.,21)
+    res@cnLevels = fspan(-1000.,1000.,21)
     res@cnFillPalette = "BlAqGrWh2YeOrReVi22"
-CRES: |
+CRES:  |
     RG
     res@cnLinesOn = False
     res@cnFillOn = True
+    res@cnFillMode = "CellFill"
+    res@cnFillPalette = "WhBlGrYeRe"
     res@lbOrientation = "Vertical"
     res@cnLevelSelectionMode = "ExplicitLevels"
-    res@cnLevels = fspan(0.,300,31)
-    ;; colormap
-    cmap       = read_colormap_file("ncl_default")
-    cmap(0,:) = 1. ;; change first to white
-    res@cnFillPalette = cmap
-    delete(cmap)
+    res@cnLevels = fspan(0.,60000,25)
 
 
 

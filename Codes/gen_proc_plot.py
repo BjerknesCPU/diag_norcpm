@@ -5,7 +5,7 @@ def gen_proc_plot(template:str,recipe):
         replace template string with dict(recipe)
     '''
     diagcmd = r';DIAG_NORCPM;' # read setting from ncl comments
-    needcmd = 'NeedBeReplace'  # special variable 
+    needcmd = 'NeedBeReplaced'  # special variable 
     OutputReplaces = False
 
     ## planeize the recipe
