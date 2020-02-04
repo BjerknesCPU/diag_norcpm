@@ -104,8 +104,8 @@ REG: nino34
 
 Scripts:  ## Scripts templates and replacements
 -  
-    plotScript: plot_forecast_correlation.ncl  ## define template
-    FIGFILENAME: fig_cor_forecast_REG
+plotScript: plot_forecast_correlation.ncl  ## define template
+FIGFILENAME: fig_cor_forecast_REG
 
 ```
 The global variables are apply to all Scripts. The contain of plot_forecast_correlation.ncl will replaced with VARIABLE, FIGFILENAME and REG. The FIGFILENAME will become "fig_cor_forecast_nino34".
@@ -118,10 +118,10 @@ Every recipe has it own work directory and an output log, shares same file name 
 
 
 # Code templates
-    The code template is the manuscirpt to generate codes. All templates should be placed in Codes/ directory.
-    Only NCL and bash script are accepted now.
-    Templates contains all CAPTIAL variables to be replace. The replacements are defined in recipe.
-    Default values can be defined in template. For a NCL example:
+The code template is the manuscirpt to generate codes. All templates should be placed in Codes/ directory.
+Only NCL and bash script are accepted now.
+Templates contains all CAPTIAL variables to be replace. The replacements are defined in recipe.
+Default values can be defined in template. For a NCL example:
 ```
 ;;DIAG_NORCPM; FIGFILENAME: fig01
 begin
@@ -150,7 +150,7 @@ Script:
         fig03
     COLUMN: 'Title01' 'tr' 1 'Title02' 'Title03' 'tr' 2
 ```
-    The layout will become:
+The layout will become:
 ```
     Title01
     fig01
