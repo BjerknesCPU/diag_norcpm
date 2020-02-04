@@ -12,6 +12,7 @@ PLOTRES: |
     res@mpMaxLatF = 70.
     res@mpMinLonF = -80.
     res@mpMaxLonF =  10.
+    res@pmTickMarkDisplayMode = "Always"
     res@mpCenterLatF = 50.
     res@mpCenterLonF =  -35.
     res@mpProjection = "LambertConformal"
@@ -23,11 +24,11 @@ PLOTRES: |
     res@pmLabelBarWidthF = 0.1
     res@pmLabelBarOrthogonalPosF   = 0.01
     ;res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/253,152,153/),(/255,118,33/),(/254,254,0/)/)
-    res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/203,204,254/),(/255,255,255/),(/255,255,255/),(/255,118,33/),(/254,254,0/)/)
+    res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/203,204,254/),(/255,255,255/),(/255,255,255/),(/254,254,0/),(/255,118,33/),(/255,0,0/),(/255,0,222/)/)
     res@cnFillColors   := res@cnFillColors/255. 
     res@cnLevelSelectionMode = "ExplicitLevels"
     ;res@cnLevels = (/.2,1,2,3,4,5/)
-    res@cnLevels = (/.2,.4,.6,.8,.9,1.,1.1,1.2/)
+    res@cnLevels = (/.2,.4,.6,.8,.9,1.,1.1,1.2,1.4,1.6/)
     res@gsnRightString = "1"
 
     lres@cnLineColor = "Red"
@@ -38,13 +39,13 @@ PLOTRES: |
     lres@cnLineLabelsOn = False
     lres@cnInfoLabelOn = False
 
-CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+CASEDIR: /projects/NS9207K/pgchiu/CASE
     ## CASE define later
 
 CTN: f08_1AGCM
     ## proxy of CCASE 'control case'
 CCASE: CTN
-CONTROLDIR: /tos-project4/NS9207K/pgchiu/CCASE
+CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
 YBEC: 1101,1250
 CONTROLYEARBE: YBEC
 NYC: 150

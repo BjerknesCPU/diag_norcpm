@@ -31,7 +31,10 @@ plotCase=$(basename $(dirname ${BASEDIR}))-${Dir} ## {model_ver}_{hindcasts}
 RUNPRE=${Dir%hindcasts} # remove "hindcast" string
 if [ -z "$(ls $BASEDIR/$RUNPRE* 2>/dev/null)" ]; then # if not, take first forecast run and remove tailling date
     RUNPRE=$(ls -d $BASEDIR/*_???????{0..9} 2>/dev/null |head -n1 )
-echo $RUNPRE
+    RUNPRE=$(basename $RUNPRE 2>/dev/null | sed "s/[0-9]\{8\}$//")
+fi
+if [ ! -z "$(ls $BASEDIR/$RUNPRE_* 2>/dev/null)" ]; then # if not, take first forecast run and remove tailling date
+    RUNPRE=$(ls -d $BASEDIR/*_???????{0..9} 2>/dev/null |head -n1 )
     RUNPRE=$(basename $RUNPRE 2>/dev/null | sed "s/[0-9]\{8\}$//")
 fi
 
@@ -84,8 +87,24 @@ plotRecipes='mpiexm/A23_varvar_ohc.yml,mpiexm/A24_varvar_ohc200.yml,mpiexm/A25_v
 plotRecipes='mpiexm/A16_clidif_ohc1000.yml,mpiexm/A04d_ctl_annualvar_global.yml,mpiexm/A04d_ctl_annualvar_NAtl.yml,mpiexm/A20NAtl_varvar_zmld.yml,mpiexm/A20_varvar_zmld.yml,mpiexm/A21NAtl_varvar_amld.yml,mpiexm/A21_varvar_amld.yml'
 plotRecipes='mpiexm/A06d_dif_sst_NAtl.yml,mpiexm/A10NAtl_clidif_zmld.yml,mpiexm/A11_clidif_amld.yml,mpiexm/A11NAtl_clidif_amld.yml,mpiexm/A12_clidif_amld_var.yml,mpiexm/A12NAtl_clidif_amld_var.yml,mpiexm/A13NAtl_clidif_ohc.yml,mpiexm/A20NAtl_varvar_zmld.yml,mpiexm/A21NAtl_varvar_amld.yml,mpiexm/A14NAtl_clidif_ohc200.yml,mpiexm/A15NAtl_clidif_ohc500.yml'
 plotRecipes='mpiexm/A23_varvar_ohc.yml,mpiexm/A24_varvar_ohc200.yml,mpiexm/A25_varvar_ohc500.yml,mpiexm/A16_clidif_ohc1000.yml'
+plotRecipes='mpiexm/A04d_ctlOnly_annualvar_global.yml,mpiexm/A05d_ctlOnly_dif_sst.yml'
+plotRecipes='mpiexm/A99/A99E_f08_5AGCMs_NASPG_average_daily_weather_1180_08.yml'
 plotRecipes='mpiexm/A99_plot_1day_weather.yml'
-plotRecipes='mpiexm/A99/A99E_f08_5AGCMs_NASPG_average_daily_weather_1080_01.yml'
+plotRecipes='mpiexm/A05d_ctlOnly_dif_sst.yml'
+plotRecipes='mpiexm/A17_clidif_prec.yml,mpiexm/A04d_ctlOnly_annualvar_global.yml'
+plotRecipes='mpiexm/A17NAtl_clidif_prec.yml'
+plotRecipes='mpiexm/A17_clidif_prec.yml'
+plotRecipes='mpiexm/A18_clidif_amoc.yml,mpiexm/A10NAtl_clidif_zmld.yml,mpiexm/A11NAtl_clidif_amld.yml'
+plotRecipes='mpiexm/A18_clidif_amoc.yml'
+plotRecipes='mpiexm/A99/A99E_f08_5AGCMs_NASPG_average_daily_weather_1180_01.yml'
+plotRecipes='mpiexm/A30_daily_spect_sst.yml,mpiexm/A30subP_daily_spect_sst.yml,mpiexm/A31_daily_spect_abswind.yml,mpiexm/A31subP_daily_spect_abswind.yml,mpiexm/A32_daily_spect_qflux.yml,mpiexm/A32subP_daily_spect_qflux.yml'
+plotRecipes='mpiexm/A30nino34_daily_spect_sst.yml'
+plotRecipes='14_AnoCor_sst_obs.yml,22_rank_histogram_ano_obs.yml'
+plotRecipes='mpiexm/A33_daily_spect_amld.yml,mpiexm/A33subP_daily_spect_amld.yml'
+plotRecipes='mpiexm/A40_spect_ratio_sst_qflux.yml'
+plotRecipes='mpiexm/A41_spect_ratio_amld_abswind.yml'
+plotRecipes='90_ocnonly_with_obs.yml'
+plotRecipes='91_AnoCor_all.yml'
 #--------------------------- case settings end -------------------------
 
 

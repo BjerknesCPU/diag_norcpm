@@ -10,13 +10,16 @@ MODELN: 1
 VARI: zmld
 VARIABLE: VARI
 VN: MixedLayer
-PLOTRES: |
+RG: |
     res@mpLimitMode = "LatLon"
     res@mpMinLatF = -90.
     res@mpMaxLatF = 90.
     res@mpMinLonF = -330.
     res@mpMaxLonF =   30.
+    res@pmTickMarkDisplayMode = "Always"
     res@mpCenterLonF =   -150.
+PLOTRES: |
+    RG
     res@cnLinesOn = False
     res@cnFillOn = True
     res@cnFillMode = "CellFill"
@@ -25,31 +28,30 @@ PLOTRES: |
     res@cnLevels = fspan(-10.,10.,21)
     res@cnFillPalette = "BlAqGrWh2YeOrReVi22"
 CRES: |
-    res@mpLimitMode = "LatLon"
-    res@mpMinLatF = -90.
-    res@mpMaxLatF = 90.
-    res@mpMinLonF = -330.
-    res@mpMaxLonF =   30.
-    res@mpCenterLonF =   -150.
+    RG
     res@cnLinesOn = False
     res@cnFillOn = True
     res@cnFillMode = "CellFill"
-    res@cnFillPalette = "WhBlGrYeRe"
     res@lbOrientation = "Vertical"
     res@cnLevelSelectionMode = "ExplicitLevels"
     res@cnLevels = fspan(0.,300,31)
+    ;; colormap
+    cmap       = read_colormap_file("ncl_default")
+    cmap(0,:) = 1. ;; change first to white
+    res@cnFillPalette = cmap
+    delete(cmap)
 
 
 
 CTN: f08_1AGCM
     ## proxy of CCASE 'control case'
 CCASE: CTN
-CONTROLDIR: /tos-project4/NS9207K/pgchiu/CCASE
+CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
 YBEC: 1101,1250
 CONTROLYEARBE: YBEC
 NYC: 150
 
-CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+CASEDIR: /projects/NS9207K/pgchiu/CASE
     ## CASE define later
 CAA: f08_5AGCMs_NASPG_average
 CNA: IEave

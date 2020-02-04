@@ -2,7 +2,8 @@
 Title: SST regional Rank histogram
 Description: |
     SST rank histogram.
-    Use HadISST as  observation data.
+    Use HadISST as observation data.
+Tags: sst, rankHisto
 COMPONENT:  ocn
 VARIABLE:  sst
 PLOTRES: |

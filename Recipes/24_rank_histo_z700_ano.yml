@@ -3,6 +3,7 @@ Title: Z700 anomaly Rank histogram
 Description: |
     Z700 anomaly prediction rank histogram.
     Use GISS as observation data.
+Tags: z700, ano, rankHisto
 Thumbnail: z700_global_rank_histogram_lead1_FMA_thumb.png
 COMPONENT:  atm
 VARIABLE:  Z700

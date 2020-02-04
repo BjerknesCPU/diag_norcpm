@@ -189,7 +189,7 @@ begin
         res@vpWidthF = 0.7
         res@vpHeightF = 0.3
         res@trYMinF = 0.00
-        res@trYMaxF = 0.21
+        res@trYMaxF = 1./dims(0) *2. ; 0.21
         res@trXMinF = 0.4
         res@trXMaxF = dimsizes(mean_rank)+0.6
         res@gsnXYBarChartBarWidth = 0.50                 ; change bar widths

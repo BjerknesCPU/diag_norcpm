@@ -229,6 +229,35 @@ begin
     return ohc
 end
 
+undef("recover_nc_lat2d_lon2d")
+function recover_nc_lat2d_lon2d(var)
+begin
+    ;; resotre lat2d and lon2d from netcdf file
+    ;; since netcdf cannot save 2d attitude
+        if(isatt(var,"lat2d"))then ;; netcdf cannot save 2d attitude
+            dims = dimsizes(var)
+            ndim = dimsizes(dims)
+            dims := dims(ndim-2:)
+            var@lat2d := onedtond(var@lat2d,dims)
+            var@lon2d := onedtond(var@lon2d,dims)
+            delete(dims)
+            delete(ndim)
+        end if
+    return var
+end
+
+undef("remove_right_size_1_dim")
+function remove_right_size_1_dim(a)
+begin
+    dims = dimsizes(a)
+    ndim = dimsizes(dims)
+    if(ndim.eq.2 .and. dims(1).eq.1)then
+        b  = a(:,0)
+        return b
+    end if
+    return a
+end
+
 undef("assign_ocn_grid")
 procedure assign_ocn_grid(var,gf:file)
 begin
@@ -276,6 +305,106 @@ begin
         ;var@area2d = area
     end if
 end
+
+undef("mask_with_latbe_lonbe")
+function mask_with_latbe_lonbe(ilat2d,ilon2d,latbe,lonbe)
+begin
+    ;; return a logical mask inside latbe and lonbe
+    ;;    dims follow lat2d and lon2d
+
+    g_areafile = "~/scratch/diag_norcpm/Data/mpiexm_areas.nc"  ;; bad idea
+    ;; check lat2d and lon2d
+    latdims = dimsizes(ilat2d)
+    londims = dimsizes(ilon2d)
+    ;; check them should be same, TBD
+
+    if(dimsizes(latdims).eq.1)then ;; incase 1d lat/lon
+        lat2d = conform_dims((/latdims,londims/),ilat2d,0)
+        lon2d = conform_dims((/latdims,londims/),ilon2d,1)
+    end if
+    if(dimsizes(latdims).eq.2)then ;; really 2d lat/lon
+        lat2d = ilat2d
+        lon2d = ilon2d
+    end if
+
+    ;;      if longitude is -180 to +180, middle 0deg
+    if(any(lonbe.lt.0))then
+        lonmid0 = True
+    else ;; if longitude is 0    to  360
+        lonmid0 = False
+    end if
+    
+    if(max(lon2d).gt.200 .eq. lonmid0)then
+        if(lonmid0)then
+            lon2d = where(lon2d.gt.180,lon2d-360.,lon2d)
+        else
+            lon2d = where(lon2d.lt.0,lon2d+360.,lon2d)
+        end if
+    end if
+
+    vmask =             lat2d.ge.min(latbe) .and. lat2d.le.max(latbe)
+    vmask = vmask .and. lon2d.ge.min(lonbe) .and. lon2d.le.max(lonbe)
+
+    ;; weighting
+
+    ;; wrong!! grid size(lat/lon) is not constant!! wgt = where(vmask,cos(lat2d/180*get_pi("double")),0)
+    ;; read area.nc, bad idea but should work, need modify
+    dims = dimsizes(lat2d)
+    if(all(dims.eq.(/96,192/)))then  ;; for atm, need modify
+        af = addfile(g_areafile,"r")
+        vn = "al01.srf"
+        area = f->$vn$
+        wgt = wgt / sum(wgt)
+    end if
+    if(all(dims.eq.(/220,256/)))then  ;; for ocn, need modify
+        af = addfile(g_areafile,"r")
+        vn = "oces.srf"
+        area = af->$vn$
+        ;; there are 2 lon line overlap overlap in data
+        adims = dimsizes(area)
+        adims(1) = adims(1)+2
+        wgt = new(adims,typeof(area))
+        wgt = 0.
+        wgt(:,:adims(1)-3) = area
+        wgt(:,adims(1)-2:) = area(:,:1)
+        wgt = wgt / max(wgt)
+    end if
+    if(.not.isvar("wgt"))then
+        print(dims)
+        print(lon2d(0,0)+" "+lon2d(0,1))
+        print(lon2d(0,254)+" "+lon2d(0,255))
+        print(lat2d(0,0)+" "+lat2d(0,1))
+        print(lat2d(0,254)+" "+lat2d(0,255))
+        exit
+    end if
+    wgt = where(vmask,wgt,0)
+    vmask@wgt = wgt
+
+    return vmask
+end
+undef("mean_with_latbe_lonbe")
+function mean_with_latbe_lonbe(var,latbe[2],lonbe[2])
+begin
+    ;; average rightmost 2 dims with latbe and lonbe
+    ;; var should be large than 2 dims
+    ;; var should have coordinates or lat2d/lon2d attitdue
+    if(isatt(var,"lat2d"))then
+        lat2d = var@lat2d
+        lon2d = var@lon2d
+    else
+        dims = dimsizes(var)
+        ndim = dimsizes(dims)
+        latname = var!(ndim-2)
+        lonname = var!(ndim-1)
+        lat2d =  var&$latname$;; not really lat2d, but compilable with mask_with_latbe_lonbe()
+        lon2d =  var&$lonname$;; not really lon2d, but compilable with mask_with_latbe_lonbe()
+    end if
+    lmask = mask_with_latbe_lonbe(lat2d,lon2d,latbe,lonbe)
+    wgt = lmask@wgt
+    varts = wgt_areaave2(var,wgt,0) ;; 0 means use non-missing value only
+    return varts
+end
+
 procedure onedto2d_grid(var)
 begin
     ;; re-assign lat2d/lon2d from 1d to 2d
@@ -333,14 +462,29 @@ begin
     end if
 end
 
-function fn_mpiexm(case, casedir,component,varname,year[1],month[*],modeln)
+function fn_mpiexm(case, casedir,component,varname,year[1],imonth[*],modeln)
 begin
     ;; get data file name
     ;; very simple one, rewrite if need to expand it
 
+    month = imonth ;; avoid warning at str_join()
     datadir = casedir+"/outdata/"+component+"/"
     if (component.eq."echam6")then ;; it's daily data, and some of them are grb file. Damn.
-        yyyymm = year+sprinti("%2.2d",month)
+        yyyymm = ""
+        yyyy = year
+        do m = 0,dimsizes(month)-1
+            mm = month(m)
+            if(month(m).gt.12)then
+                yyyy = year +1
+                mm = month(m)-12
+            end if
+            if(month(m).lt.1)then
+                yyyy = year -1
+                mm = month(m)+12
+            end if
+            yyyymm := array_append_record(yyyymm,yyyy+sprinti("%2.2d",mm),0)
+        end do
+        yyyymm := yyyymm(1:)
         ;; "_echam_", "_co2_", "_trdiag_"
         ;; if any operation for daily data
         if(isatt(varname,"cdo_operator"))then ;; sould be string or string array
@@ -357,25 +501,32 @@ begin
             print("use read_mpiexm_season_mean_ensmean_ZLL()")
             return False
         else
-            dailyfn = casedir+"/outdata/"+component+"/"+case+sprinti("%2.2d",modeln)+"_"+component+"_echam_"+yyyymm+".nc"
-            fns = case+"_"+varname+"_"+str_sub_str(cdoop," ","_")+"_"+component+"_"+sprinti("%2.2d",modeln)+"_echam_"+yyyymm+".nc"
-            fn = case+"_"+varname+"_"+str_sub_str(cdoop," ","_")+"_"+component+"_"+sprinti("%2.2d",modeln)+"_echam_"+year+"-"+str_join(month,"-")+".nc"
+            if(modeln .eq.0)then
+                dailyfn = casedir+"/outdata/"+component+"/"+case+"_"+component+where(varname.eq."slp","_slp_","_echam_")+yyyymm+".nc"
+                fns = case+"_"+varname+"_"+str_sub_str(cdoop," ","_")+"_"+component+"_"+"_echam_"+yyyymm+".nc"
+            else
+                dailyfn = casedir+"/outdata/"+component+"/"+case+sprinti("%2.2d",modeln)+"_"+component+where(varname.eq."slp","_slp_","_echam_")+yyyymm+".nc"
+                fns = case+"_"+varname+"_"+str_sub_str(cdoop," ","_")+"_"+component+"_"+sprinti("%2.2d",modeln)+"_echam_"+yyyymm+".nc"
+            end if
             ;; make tmp nc file
             nf = dimsizes(dailyfn)
+            system("rm -rf datatmp")
+            system("mkdir -p datatmp")
             do i =0, nf-1
                 if(isfilepresent(fns(i)))then
                     continue
                 end if
-                print("cdo --silent -t echam6 -f nc "+cdoop+" -select,name="+varname+" "+dailyfn(i)+" 'tmp_"+fns(i)+"' && mv 'tmp_"+fns(i)+"'  '"+fns(i)+"'")
-                system("cdo --silent -t echam6 -f nc "+cdoop+" -select,name="+varname+" "+dailyfn(i)+" 'tmp_"+fns(i)+"' && mv 'tmp_"+fns(i)+"'  '"+fns(i)+"'")
+                print("cdo --silent -t echam6 -f nc "+cdoop+" -select,name="+varname+" "+dailyfn(i)+" 'datatmp/tmp_"+fns(i)+"' && mv 'datatmp/tmp_"+fns(i)+"'  'datatmp/"+fns(i)+"'")
+                system("cdo --silent -t echam6 -f nc "+cdoop+" -select,name="+varname+" "+dailyfn(i)+" 'datatmp/tmp_"+fns(i)+"' && mv 'datatmp/tmp_"+fns(i)+"'  'datatmp/"+fns(i)+"'")
             end do
+            fns = "datatmp/"+fns
             return fns
 
         end if
     end if
     if (component.eq."mpiom")then
         ;; "_data_2d_dm_", "_data_2d_mm_", "_data_3du_mm_", "_data_3dw_mm_", "_monitorig_ym_", "_timeser_dm_"
-        datatypes = (/"_data_2d_dm_", "_data_2d_mm_", "_data_3du_mm_", "_data_3dw_mm_", "_monitorig_ym_", "_timeser_dm_"/)
+        datatypes = (/ "_data_2d_mm_", "_data_3du_mm_", "_data_3dw_mm_", "_data_2d_dm_", "_monitoring_ym_", "_timeser_dm_"/)
         do i = 0, dimsizes(datatypes)-1
             fn = case+"_"+component+datatypes(i)+year+"0101_"+year+"1231.nc"
             fullfn = casedir+"/outdata/"+component+"/"+fn
@@ -396,14 +547,30 @@ end
 
 function mpiexm_daily_fn(case, casedir,component,varname,year,month,day,modeln)
 begin
-    yyyymm = year+sprinti("%2.2d",month)
+    yyyy = year
+    mm = month
+    if(month.gt.12)then
+        yyyy = year +1
+        mm = month-12
+    end if
+    if(month.lt.1)then
+        yyyy = year -1
+        mm = month+12
+    end if
+    yyyymm = yyyy+sprinti("%2.2d",mm)
     if (component.eq."echam6")then ;; it's daily data, and some of them are grb file. Damn.
-        dailyfn = casedir+"/outdata/"+component+"/"+case+sprinti("%2.2d",modeln)+"_"+component+"_echam_"+yyyymm+".nc"
+        nn = where(modeln.eq.0,"",sprinti("%2.2d",modeln))
+        if(varname.eq."slp")then
+            dailyfn = casedir+"/outdata/"+component+"/"+case+nn+"_"+component+"_slp_"+yyyymm+".nc"
+        else
+            dailyfn = casedir+"/outdata/"+component+"/"+case+nn+"_"+component+"_echam_"+yyyymm+".nc"
+        end if
     end if
     if (component.eq."mpiom")then
             ;; "_data_2d_dm_", "_data_2d_mm_", "_data_3du_mm_", "_data_3dw_mm_", "_monitorig_ym_", "_timeser_dm_"
             ;;dailyfn = casedir+"/outdata/"+component+"/"+case+"_"+component+"_data_2d_dm_"+year+"0101_"+year+"1231.nc"
         dailyfn = fn_mpiexm(case, casedir,component,varname,year,month,modeln)
+        dailyfn = str_sub_str(dailyfn,"data_2d_mm","data_2d_dm")
         f = addfile(dailyfn,"r")
         dims = getfilevardimsizes(f,"time")
         if(dims.eq.12 .or. dims.eq.1)then
@@ -416,10 +583,12 @@ begin
     end if
     return dailyfn
 end
-function read_mpiexm_filevar_1day(case, casedir,component,varname,year,month,day,modeln)
+function read_mpiexm_filevar_1day(case, casedir,component,ivarname,year,month,day,modeln)
 begin
+    varname = ivarname
     ;; read one day data
     fn = mpiexm_daily_fn(case, casedir,component,varname,year,month,day,modeln)
+    print(fn+"")
     f = addfile(fn,"r")
     filevarnames = getfilevarnames(f)
     if(.not.any(filevarnames.eq.varname))then
@@ -452,8 +621,8 @@ begin
         var = f->$varname$(itime,:,:,:)
     end if
     if(.not.isvar("var"))then
-        print("read_mpiexm_filevar_1d(): there is no "+varname+" in file:")
-        print("read_mpiexm_filevar_1d(): "+fn)
+        print("read_mpiexm_filevar_1day(): there is no "+varname+" in file:")
+        print("read_mpiexm_filevar_1day(): "+fn)
         exit
     end if
     assign_ocn_grid(var,f)
@@ -511,6 +680,242 @@ begin
     return m
 end 
 
+function get_vmask_to_ilat_ilon_1_2(ivmask)
+begin
+    ;; get minimum square of vmask
+    vmask = ivmask
+    dims = dimsizes(vmask)
+    ilon1 = 9999
+    ilon2 = -1 
+    do j = 0,dims(0)-1
+        ilon1 = min((/min(ind(vmask(j,:))),ilon1/))  ;; leftest subscript
+        ilon2 = max((/max(ind(vmask(j,:))),ilon2/))  ;; rightest subscript
+    end do
+    ilat1 = 9999
+    ilat2 = -1
+    do i = 0,dims(1)-1
+        ilat1 = min((/min(ind(vmask(:,i))),ilat1/))  ;; bottom most subscript, not exactly south
+        ilat2 = max((/max(ind(vmask(:,i))),ilat2/))  ;; top most subscript
+    end do
+
+    vmask@ilat1 = ilat1
+    vmask@ilat2 = ilat2
+    vmask@ilon1 = ilon1
+    vmask@ilon2 = ilon2
+
+    return vmask
+end
+function read_mpiexm_filevar_mean_daily_ts_1m(case, casedir,component,varname,year,month,latbe,lonbe,modeln)
+begin
+    ;; read daily data 1 month
+    fn = mpiexm_daily_fn(case, casedir,component,varname,year,month,1,modeln)
+    f = addfile(fn,"r")
+    time = f->time
+    ndim = dimsizes(getfilevardimsizes(f,varname))
+
+    opt = 0
+    if(isatt(time,"calendar"))then
+        opt@calendar = time@calendar
+    end if
+    it1 = minind(abs(time-cd_inv_calendar(year,month,1,0,0,0,time@units,opt)))
+    it2 = minind(abs(time-cd_inv_calendar(year,month,days_in_month(year,month),23,59,59,time@units,opt)))
+
+    ;; read and averaging region of var
+    lat2d = f->lat
+    lon2d = f->lon
+    vmask = mask_with_latbe_lonbe(lat2d,lon2d,latbe,lonbe) ;; True in desire region
+    wgt = vmask@wgt
+
+    ;; find minimum square to read
+    if(.not.isatt(vmask,"lat1"))then
+        vmask = get_vmask_to_ilat_ilon_1_2(vmask)
+    end if
+    ilat1 = vmask@ilat1
+    ilat2 = vmask@ilat2
+    ilon1 = vmask@ilon1
+    ilon2 = vmask@ilon2
+
+    if(ndim.eq.3)then
+        var = f->$varname$(it1:it2,ilat1:ilat2,ilon1:ilon2)
+    end if
+    if(ndim.eq.4)then
+        var = f->$varname$(it1:it2,:,ilat1:ilat2,ilon1:ilon2)
+    end if
+    if(.not.isvar("var"))then
+        print("read_mpiexm_filevar_mean_daily_ts_1m(): "+varname+" is not in "+fn)
+        exit
+    end if
+
+    if (False) then ; debug
+        system("rm -f tmp.nc")
+        f=addfile("tmp.nc","c")
+        f->vmask = where(vmask,1,0)
+        f->wgt = wgt
+        f->lat2d = lat2d
+        f->var = var
+    end if
+
+    varts = wgt_areaave2(var,wgt(ilat1:ilat2,ilon1:ilon2),0) ;; 0 means use non-missing value only
+                                    ;; since here use global values with 0 weight outside
+    varts!0 = "time"
+    varts&time = var&$var!0$
+
+    delete(var)
+    return varts
+end
+function read_mpiexm_filevar_mean_daily_region_1m(case, casedir,component,varname,year,month,vmask,modeln)
+begin
+    ;; read daily data 1 month with vmask region only
+    fn = mpiexm_daily_fn(case, casedir,component,varname,year,month,1,modeln)
+    f = addfile(fn,"r")
+    time = f->time
+    ndim = dimsizes(getfilevardimsizes(f,varname))
+
+    opt = 0
+    if(isatt(time,"calendar"))then
+        opt@calendar = time@calendar
+    end if
+    it1 = minind(abs(time-cd_inv_calendar(year,month,1,0,0,0,time@units,opt)))
+    it2 = minind(abs(time-cd_inv_calendar(year,month,days_in_month(year,month),23,59,59,time@units,opt)))
+
+    ;; find minimum square to read
+    if(.not.isatt(vmask,"lat1"))then
+        vmask = get_vmask_to_ilat_ilon_1_2(vmask)
+    end if
+
+    ilat1 = vmask@ilat1
+    ilat2 = vmask@ilat2
+    ilon1 = vmask@ilon1
+    ilon2 = vmask@ilon2
+
+    if(ndim.eq.3)then
+        var = f->$varname$(it1:it2,ilat1:ilat2,ilon1:ilon2)
+    end if
+    if(ndim.eq.4)then
+        var = f->$varname$(it1:it2,:,ilat1:ilat2,ilon1:ilon2)
+    end if
+    if(.not.isvar("var"))then
+        print("read_mpiexm_filevar_mean_daily_region_1m(): "+varname+" is not in "+fn)
+        exit
+    end if
+
+    return var
+end
+function read_mpiexm_filevar_mean_daily_ts_seasonaly(case, casedir,component,varname,years,imonths,latbe,lonbe,modeln)
+begin
+    ;; frontend of read_mpiexm_filevar_mean_daily_ts_1m()
+    ;; read monthly data (months) for each (years)
+    ;; if imonth .eq. 0 => whole year => months = ispan(1,12,1)
+
+    if(any(imonths.eq.0))then
+        months = ispan(1,12,1)
+    else
+        months = imonths
+    end if
+
+    ;; if echam6, use cdo to read daily time series(quicker)
+    ;; time cdo -fldmean -sellonlatbox,-57.5,-32.5,25,35 -select,name=trad0 ../f08_5AGCMs_NASPG_average/outdata/echam6/f08_5AGCMs_NASPG_average01_echam6_echam_111[100-212].nc 1.nc 
+    if(component .eq. "echam6")then ;; read with cdo, use in fixed grid only
+        ;; input file links in tmp dir
+        ;; get latlon box and output file name
+        lonlatbox=min(lonbe)+","+max(lonbe)+","+min(latbe)+","+max(latbe)
+        ofn = case+"_mod"+sprinti("%2.2d",modeln)+"_"+varname+"_"+str_sub_str(lonlatbox,",","_")+".nc"
+
+        if(isfilepresent(ofn))then
+            f = addfile(ofn,"r")
+            if(getfilevardims(f,"time").eq.1)then
+                print("cache file wrong, remove it. "+ofn)
+                system("rm -f "+ofn)
+            end if
+        end if
+        if(.not.isfilepresent(ofn))then
+            tmpdatadir = "tmpdata_"+case+sprinti("%2.2d",modeln)
+            system("rm -rf "+tmpdatadir) ;; must clean out data file links
+            system("mkdir -p "+tmpdatadir)
+            do y = 0, dimsizes(years)-1
+            do m = 0, dimsizes(months)-1
+                fn = mpiexm_daily_fn(case, casedir,component,varname,years(y),months(m),1,modeln)
+                system("ln -sf "+fn+" "+tmpdatadir+"/")
+            end do
+            end do
+            cmd = "cdo  -fldmean -sellonlatbox,"+lonlatbox+" -select,name="+varname+" '"+tmpdatadir+"/*' "+ofn
+            print(""+cmd)
+            system("rm -f "+ofn)
+            system(cmd)
+        end if
+
+        f = addfile(ofn,"r")
+        varall = f->$varname$(:,0,0)
+        return remove_right_size_1_dim(varall)
+    end if
+
+    ;; others read with ncl
+    do y = 0, dimsizes(years)-1
+    do m = 0, dimsizes(months)-1
+        var1 = read_mpiexm_filevar_mean_daily_ts_1m(case, casedir,component,varname,years(y),months(m),latbe,lonbe,modeln)
+        if(.not.isvar("varall"))then
+            varall = var1
+            tunit = var1&$var1!0$@units
+        else
+            var1&$var1!0$ = cd_convert(var1&$var1!0$,tunit)
+            varall1 = array_append_record(varall,var1,0)
+            delete(varall)
+            varall = varall1
+            delete(varall1)
+        end if
+        delete(var1)
+    end do
+    end do
+    return remove_right_size_1_dim(varall)
+end
+function read_mpiexm_var_mean_daily_ts_seasonaly_1model(case, casedir,component,varname,years,imonths,latbe,lonbe,modeln)
+begin
+    ;; frontend of read_mpiexm_filevar_mean_daily_ts_seasonaly
+    ;; for extend variables
+    if(any(varname .eq.(/"Q_FLUX_SFC"/)))then
+        if(varname .eq. "Q_FLUX_SFC")then
+            ;; surface heat flux, downward is negative , sum of 
+                ;; surface sensible heat flux
+                ;; surface latent heat flux
+                ;; short wave radiation
+                ;; long wave radiation
+                print("read_mpiexm_var_mean_daily_ts_seasonaly_1model(): for Q_FLUX_SFC, reading shf(ahfs) in model "+modeln)
+            shf = read_mpiexm_filevar_mean_daily_ts_seasonaly(case, casedir,component,"ahfs",years,imonths,latbe,lonbe,modeln)
+                print("read_mpiexm_var_mean_daily_ts_seasonaly_1model(): for Q_FLUX_SFC, reading lhf(ahfl) in model "+modeln)
+            lhf = read_mpiexm_filevar_mean_daily_ts_seasonaly(case, casedir,component,"ahfl",years,imonths,latbe,lonbe,modeln)
+                print("read_mpiexm_var_mean_daily_ts_seasonaly_1model(): for Q_FLUX_SFC, reading swr(srads) in model "+modeln)
+            swr = read_mpiexm_filevar_mean_daily_ts_seasonaly(case, casedir,component,"srads",years,imonths,latbe,lonbe,modeln)
+                print("read_mpiexm_var_mean_daily_ts_seasonaly_1model(): for Q_FLUX_SFC, reading lwr(trads) in model "+modeln)
+            lwr = read_mpiexm_filevar_mean_daily_ts_seasonaly(case, casedir,component,"trads",years,imonths,latbe,lonbe,modeln)
+            qflux = shf
+            qflux = shf+lhf+swr+lwr
+            qflux@long_name = "net heat flux at surface"
+            reorder_dim_var(qflux)
+            return qflux
+        end if
+        print("read_mpiexm_var_mean_daily_ts_seasonaly(): "+varname+" is not support yet")
+        exit
+    else
+        return read_mpiexm_filevar_mean_daily_ts_seasonaly(case, casedir,component,varname,years,imonths,latbe,lonbe,modeln)
+    end if
+end
+function read_mpiexm_var_mean_daily_ts_seasonaly(case, casedir,component,varname,years,imonths,latbe,lonbe,modeln)
+begin
+    ;; frontend fo read_mpiexm_var_mean_daily_ts_seasonaly_1model()
+    if (dimsizes(modeln).eq.1)then
+        return read_mpiexm_var_mean_daily_ts_seasonaly_1model(case, casedir,component,varname,years,imonths,latbe,lonbe,modeln)
+    else
+        nmodel = dimsizes(modeln)
+        var = read_mpiexm_var_mean_daily_ts_seasonaly(case, casedir,component,varname,years,imonths,latbe,lonbe,modeln(0))
+        var = var/nmodel
+        do i = 1, nmodel-1
+            var = var + (read_mpiexm_var_mean_daily_ts_seasonaly(case, casedir,component,varname,years,imonths,latbe,lonbe,modeln(i))/nmodel)
+        end do
+        return var
+    end if
+    print("read_mpiexm_var_mean_daily_ts_seasonaly(): should not be here...")
+    exit
+end
 function read_mpiexm_filevar_daily_1m(case, casedir,component,varname,year,month,modeln)
 begin
     ;; read daily data 1 month
@@ -524,7 +929,7 @@ begin
         opt@calendar = time@calendar
     end if
     it1 = minind(abs(time-cd_inv_calendar(year,month,1,0,0,0,time@units,opt)))
-    it2 = minind(abs(time-cd_inv_calendar(year,month,days_in_month(year,month),0,0,0,time@units,opt)))
+    it2 = minind(abs(time-cd_inv_calendar(year,month,days_in_month(year,month),23,59,59,time@units,opt)))
     if(ndim.eq.3)then
         var = f->$varname$(it1:it2,:,:)
     end if
@@ -532,8 +937,8 @@ begin
         var = f->$varname$(it1:it2,:,:,:)
     end if
     if(.not.isvar("var"))then
-        print("read_mpiexm_filevar_1d(): there is no "+varname+" in file:")
-        print("read_mpiexm_filevar_1d(): "+fn)
+        print("read_mpiexm_filevar_daily_1m(): there is no "+varname+" in file:")
+        print("read_mpiexm_filevar_daily_1m(): "+fn)
         exit
     end if
     assign_ocn_grid(var,f)
@@ -549,6 +954,16 @@ begin
     varvar = dim_variance_n_Wrap(var1m,0) ;; assume dim 0 is time(daily)
     varvar@units = "("+varvar@units+")^2"
     return varvar
+end
+function read_mpiexm_var_daily_1m(case, casedir,component,varname,year,month,modeln)
+begin
+    ;; front end for read_mpiexm_filevar_daily_1m()
+    ;; process the variance of daily variable
+
+    if(.not.ismissing(str_match_regex(varname,"_var$")))then
+        return read_mpiexm_filevar_daily_variance_1m(case, casedir,component,varname,year,month,modeln)
+    end if
+    return read_mpiexm_filevar_daily_1m(case, casedir,component,varname,year,month,modeln)
 end
 function read_mpiexm_filevar_season_1y(case, casedir,component,ivarname,year,months,modeln)
 begin
@@ -591,7 +1006,7 @@ begin
             return varall
         end if 
     end if
-    if(component.eq."echam6")then
+    if(component.eq."echam6")then ;; monthly file
         fns = fn_mpiexm(case, casedir,component,varname,year,months,modeln)
         ;print(fns)
         ;print("read_mpiexm_12m(): reading echam6 is not done yet")
@@ -623,26 +1038,26 @@ begin
         fn = fn_mpiexm(case, casedir,component,varname,year,0,modeln)
         f = addfile(fn,"r")
         var = f->$varname$
-        if(var@coordinates .eq. "lon lat")then
+        if(isatt(var,"coordinates").and.var@coordinates .eq. "lon lat")then
             var@lat2d = f->lat
             var@lon2d = f->lon
         end if
-        var1 = var(months-1,:,:,:)
+        dims = dimsizes(var)
+        if(dims(0).eq.12)then
+            var1 = var(months-1,:,:,:)
+        else
+            var1 = var
+        end if
+        if(dims(0) .gt.12)then
+            print("read_mpiexm_filevar_season_1y(): unexpected daily data")
+            print("read_mpiexm_filevar_season_1y(): ERROR? exit...")
+            exit
+        end if
         delete(var)
         return var1
     end if
     print("read_mpiexm_filevar_season_1y(): unknown component: "+component)
     exit
-end
-function read_mpiexm_var_daily_1m(case, casedir,component,varname,year,month,modeln)
-begin
-    ;; front end for read_mpiexm_filevar_daily_1m()
-    ;; process the variance of daily variable
-
-    if(.not.ismissing(str_match_regex(varname,"_var$")))then
-        return read_mpiexm_filevar_daily_variance_1m(case, casedir,component,varname,year,month,modeln)
-    end if
-    return read_mpiexm_filevar_daily_1m(case, casedir,component,varname,year,month,modeln)
 end
 function read_mpiexm_extvar_season_1y(case, casedir,component,varname,year,month,modeln)
 begin
@@ -671,6 +1086,7 @@ begin
         ohc@standar_name = "Ocean heat content "+to_depth+" m"
         return ohc
     end if
+    ;; SST, just in degC
     if(vn .eq. "SSTC")then
         sstk = read_mpiexm_filevar_season_1y(case, casedir,component,"sst",year,month,modeln)
         sstc = sstk
@@ -678,13 +1094,29 @@ begin
         sstc@units = "degC"
         return sstc
     end if
-    
+    ;; precipitaion = convective + stra.
+    if(vn .eq. "PREC")then
+        aprl = read_mpiexm_filevar_season_1y(case, casedir,component,"aprl",year,month,modeln)
+        aprc = read_mpiexm_filevar_season_1y(case, casedir,component,"aprc",year,month,modeln)
+        prec = aprl 
+        prec = aprl + aprc
+        prec@long_name = "total precipitation (aprl + aprc)"
+        ;; W/m2s2 => mm/day
+        prec = prec * 86400
+        prec@units = "mm/day"
+
+        return prec
+    end if
+    ;; 90 percentile of daily rainfall
+    ;;      not start yet
+    ;;if(vn .eq. "PRECP90")then
+    ;;end if
 end
 
 
 function read_mpiexm_season_1y(case, casedir,component,varname,year,months,modeln)
 begin
-    ext_varnames = (/"OHC","SSTC","HEATFLUX"/)
+    ext_varnames = (/"OHC","SSTC","HEATFLUX","PREC"/)
     isextvar = False
     do i = 0, dimsizes(ext_varnames)-1
         if(.not.ismissing(str_match_regex(varname,"^"+ext_varnames(i))))then
@@ -697,6 +1129,7 @@ begin
     end if
     return read_mpiexm_filevar_season_1y(case, casedir,component,varname,year,months,modeln)
 end
+
 function read_mpiexm_12m(case, casedir,component,varname,year,modeln)
 begin
     return read_mpiexm_season_1y(case, casedir,component,varname,year,ispan(1,12,1),modeln)
@@ -845,6 +1278,32 @@ function read_mpiexm_YZLL(case, casedir,component,varname,years,modeln)
 begin
     return read_mpiexm_season_YZLL(case, casedir,component,varname,years,ispan(1,12,1),modeln)
 end
+function read_mpiexm_season_ensmean_YZLL(case, casedir,component,varname,years,imonths,modeln)
+begin
+    ;; frontend of read_mpiexm_season_YZLL(), return ensemble mean
+    nmodel = dimsizes(modeln)
+    if(nmodel.eq.1)then
+        return read_mpiexm_season_YZLL(case, casedir,component,varname,years,imonths,modeln)
+    end if
+
+    m1 = read_mpiexm_season_YZLL(case, casedir,component,varname,years,imonths,modeln(0))
+    m1 = m1/nmodel
+    do i = 1, nmodel-1
+        m1 = m1+ (read_mpiexm_season_YZLL(case, casedir,component,varname,years,imonths,modeln(i))/nmodel)
+    end do
+    m1@modeln = modeln
+    return m1
+end 
+
+function read_mpiexm_season_ts(case, casedir,component,varname,years,months,latbe,lonbe,modeln)
+begin
+    ;; return time yearly(seasonal) series 
+    a = read_mpiexm_season_YZLL(case, casedir,component,varname,years,months,modeln)
+    b = mean_with_latbe_lonbe(a,latbe,lonbe)
+    b!0 = a!0
+    b&$b!0$ = a&$a!0$
+    return remove_right_size_1_dim(b)
+end
 
 function read_mpiexm_season_mean_ZLL(case, casedir,component,varname,years,imonths,modeln)
 begin
@@ -889,6 +1348,7 @@ end
 
 ;; test
 ;a = read_mpiexm_season_mean_ZLL("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",ispan(1060,1062,1),(/4,5,6/),1)
+;a = read_mpiexm_season_YZLL("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",ispan(1060,1062,1),(/12,13,14/),1)
 ;a = read_mpiexm_season_mean_ensmean_ZLL("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",ispan(1060,1062,1),(/4,5,6/),ispan(1,5,1))
 ;a = mpiexm_daily_fn("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",1060,1,15,1)
 ;a = mpiexm_daily_fn("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",1060,1,15,1)
@@ -904,6 +1364,19 @@ end
 ;f =addfile("tmp.nc","c")
 ;f->var = a
 
+;a = read_mpiexm_season_mean_ensmean_ZLL("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","atlantic_moc",(/1060,1061,1062,1063/),(/6/),0) ;; atlantic_moc in monitoring_ym, yearly, (time,depth,lat,1)
+;printVarSummary(a)
+;printMinMax(a,0)
+;exit
+
 ;a = read_mpiexm_filevar_1day("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",1060,04,30,1)
 ;a = read_mpiexm_filevar_1day("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","relhums",1060,04,30,1)
 ;printVarSummary(a)
+
+;a = read_mpiexm_filevar_mean_daily_ts_1m("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",1060,05,(/-30.,-40./),(/0.,10./),0)
+;a = read_mpiexm_filevar_mean_daily_ts_seasonaly("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",ispan(1061,1070,1),(/1,2,3/),(/-30.,-40./),(/0.,10./),0)
+;a = read_mpiexm_var_mean_daily_ts_seasonaly("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",ispan(1061,1070,1),(/1,2,3/),(/-30.,-40./),(/0.,10./),0)
+;;a = read_mpiexm_season_ts("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",ispan(1060,1062,1),(/12,13,14/),(/-10.,10./),(/120.,180./),1)
+;;a = read_mpiexm_season_ts("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",ispan(1060,1062,1),(/10,11,12/),(/-10.,10./),(/120.,180./),1)
+;;printVarSummary(a)
+

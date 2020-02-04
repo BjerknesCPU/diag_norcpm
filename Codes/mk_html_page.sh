@@ -47,13 +47,17 @@ text+="<tr>"$'\n'
 
 # if column start with non integer
 while [ ! -z "${column[$icol]}" ] ; do
-    if [[ "${column[$icol]}" =~ ^[0-9]+$ ]] ; then
+    dst="${column[$icol]}"
+    if [[ "${dst}" =~ ^[0-9]+$ ]] ; then
         break
     else
-        if [ "${column[$icol]}" = '</tr><tr>' ]; then
-            text+="${column[$icol]}"$'\n'
+        if [ "${dst}" = 'tr' ]; then
+            dst='</tr><tr>'
+        fi
+        if [ "${dst}" = '</tr><tr>' ]; then
+            text+="${dst}"$'\n'
         else
-            text+="<th>${column[$icol]}</th>"$'\n'
+            text+="<th>${dst}</th>"$'\n'
         fi
         icol=$(expr $icol + 1)
     fi
@@ -81,17 +85,21 @@ for i in ${figs}; do
         text+=$'<tr>\n'
         icol=$(expr $icol + 1)
         while [ ! -z "${column[$icol]}" ] ; do
-            if [[ "${column[$icol]}" =~ ^[0-9]+$ ]] ; then
+            dst="${column[$icol]}"
+            if [ "${dst}" = 'tr' ]; then
+                dst='</tr><tr>'
+            fi
+            if [[ "${dst}" =~ ^[0-9]+$ ]] ; then
                 break
             else
-                text+="<th><b>${column[$icol]}</b></th>"$'\n'
+                text+="<th><b>${dst}</b></th>"$'\n'
                 icol=$(expr $icol + 1)
             fi
         done
         if [ $icol -ge $ncolarr ];then
             icol=$(expr $ncolarr - 1)
         fi
-        col=${column[$icol]}
+        col=${dst}
         row=1
     else
         row=$(expr $row + 1)

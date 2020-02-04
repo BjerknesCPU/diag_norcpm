@@ -1,6 +1,6 @@
 
 ;; plot variable variance in echam6 along members
-;; not done yet
+;; not done yet, even not start yet
 
 ;;DIAG_NORCPM; FIGFILENAME: fig
 ;;DIAG_NORCPM; PLOTRES: ;; PLOTRES

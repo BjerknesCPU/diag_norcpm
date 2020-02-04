@@ -3,6 +3,7 @@ Title: SST Rank histogram test. Use member 1 as proxy obs data.
 Description: |
     This is a test for rank histogram.
     Use 1st member as proxy observation.
+Tags: sst, rankHisto, proxyObs
 COMPONENT:  ocn
 VARIABLE:  sst
 PLOTRES: |

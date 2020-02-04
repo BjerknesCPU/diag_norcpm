@@ -11,6 +11,7 @@ PLOTRES: |
     res@mpMaxLatF = 70.
     res@mpMinLonF = -110.
     res@mpMaxLonF =   40.
+    res@pmTickMarkDisplayMode = "Always"
     res@cnLinesOn = False
     res@cnFillOn = True
     res@lbOrientation = "Vertical"
@@ -31,10 +32,10 @@ PLOTRES: |
     lres@cnLineLabelsOn = False
     lres@cnInfoLabelOn = False
 
-CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+CASEDIR: /projects/NS9207K/pgchiu/CASE
     ## CASE define later
 CCASE: f07_1AGCM
-CONTROLDIR: /tos-project4/NS9207K/pgchiu/CCASE
+CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
 CONTROLYEARBE: 1051,1150
 NYC: 100
 
@@ -139,7 +140,7 @@ Scripts:
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
-    CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
+    CASEDIR: /projects/NS9207K/earnest/mpiexm_exp/CASE
     YEARBE: YBEA
     LATBE: 50.,60.
     LONBE: -40.,-10.
@@ -170,7 +171,7 @@ Scripts:
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
-    CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
+    CASEDIR: /projects/NS9207K/earnest/mpiexm_exp/CASE
     YEARBE: YBEA
     MONTHS: 12,1,2
     LATBE: 50.,60.
@@ -201,7 +202,7 @@ Scripts:
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
-    CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
+    CASEDIR: /projects/NS9207K/earnest/mpiexm_exp/CASE
     YEARBE: YBEA
     MONTHS: 3,4,5
     LATBE: 50.,60.
@@ -232,7 +233,7 @@ Scripts:
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
-    CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
+    CASEDIR: /projects/NS9207K/earnest/mpiexm_exp/CASE
     YEARBE: YBEA
     MONTHS: 6,7,8
     LATBE: 50.,60.
@@ -263,7 +264,7 @@ Scripts:
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
-    CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
+    CASEDIR: /projects/NS9207K/earnest/mpiexm_exp/CASE
     YEARBE: YBEA
     MONTHS: 9,10,11
     LATBE: 50.,60.

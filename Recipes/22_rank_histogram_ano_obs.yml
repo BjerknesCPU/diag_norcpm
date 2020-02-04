@@ -3,6 +3,7 @@ Title: SST anomaly Rank histogram
 Description: |
     SST anomaly prediction rank histogram.
     Use HadISST as  observation data.
+Tags: sst, ano, rankHisto
 COMPONENT:  ocn
 VARIABLE:  sst
 PLOTRES: |

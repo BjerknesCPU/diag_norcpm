@@ -3,6 +3,7 @@ Title: Tsfc anomaly Rank histogram
 Description: |
     Tsfc anomaly prediction rank histogram.
     Use GISS as observation data.
+Tags: tsfc, ano, rankHisto
 Thumbnail: tsfc_global_rank_histogram_lead1_FMA_thumb.png
 COMPONENT:  atm
 VARIABLE:  TS

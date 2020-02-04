@@ -4,6 +4,7 @@ Title: ENSO predictionskill
 Description: 
     Correlation and RMSE of Nino3.4, compare with HadISST.
 Thumbnail: fig_cor_forecast_nino34_thumb.png
+Tags: sst, predictionSkill
 COMPONENT:  ocn
 VARIABLE:  sst
 MINLAT: -5.

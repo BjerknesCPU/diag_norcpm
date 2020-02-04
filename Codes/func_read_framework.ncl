@@ -54,15 +54,30 @@ begin
     end if
     dims = getfilevardimsizes(f,varname)
     ndim = dimsizes(dims)
-    dimnames = getfilevardims(f,varname)
 
     ;; check if coordinated with lat/lon
+    dimnames = getfilevardims(f,varname)
     if(any(str_match_bool_ic(dimnames,"lat")))then
         ilat = ind(str_match_bool_ic(dimnames,"lat"))
         ilon = ind(str_match_bool_ic(dimnames,"lon"))
         COORDed = True
+        ;; produce ilatB ilatE ilonB ilonE
+        lats = f->$dimnames(ilat)$
+        latind = ind(lats.ge.min(ybe) .and. lats.le.max(ybe))
+        latB = min(latind)
+        latE = max(latind)
+
         ;; need add lon out of range check
-        ;; need add lat monotonic check
+        lons = f->$dimnames(ilon)$
+        ;;;; -180-180 or 0-360
+        if(any(xbe.lt.0))then ;; -180-180
+            lons = where(lons.gt.180,lons-360,lons)
+        else ;; 0-360
+            lons = where(lons.lt.0,lons+360,lons)
+        end if
+        lonind = ind(lons.ge.min(xbe) .and. lons.le.max(xbe))
+        lonB = min(lonind)
+        lonE = max(lonind)
     else
         COORDed = False
     end if
@@ -77,41 +92,53 @@ begin
     if(COORDed .and. COORD0time        .and. ndim.eq.3)then ;; assume time is the first
         if(MultiFile)then
             f := addfiles(fn,"r")
-            var = f[:]->$varname$(indtime,{min(ybe):max(ybe)},{min(xbe):max(xbe)})
+            var = f[:]->$varname$(indtime,latB:latE,lonB:lonE)
         else
-            var = f->$varname$(indtime,{min(ybe):max(ybe)},{min(xbe):max(xbe)})
+            var = f->$varname$(indtime,latB:latE,lonB:lonE)
         end if
 
         reorder_dim_var(var)
-        return short2flt(var)
+        if(typeof(var).eq."short")then
+            return short2flt(var)
+        else
+            return var
+        end if
     end if
     if(COORDed .and. (.not.COORD0time) .and. ndim.eq.3)then ;; assume lev is the first
         if(MultiFile)then
             f := addfiles(fn,"r")
             if(any(levs.eq.-1))then
-                var = f[:]->$varname$(:,{min(ybe):max(ybe)},{min(xbe):max(xbe)})
+                var = f[:]->$varname$(:,latB:latE,lonB:lonE)
             else
-                var = f[:]->$varname$({levs},{min(ybe):max(ybe)},{min(xbe):max(xbe)})
+                var = f[:]->$varname$({levs},latB:latE,lonB:lonE)
             end if
         else
-            var = f->$varname$({levs},{min(ybe):max(ybe)},{min(xbe):max(xbe)})
+            var = f->$varname$({levs},latB:latE,lonB:lonE)
         end if
         reorder_dim_var(var)
-        return short2flt(var)
+        if(typeof(var).eq."short")then
+            return short2flt(var)
+        else
+            return var
+        end if
     end if
     if(COORDed .and. COORD0time        .and. ndim.eq.4)then ;; assume time is the first
         if(MultiFile)then
             f := addfiles(fn,"r")
             if(any(levs.eq.-1))then
-                var = f[:]->$varname$(indtime,:,{min(ybe):max(ybe)},{min(xbe):max(xbe)})
+                var = f[:]->$varname$(indtime,:,latB:latE,lonB:lonE)
             else
-                var = f[:]->$varname$(indtime,{levs},{min(ybe):max(ybe)},{min(xbe):max(xbe)})
+                var = f[:]->$varname$(indtime,{levs},latB:latE,lonB:lonE)
             end if
         else
-            var = f->$varname$(indtime,{levs},{min(ybe):max(ybe)},{min(xbe):max(xbe)})
+            var = f->$varname$(indtime,{levs},latB:latE,lonB:lonE)
         end if
         reorder_dim_var(var)
-        return short2flt(var)
+        if(typeof(var).eq."short")then
+            return short2flt(var)
+        else
+            return var
+        end if
     end if
     if(COORDed)then
         print("read_file_with_ranges(): not supported ndim: "+ndim)
@@ -177,7 +204,11 @@ begin
             var = f->$varname$(indtime,bs:bn,bw:be)
         end if
         reorder_dim_var(var)
-        return short2flt(var)
+        if(typeof(var).eq."short")then
+            return short2flt(var)
+        else
+            return var
+        end if
     end if
     if(ndim .eq. 4)then
         if(MultiFile)then ;; t,z,y,x
@@ -195,7 +226,11 @@ begin
             end if
         end if
         reorder_dim_var(var)
-        return short2flt(var)
+        if(typeof(var).eq."short")then
+            return short2flt(var)
+        else
+            return var
+        end if
     end if
 
     print("read_file_with_ranges(): unknow error")
@@ -228,7 +263,8 @@ begin
     do t = 0, nt-1
         fn = str_sub_str(fFmt,"{YYYY}",""+years(t))
         fn = str_sub_str(fn,"{MM}",sprinti("%2.2d",months(t)))
-        fns := array_append_record(fns,dataroot+"/"+dataset+"/"+fn,0)
+        ;;fns := array_append_record(fns,dataroot+"/"+dataset+"/"+fn,0)
+        fns := array_append_record(fns,fn,0)
     end do
     fns := fns(1:)
     ;; not done yet
@@ -326,6 +362,12 @@ begin
             return read_data_profile_03(dataroot, dataset, vn, years, months, vnlev, latbe, lonbe, opt)
         end if
         return read_data_profile_03(dataroot, dataset, varname, years, months, lev, latbe, lonbe, opt)
+    end if
+    if(dataroot.eq."~/NS9560K/shared/Obs" .and. str_match_bool_ic(dataset,"SST/HADISST"))then
+        ;; one month per file
+        opt = True
+            opt@filenameFmt = "{YYYY}_{MM}.nc"
+        return read_data_profile_01(dataroot, dataset, varname, years, months, lev, latbe, lonbe, opt)
     end if
     if(dataroot.eq."~/NS9560K/shared/Obs" .and. str_match_bool_ic(dataset,"SSH/CLS"))then
         ;; one month per file

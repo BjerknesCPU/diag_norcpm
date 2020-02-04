@@ -210,7 +210,6 @@ begin
             f->obsvarSea  = obsvarSea
         end if
 
-        AChom2 = AChom2*100
         AChom2@readMMName = readMonName 
 
         f = addfile(cache,"c")
@@ -222,6 +221,15 @@ begin
     ;; rgb
     color_map =(/(/255,255,255/), \
                 (/  0,  0,  0/), \
+                (/165, 00, 33/), \
+                (/247, 39, 53/), \
+                (/255, 61, 61/), \
+                (/255,120, 86/), \
+                (/255,172,117/), \
+                (/255,214,153/), \
+                (/255,241,188/), \
+                (/255,241,188/), \
+                (/255,255,234/), \
                 (/255,255,255/), \
                 (/255,250,169/), \
                 (/255,231,120/), \
@@ -231,18 +239,23 @@ begin
                 (/220,220,254/) , \
                 (/160,140,255/), \
                 (/112, 96,220/), \
-                (/ 61, 40,181/) /)
+                (/ 61, 40,181/) \
+                /)
 
     cmap = tofloat(color_map)/255.
 
+    if(max(abs(AChom2)).gt.2)then ;; units % to 1
+        AChom2 = AChom2/100.
+    end if
 
 
     ;; plot AChom figure  
     res = True
         res@cnFillOn    = True
+        res@cnFillMode = "CellFill"
         res@cnLinesOn   = False
         res@cnLevelSelectionMode = "ExplicitLevels"
-        res@cnLevels = fspan(10,90,9)
+        res@cnLevels = fspan(-.9,.9,19)
         res@tiMainString  = "TITLE"
         if("TITLELEFT" .eq. "")then
             res@gsnLeftString = AChom2@readMMName
@@ -288,6 +301,12 @@ begin
             lat2d := onedtond(AChom2@lat2d,dimsizes(AChom2(:,:)))
             lon2d := onedtond(AChom2@lon2d,dimsizes(AChom2(:,:)))
         end if
+        ;; add cyclic point
+        lat2d := table_attach_columns(lat2d,(/lat2d(:,0:0)/),0)
+        lon2d := table_attach_columns(lon2d,(/lon2d(:,0:0)/),0)
+        AChom2 := table_attach_columns(AChom2,(/AChom2(:,0:0)/),0)
+        p := table_attach_columns(p,(/p(:,0:0)/),0)
+
         AChom2@lat2d := lat2d
         AChom2@lon2d := lon2d
         p@lat2d := lat2d

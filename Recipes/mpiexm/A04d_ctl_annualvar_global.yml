@@ -12,6 +12,7 @@ PLOTRES: |
     res@mpMaxLatF = 90.
     res@mpMinLonF = -330.
     res@mpMaxLonF =   30.
+    res@pmTickMarkDisplayMode = "Always"
     res@mpCenterLonF =   -150.
     res@cnLinesOn = False
     res@cnFillOn = True
@@ -19,11 +20,11 @@ PLOTRES: |
     res@pmLabelBarWidthF = 0.1
     res@pmLabelBarOrthogonalPosF   = 0.01
     ;;res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/253,152,153/),(/255,118,33/),(/254,254,0/)/)
-    res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/203,204,254/),(/255,255,255/),(/255,255,255/),(/255,118,33/),(/254,254,0/)/)
+    res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/203,204,254/),(/255,255,255/),(/255,255,255/),(/254,254,0/),(/255,118,33/),(/255,0,0/),(/255,0,222/)/)
     res@cnFillColors   := res@cnFillColors/255. 
     res@cnLevelSelectionMode = "ExplicitLevels"
     ;res@cnLevels = (/.2,1,2,3,4,5/)
-    res@cnLevels = (/.2,.4,.6,.8,.9,1.,1.1,1.2/)
+    res@cnLevels = (/.2,.4,.6,.8,.9,1.,1.1,1.2,1.4,1.6/)
     res@gsnRightString = "1"
 
     lres@cnLineColor = "Red"
@@ -34,13 +35,13 @@ PLOTRES: |
     lres@cnLineLabelsOn = False
     lres@cnInfoLabelOn = False
 
-CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+CASEDIR: /projects/NS9207K/pgchiu/CASE
     ## CASE define later
 
 CTN: f08_1AGCM
     ## proxy of CCASE 'control case'
 CCASE: CTN
-CONTROLDIR: /tos-project4/NS9207K/pgchiu/CCASE
+CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
 YBEC: 1101,1250
 CONTROLYEARBE: YBEC
 NYC: 150
@@ -275,7 +276,63 @@ Scripts:
     FIGFILENAME: sst_ts_control_case_SON
 
 -  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAS
+    YEARBE: YBES
+    LATBE: 45.,57.
+    LONBE: -50.,-15.
+    PLOTRES:
+    TITLE: SST ts CNS 50W-15W, 45N-57N
+    FIGFILENAME: sst_ts_subP_sample_case
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    LATBE: 45.,57.
+    LONBE: -50.,-15.
+    PLOTRES:
+    TITLE: SST ts CNA 50W-15W, 45N-57N
+    FIGFILENAME: sst_ts_subP_average_case
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    LATBE: 45.,57.
+    LONBE: -50.,-15.
+    PLOTRES:
+    TITLE: SST ts CTL 50W-15W, 45N-57N
+    FIGFILENAME: sst_ts_subP_control_case
+
+-  
     plotScript: mk_html_page.sh
-    FIGFILES: sst_var_ratio_sample_case sst_var_ratio_average_case sst_ts_sample_case sst_ts_average_case sst_ts_control_case sst_var_ratio_sample_case_DJF sst_var_ratio_average_case_DJF sst_var_ratio_sample_case_MAM sst_var_ratio_average_case_MAM sst_var_ratio_sample_case_JJA sst_var_ratio_average_case_JJA sst_var_ratio_sample_case_SON sst_var_ratio_average_case_SON sst_ts_sample_case_DJF sst_ts_average_case_DJF sst_ts_control_case_DJF sst_ts_sample_case_MAM sst_ts_average_case_MAM sst_ts_control_case_MAM sst_ts_sample_case_JJA sst_ts_average_case_JJA sst_ts_control_case_JJA sst_ts_sample_case_SON sst_ts_average_case_SON sst_ts_control_case_SON 
-    COLUMN: figs CNS CNA Control '</tr><tr>' ANN 2 ANN 3 DJF 2 MAM 2 JJA 2 SON 2 DJF 3 MAM 3 JJA 3 SON 3
+    FIGFILES:
+        sst_var_ratio_sample_case
+        sst_var_ratio_average_case
+        sst_ts_sample_case
+        sst_ts_average_case
+        sst_ts_control_case
+        sst_ts_subP_sample_case
+        sst_ts_subP_average_case
+        sst_ts_subP_control_case
+        sst_var_ratio_sample_case_DJF
+        sst_var_ratio_average_case_DJF
+        sst_var_ratio_sample_case_MAM
+        sst_var_ratio_average_case_MAM
+        sst_var_ratio_sample_case_JJA
+        sst_var_ratio_average_case_JJA
+        sst_var_ratio_sample_case_SON
+        sst_var_ratio_average_case_SON
+        sst_ts_sample_case_DJF
+        sst_ts_average_case_DJF
+        sst_ts_control_case_DJF
+        sst_ts_sample_case_MAM
+        sst_ts_average_case_MAM
+        sst_ts_control_case_MAM
+        sst_ts_sample_case_JJA
+        sst_ts_average_case_JJA
+        sst_ts_control_case_JJA
+        sst_ts_sample_case_SON
+        sst_ts_average_case_SON
+        sst_ts_control_case_SON
+    COLUMN: figs CNS CNA Control '</tr><tr>' ANN 2 NAtl 3 SubPolarGyre 3 DJF 2 MAM 2 JJA 2 SON 2 DJF 3 MAM 3 JJA 3 SON 3
     COMMENT: SST variance ratio to control run #, and annual anomaly time series.

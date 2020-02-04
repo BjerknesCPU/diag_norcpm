@@ -16,6 +16,7 @@ RG:  |
     res@mpMaxLatF = 90.
     res@mpMinLonF = -330.
     res@mpMaxLonF =   30.
+    res@pmTickMarkDisplayMode = "Always"
     res@mpCenterLonF =   -150.
 PLOTRES:   |
     RG
@@ -41,12 +42,12 @@ CRES:  |
 CTN: f08_1AGCM
     ## proxy of CCASE 'control case'
 CCASE: CTN
-CONTROLDIR: /tos-project4/NS9207K/pgchiu/CCASE
+CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
 YBEC: 1101,1250
 CONTROLYEARBE: YBEC
 NYC: 150
 
-CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+CASEDIR: /projects/NS9207K/pgchiu/CASE
     ## CASE define later
 CAA: f08_5AGCMs_NASPG_average
 CNA: IEave

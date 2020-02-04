@@ -12,6 +12,7 @@ PLOTRES: |
     res@mpMaxLatF = 90.
     res@mpMinLonF = -330.
     res@mpMaxLonF =   30.
+    res@pmTickMarkDisplayMode = "Always"
     res@mpCenterLonF =   -150.
     res@cnLinesOn = False
     res@cnFillOn = True
@@ -33,11 +34,11 @@ PLOTRES: |
     lres@cnLineLabelsOn = False
     lres@cnInfoLabelOn = False
 
-CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
+CASEDIR: /projects/NS9207K/earnest/mpiexm_exp/CASE
     ## CASE define later
 
 CCASE: f05_1AGCM
-CONTROLDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CCASE
+CONTROLDIR: /projects/NS9207K/earnest/mpiexm_exp/CCASE
 CONTROLYEARBE: 1851,2050
 NYC: 200
 
@@ -142,7 +143,7 @@ Scripts:
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
-    CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
+    CASEDIR: /projects/NS9207K/earnest/mpiexm_exp/CASE
     YEARBE: 1851,2050
     LATBE: 50.,60.
     LONBE: -40.,-10.
@@ -173,7 +174,7 @@ Scripts:
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
-    CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
+    CASEDIR: /projects/NS9207K/earnest/mpiexm_exp/CASE
     YEARBE: 1951,2050
     MONTHS: 12,1,2
     LATBE: 50.,60.
@@ -204,7 +205,7 @@ Scripts:
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
-    CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
+    CASEDIR: /projects/NS9207K/earnest/mpiexm_exp/CASE
     YEARBE: 1951,2050
     MONTHS: 3,4,5
     LATBE: 50.,60.
@@ -235,7 +236,7 @@ Scripts:
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
-    CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
+    CASEDIR: /projects/NS9207K/earnest/mpiexm_exp/CASE
     YEARBE: 1951,2050
     MONTHS: 6,7,8
     LATBE: 50.,60.
@@ -266,7 +267,7 @@ Scripts:
 -  
     plotScript: mpiexm/plot_annual_timeseries.ncl
     CASE: f05_1AGCM
-    CASEDIR: /tos-project4/NS9207K/earnest/mpiexm_exp/CASE
+    CASEDIR: /projects/NS9207K/earnest/mpiexm_exp/CASE
     YEARBE: 1951,2050
     MONTHS: 9,10,11
     LATBE: 50.,60.

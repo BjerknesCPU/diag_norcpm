@@ -15,8 +15,9 @@
 ;;DIAG_NORCPM; VECTORU: ustrw
 ;;DIAG_NORCPM; VECTORV: vstrw
     ;; wind stress over water
-;;DIAG_NORCPM; SHADING: trad0
+;;DIAG_NORCPM; SHADING: aclcov
     ;; trad0 is OLR
+    ;; aclcov is total cloud cover
 ;;DIAG_NORCPM; CONTOUR: tsurf
     ;; surface temperature
 ;;DIAG_NORCPM; UILEVEL: -1

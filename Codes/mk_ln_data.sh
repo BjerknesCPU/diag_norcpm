@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## link nc data file from other recipe dir
-#;;diag_norcpm;; RECIPES: empty
+#;DIAG_NORCPM; RECIPES: empty
 
 recipes="RECIPES"
 nowdir=$(pwd|sed "s:.*/::")
@@ -16,5 +16,9 @@ if [ "$recipes" == "$nowdir" ]; then
 fi
 
 for i in $recipes ; do
-    ln -fs ../$i/*.nc .
+    ii=$(basename $i)
+    ii=${ii%.*}
+    for iii in ../$ii/*.nc; do
+        ln -fs "${iii}" .
+    done
 done

@@ -9,6 +9,7 @@ Title: SST heterogeneous Anomaly Correlation(AC), 1-4 lead season
 Description: |
     Following <a href='http://doi.org/10.1175/JCLI-D-13-00597.1'>Becker et al. 2014</a> approach, 1-4 lead seasonal forecast correlation.  </br>
     The correlation is between HadISST and ensemble mean.</br>
+Tags: sst, anoCor
 COMPONENT:  ocn
 VARIABLE:  sst
 BEFOREPLOT: |

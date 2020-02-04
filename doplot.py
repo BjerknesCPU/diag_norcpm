@@ -3,7 +3,7 @@
 import os,sys,re,time,traceback
 import yaml
 import subprocess as sp
-from multiprocessing import Process
+from multiprocessing import Pool
 from Codes.gen_proc_plot import gen_proc_plot
 try: # use to parse index.html in recipe directories
     import bs4
@@ -11,17 +11,43 @@ try: # use to parse index.html in recipe directories
 except:
     isbs4 = False
     
-
+maxprocess = 1
 dryrun = False
-# get envrionment variables
-plotCase            = os.environ.get('plotCase')
-#ensDataDirs         = os.environ.get('ensDataDirs').split()
-BASEDIR            = os.environ.get('BASEDIR')
-RUNPRE             = os.environ.get('RUNPRE')
-plotRecipes        = os.environ.get('plotRecipes')
-outputDir           = os.environ.get('outputDir')
-diag_norcpm_Root    = os.environ.get('diag_norcpm_Root')
-DefaultYML          = os.environ.get('defaultRecipe')
+plotCaseYML = 'plotCase.yml'
+ReadENV = True
+if os.path.exists(plotCaseYML) and ReadENV: # read plotCaseYML instead of environment
+    with open(plotCaseYML,'r') as j:
+        try:
+            plotSettings = yaml.load(j,Loader=yaml.BaseLoader)
+            plotCase            = plotSettings.get('plotCase')
+            BASEDIR             = plotSettings.get('BASEDIR')
+            RUNPRE              = plotSettings.get('RUNPRE')
+            plotRecipes         = plotSettings.get('plotRecipes')
+            outputDir           = plotSettings.get('outputDir')
+            diag_norcpm_Root    = plotSettings.get('diag_norcpm_Root')
+            DefaultYML          = plotSettings.get('DefaultYML')
+            ReadENV = False
+        except yaml.YAMLError as exc:
+            print(exc)
+else:
+    plotCase            = os.environ.get('plotCase')
+    BASEDIR            = os.environ.get('BASEDIR')
+    RUNPRE             = os.environ.get('RUNPRE')
+    plotRecipes        = os.environ.get('plotRecipes')
+    outputDir           = os.environ.get('outputDir')
+    diag_norcpm_Root    = os.environ.get('diag_norcpm_Root')
+    DefaultYML          = os.environ.get('defaultRecipe')
+
+    ymltext = ''
+    ymltext += 'plotCase: '+plotCase+'\n'
+    ymltext += 'BASEDIR: '+BASEDIR+'\n'
+    ymltext += 'RUNPRE: '+RUNPRE+'\n'
+    ymltext += 'plotRecipes: '+plotRecipes+'\n'
+    ymltext += 'outputDir: '+outputDir+'\n'
+    ymltext += 'diag_norcpm_Root: '+diag_norcpm_Root+'\n'
+    ymltext += 'DefaultYML: '+DefaultYML+'\n'
+    with open(outputDir+'/'+plotCaseYML,'w') as j:
+        j.write(ymltext)
 
 # default directories and setting, begin -------------------------------------------------
 RecipeDir      = diag_norcpm_Root+'/Recipes/'
@@ -59,13 +85,27 @@ if not plotRecipes:
     for i in files:
         if re.match('.*\.(?:yml|json)$',i): plotRecipes.append(i) # accept yaml and json
 else:
-    plotRecipes = plotRecipes.split(',')
+    plotRecipes = re.split(',| ',plotRecipes)
 
 if not plotRecipes:
     print("No recipe in "+RecipeDir+" or script")
     sys.exit()
 # list Recipes, end -----------------------------------------
 
+#### makefile to rerun the recipes
+updateTxt  = 'cd .. \n'
+updateTxt += diag_norcpm_Root+'/diag_norcpm.sh '+BASEDIR+'\n'
+open('update.sh','w').write(updateTxt)
+Dirname = outputDir.split('/')[-1]
+makefileTxt = f'''
+replot:
+	time python3 {diag_norcpm_Root}/doplot.py
+upload:
+	cd ../ ; ~/exec/public {Dirname} ; cd -
+all: replot upload
+'''
+with open('Makefile','w') as f:
+    f.write(makefileTxt)
 
 # Step 1 - parse recipes, begin ------------------------------------------------
 print('plot recipes: '+','.join(plotRecipes))
@@ -167,6 +207,8 @@ for recipe in Recipes:
     recipeName = recipe.get("recipeName")
     depends = recipe.get("Depends")
     scripts = recipe.get("Scripts")
+    showinindex = recipe.get("ShowInIndex") or "Yes"
+    tags = recipe.get("Tags") or "['misc']"
     AllScripts[recipeName] = list()
     if depends:
         Depends[recipeName] = re.split(' |,',depends)
@@ -175,10 +217,13 @@ for recipe in Recipes:
 
     if not os.path.exists(outputDir+'/'+recipeName): os.makedirs(outputDir+'/'+recipeName)
  
-    # write README
+    # write README, as a description of this plot
     readmetext = 'Title: "'+title+'"\nDescription: "'+desc+'"\n'
+    readmetext += 'ShowInIndex: '+showinindex+'\n'
+    readmetext += 'Tags: '+str(tags)+'\n'
     if thumbnail: readmetext+='Thumbnail: "'+thumbnail+'"\n'
-    open(outputDir+'/'+recipeName+'/README',"w").write(readmetext)
+    with open(outputDir+'/'+recipeName+'/README',"w") as f:
+        f.write(readmetext)
 
     # get all capital in recipe
     baseDict = dict()
@@ -215,6 +260,11 @@ for r in AllScripts.keys():
     runallTxt += 'cd '+outputDir+'/'+r+'\n'
     runallTxt += '    echo "running plot set: '+r+'"\n'
     logfile = outputDir+'/'+r+'.log'
+    ## remove old log
+    try:
+        os.remove(logfile)
+    except:
+        pass
     for fn in AllScripts.get(r):
         rootfn,suffix = os.path.splitext(fn)
         if suffix == '.ncl': 
@@ -235,18 +285,6 @@ for r in AllScripts.keys():
 open('runall.sh','w').write(runallTxt)
 
 ### output update script
-#### script to rerun diag_norcpm
-updateTxt  = 'cd .. \n'
-updateTxt += diag_norcpm_Root+'/diag_norcpm.sh '+BASEDIR+'\n'
-open('update.sh','w').write(updateTxt)
-makefileTxt = '''
-replot:
-	time sh update.sh 
-upload:
-	cd ../ ; ~/exec/public work-STERCP ; cd -
-all: replot upload
-'''
-open('Makefile','w').write(makefileTxt)
 
 
 ### run all (parallel)
@@ -254,11 +292,15 @@ open('Makefile','w').write(makefileTxt)
 #### function for threading
 def run_seq(workdir,scripts,logfile):
     os.chdir(workdir)
+    nscript = str(len(scripts))
+    #print('    '+os.path.basename(workdir)+': start at ',datetime.now.strftime("%d/%m/%Y %H:%M:%S"))
+    #print('    '+os.path.basename(workdir)+': start ')
     logf = open(logfile,'w')
     for fn in scripts:
+        n = str(scripts.index(fn)+1)
         rootfn,suffix = os.path.splitext(fn)
         if suffix == '.ncl': 
-            cmd = 'ncl'
+            cmd = 'ncl -Q'
         elif suffix == '.m': 
             cmd = 'matlab'
         elif suffix == '.py': 
@@ -268,72 +310,81 @@ def run_seq(workdir,scripts,logfile):
         else: 
             cmd = 'sh'  # bad idea
         #print('    running '+cmd+' '+workdir+'/'+fn)
-        print('    '+os.path.basename(workdir)+': '+fn)
+        print('    '+os.path.basename(workdir)+'('+n+'/'+nscript+'): '+fn)
         logf.write('>>>>>>>>>>>>>>>> running '+cmd+' '+fn+'\n')
         logf.flush()
         if dryrun:
             print("        dryrun: "+cmd+" "+fn)
         else:
-            sp.run([cmd,fn],stdout=logf,stderr=logf)
+            start = time.perf_counter()
+            #sp.run([cmd,fn],stdout=logf,stderr=logf)
+            sp.run(' '.join([cmd,fn]),shell=True,stdout=logf,stderr=logf)
+            end = time.perf_counter()
+            logf.write('>>>>>>>>>>>>>>>> '+cmd+' '+fn+' done with %2.2f secs.\n'%(end-start))
+            logf.flush()
     logf.close()
 
 #### make and run process list
-procall = []
-for r in AllScripts.keys():
-    logfile = outputDir+'/'+r+'.log'
-    workdir = outputDir+'/'+r
-    p = Process(target=run_seq,args=(workdir,AllScripts[r],logfile))
-    p.name = r # dependency
-    procall.append(p)
-    
-###### need rewrite to resolve dependency
 ###### run no depend first
-RunStart = list()
-for p in procall:
-    if not Depends[p.name]: 
-        p.start()
-        RunStart.append(p.name)
-        print('running '+p.name+' at pid='+str(p.pid))
-if not RunStart:
+pool = Pool(processes=maxprocess)
+Running = list()
+Waiting = list()
+for r in AllScripts.keys():
+    if Depends[r]: 
+        Waiting.append(r)
+    else:
+        logfile = outputDir+'/'+r+'.log'
+        workdir = outputDir+'/'+r
+        p = pool.apply_async(run_seq,(workdir,AllScripts[r],logfile))
+        p.name = r # dependency
+        print('Pooling '+p.name)
+        Running.append(p)
+    
+if not Running:
     print("No recipe be able to run, exit.")
     sys.exit()
 
-###### check process end, bad idea 
-RunDone = list()
-Running = 1
-while Running:
+###### check process end every 3 sec, bad idea 
+StillWaiting = True
+while StillWaiting:
     time.sleep(3)
-    Running = 0
-    for p in procall:
-        ## is in RunStart, is_alive
-        if p.name in RunStart and p.is_alive(): # running
-            Running = 1
-        elif p.name in RunStart : # run done
-            #print(p.name+" done")
+    StillWaiting = False
+    ## update RunDone
+    RunDone = list()
+    RunningNames = list()
+    InQueue  = list()
+    for p in Running:
+        RunningNames.append(p.name)
+        if p.ready(): 
             RunDone.append(p.name)
-        elif not p.name in RunStart: # not start yet
-            ## check depends done or not
-            allDone = True
-            Running = 1
-            for i in Depends[p.name]: # there are file names in Depends 
-                if not re.sub('^.*/','',os.path.splitext(i)[0]) in RunDone: allDone = False
-            if allDone:
-                p.start()
-                RunStart.append(p.name)
-                print('running '+p.name+' at pid='+str(p.pid))
         else:
-            print("Unexpected situtation, should not happen")
-            print("p.name:"+p.name)
-            print("RunStart:")
-            print(RunStart)
-            print("RunDone:")
-            print(RunDone)
-            sys.exit()
-        pass
+            InQueue.append(p.name)
+    ## update Waiting
+    Waiting = [ i for i in Waiting if not i in RunningNames ]
+    if Waiting: StillWaiting = True
+    with open('Waiting.txt','w') as wf:
+        wf.write('InQueue: '+str(InQueue)+'\n')
+        wf.write('RunDone: '+str(RunDone)+'\n')
+        wf.write('Waiting: '+str(Waiting)+'\n')
 
+    for n in Waiting:
+        DepsDone = True
+        for d in Depends[n]:
+            dd =  re.sub(".*/","",d.replace(".yml",''))
+            if not dd in RunDone: 
+                #print(d+" is not in "+str(RunDone))
+                DepsDone = False
+        if DepsDone:
+            logfile = outputDir+'/'+n+'.log'
+            workdir = outputDir+'/'+n
+            p = pool.apply_async(func=run_seq,args=(workdir,AllScripts[n],logfile))
+            p.name = n # dependency
+            print('pooling '+p.name)
+            Running.append(p)
+            
 #### wait all  process done
-for p in procall:
-    p.join()
+for p in Running:
+    p.wait()
 
 ### make index.html for all directories
 os.chdir(outputDir)
@@ -344,6 +395,7 @@ subdirs.sort()
 for i in subdirs:
     thumbnail = ''
     description = ''
+    showinindex = 'True'
     # try index.html
     if isbs4: # if bs4 present and there is index.html in subdir, not done yet
         indexfile =  [ j for j in os.listdir(i) if re.match(".*index..*",j) ] [0]
@@ -358,6 +410,7 @@ for i in subdirs:
             if readme.get('Title'): title = readme.get('Title')
             if readme.get('Description'): description = readme.get('Description')
             if readme.get('Thumbnail'): thumbnail = readme.get('Thumbnail')
+            if readme.get('ShowInIndex'): showinindex = readme.get('ShowInIndex')
         except:
             pass
 
@@ -375,7 +428,7 @@ for i in subdirs:
     if not title:
         title = i
     # store it
-    recipeInfo.update({i:{'title': title, 'thumb': thumbnail, 'desc': description}})
+    recipeInfo.update({i:{'title': title, 'thumb': thumbnail, 'desc': description, 'showinindex': showinindex}})
 
 print("All Recieps compelete, making index page...")
 #### html header
@@ -392,6 +445,7 @@ dirs = recipeInfo.keys()
 sorted(dirs)
 for i in dirs:
     r = recipeInfo[i]
+    if r['showinindex'] in [False,"False",'no','NO','No']: continue
     html += "<span style='display:inline-block'>"
     html += '<a href="'+i+'">'
     html += '<h4>'+r['title']+'</h4>'

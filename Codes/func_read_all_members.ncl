@@ -82,11 +82,29 @@ begin
     var@lon2d = lon2d
     return var
 end
+undef("")
+function get_members_path(forecastdir[1])
+begin
+    ;; not done yet
+    ;; list members path with 1 forecast dir or .tar.gz
+    ;; used to replace:  memberdirs = systemfunc("ls -d "+forecastdir+"/*mem??")
+    
+    ;if(.not.ismissing(str_match_regex(forecastdir,".tar.gz$")))then ;; if end with .tar.gz
+        
+    ;end if
+
+    ;; normally without any postprocess
+    memberdirs = systemfunc("ls -d "+forecastdir+"/*mem??")
+    return memberdirs
+end 
+
 undef("ls_monthly_nc_files")
 function ls_monthly_nc_files(path,component)
 begin
-    ;; path is the member dir, which contains:
+    ;; path is the 1 member dir, which contains:
     ;;      path/atm/hist/*.nc
+    ;; or
+    ;;      path(with .tar.gz)/atm/hist/*.nc
     monfix=""
     if(component.eq."ocn")then
         monfix="hm"
@@ -95,7 +113,35 @@ begin
         monfix="h0"
     end if
 
+    ;; normally the data is not gzipped or postprocessed
     fns = systemfunc("ls "+path+"/"+component+"/hist/*"+monfix+"*.nc|sort|head -n13") ;; only 13 month data, bad idea
+    if(.not.any(ismissing(fns)))then
+        return fns
+    end if
+
+    ;; if data files are tar and gz...
+    ;; not done yet
+        ;; tar -C tmp/ --strip-components 9  --occurrence  -vxf  /tos-project3/NS9602K/V1c60/HIND/ocn/sfe60_hindcast_19951015_ocn.tar.gz  cluster/work/users/madimm/archive/tar_folder/sfe60_hindcast_19951015_ocn/sfe60_hindcast_19951015_mem09/ocn/hist/sfe60_hindcast_19951015_mem09.micom.hm.1996-05.nc
+            ;; bad idea, if we need the last file in tar.gz, then the occurrence argument will not help
+            ;; it will become:
+                ;; extract all file -> 2 mins
+                ;; extract 1 file -> 2sec to 2mins, each file
+        ;; since gz is line ziper, so extract all files is a more effency method
+        ;; untar all zip and extract one variable, than remove data files
+            ;; when to remove datafiles? after all plots done?
+                ;; or just after extract 1 variable of all files in 1 tar.gz
+                    ;; problem is this will repeat extract same file for each variable
+                ;; or use a plotScript to extract all variable in all recipe
+                    ;; A meta recipe collect all variables?
+            ;; extract variable to where?
+                ;; common tmp data directory, but where?
+                ;; too large for /tmp or /dev/shm
+    if(.not.ismissing(str_match_regex(path,".tar.gz$")))then
+        tmpdir = "./tmpdata"
+        system("mkdir -p "+tmpdir)
+
+    end if
+
     if(any(ismissing(fns)))then
         print("ls_monthly_nc_files(): no file in "+path)
         exit
@@ -398,7 +444,10 @@ begin
     ;; lead_months=0 .and. start_ym=198610 => read months=198610
     ;;                                        dmonths    =    +0
     ;; assume one time per file
-
+    if(any(ismissing(dirs)))then
+        print("read_noresm_members_filevar_leadmonths(): dir is missing")
+        return
+    end if
     nmember = dimsizes(dirs)
 
     monfix=""
@@ -412,7 +461,7 @@ begin
     ;; check first data file name in all memebers
     fn = systemfunc("ls "+dirs(0)+"/"+component+"/hist/*"+monfix+"*.nc|sort|head -n1")
     if(ismissing(fn))then
-        print("read_noresm_members_leadmonths(): no file in "+dirs(0))
+        print("read_noresm_members_filevar_leadmonths(): no file in "+dirs(0))
         print("cmd: ls "+dirs(0)+"/"+component+"/hist/*"+monfix+"*.nc|sort|head -n1")
     end if
     f = addfile(fn,"r")
@@ -472,6 +521,8 @@ begin
         else
             var1 = f->$vn$
         end if
+        ;print("read_noresm_members_filevar_leadmonths(): reading "+vn+" in "+fn)
+        ;print("    number of missing values: "+num(ismissing(var1)))
 
         if(ndim.eq.5)then ;; member,t=dmonth,z,y,x
             varall(m,t,:,:,:) = var1(0,:,:,:) ;; one time per file
@@ -558,6 +609,11 @@ begin
     nforecast = dimsizes(forecastDirs)
     ;;;; 1st forecast
     memDirs = systemfunc("ls -d "+forecastDirs(0)+"/*")
+    if(any(ismissing(memDirs)))then
+        print("read_noresm_forecasts_members_leadmonths(): memDirs missing")
+        print("cmd: "+"ls -d "+forecastDirs(0)+"/*")
+        return
+    end if
     ;;;; check memDirs (TBD)
     ;;;; read first forecast
     varF1 = read_noresm_members_leadmonths(memDirs,component,vn,lead_months,ocngridfile)
