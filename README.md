@@ -70,30 +70,31 @@ DefaultYML: /nird/home/pgchiu/scratch/diag_norcpm/Defaults.yml
 ```
 
 # Recipes and replace rules.
-    Each recipe take in charge one directory, defining how to generage plot script, and the variables for webpage. It also the minial unit of parallel processing in diag_norcpm.
-    
-    The replacement will be take in place only for CAPITAL variables. Start from longest variables. Former replacement will be replace by latters. For example, in a snip of recipe:
+Each recipe take in charge one directory, defining how to generage plot script, and the variables for webpage. It also the minial unit of parallel processing in diag_norcpm.
+
+The replacement will be take in place only for CAPITAL variables. Start from longest variables. Former replacement will be replace by latters. For example, in a snip of recipe:
 ```
 NAME: sst
 VARIABLE: NAME
 ```
-    Then the 'VARIABLE' will be replace to 'NAME' and then 'sst'. But if
+Then the 'VARIABLE' will be replace to 'NAME' and then 'sst'. But if
 ```
 THISISNAME: sst
 VARIABLE: THISISNAME
 ```
-    Then the 'VARIABLE' will be 'THISISNAME' only, since it happen latter. It usually cause problem.
-    Another case is 
+Then the 'VARIABLE' will be 'THISISNAME' only, since it happen latter. It usually cause problem.
+
+Another case is 
 ```
 NAME: sst
 VARIABLE: THISISNAME
 ```
-    Then the 'VARIABLE' will become 'THISISsst'. So be careful.
+Then the 'VARIABLE' will become 'THISISsst'. So be careful.
 
 
-    Multiple plotScripts can be defined in one recipe. There can be some kind of 'global variable' in recipe, and can be overide in Scripts section.
+Multiple plotScripts can be defined in one recipe. There can be some kind of 'global variable' in recipe, and can be overide in Scripts section.
 
-    Here is an example:
+Here is an example:
     
 ```
 Title: ENSO predictionskill  # for webpage
