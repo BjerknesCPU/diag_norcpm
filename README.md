@@ -108,12 +108,13 @@ Scripts:  ## Scripts templates and replacements
     FIGFILENAME: fig_cor_forecast_REG
 
 ```
-    The global variables are apply to all Scripts. The contain of plot_forecast_correlation.ncl will replaced with VARIABLE, FIGFILENAME and REG. The FIGFILENAME will become "fig_cor_forecast_nino34".
+The global variables are apply to all Scripts. The contain of plot_forecast_correlation.ncl will replaced with VARIABLE, FIGFILENAME and REG. The FIGFILENAME will become "fig_cor_forecast_nino34".
 
-    Special variables in recipes (TBD): Title, Description, Thumbnail(optional), Tags(optional), Depends(optional).
-    "Depends" is a special variable in recipe, which add additional recipes into poll and run after the additions.
+Special variables in recipes (TBD): Title, Description, Thumbnail(optional), Tags(optional), Depends(optional).
 
-    Every recipe has it own work directory and an output log, shares same file name with the recipe.
+"Depends" is a special variable in recipe, which add additional recipes into poll and run after the additions.
+
+Every recipe has it own work directory and an output log, shares same file name with the recipe.
 
 
 # Code templates
@@ -129,7 +130,7 @@ begin
     wks = gsn_open_wks("ps",figfn)
     ...
 ```
-    If FIGFILENAME is not set in recipe, it will be replace by 'fig01'. The key word for setting default value is ";DIAG_NORCPM; ". Here is a bash example:
+If FIGFILENAME is not set in recipe, it will be replace by 'fig01'. The key word for setting default value is ";DIAG_NORCPM; ". Here is a bash example:
 ```
 #!/bin/bash
 #;DIAG_NORCPM; HTMLFILENAME: index.html
@@ -137,8 +138,8 @@ htmlfn="HTMLFILENAME"
 ```
 
 # mk_html_page.sh
-    This script convert postscript file to png, and generate gallery of figures with html. COLUMN defined the number and text in <table> tag.
-    For example, 
+This script convert postscript file to png, and generate gallery of figures with html. COLUMN defined the number and text in <table> tag.
+For example, 
 ```
 Script:
 -
@@ -159,14 +160,14 @@ Script:
 
 
 # Parallel processing 
-    Parallel processing is supported in doplot.py. The variable 'maxprocess' in doplot.py control the max number of recipes run at same time.
-    Becarefull, RLIMIT is set on some machine. If you enconter this kind of error, set maxprocess to 1.
+Parallel processing is supported in doplot.py. The variable 'maxprocess' in doplot.py control the max number of recipes run at same time.
+Becarefull, RLIMIT is set on some machine. If you enconter this kind of error, set maxprocess to 1.
 
 
 # How it work
-    1. Setup run environment. Including script path and NCL (or other plotting language) environment.
-    2. Generate plot scripts, doplot.py replace strings in plot script template.
-        The strings to be replace are defined in recipe and plot script template(as default value).
-    3. Run plot scripts, which produce figures, index.html and README for each receipt directories.
-    4. Generate index.html for each recipes.
+1. Setup run environment. Including script path and NCL (or other plotting language) environment.
+2. Generate plot scripts, doplot.py replace strings in plot script template.
+    The strings to be replace are defined in recipe and plot script template(as default value).
+3. Run plot scripts, which produce figures, index.html and README for each receipt directories.
+4. Generate index.html for each recipes.
 
