@@ -1,0 +1,24 @@
+# Recipe to make life easier
+#
+Title: Compare with obs/reanalysis data
+Description: 
+    Just a meta recipe. 
+Depends: 
+    14_AnoCor_sst_obs.yml
+    15_AnoCor_prec_obs.yml
+    16_AnoCor_ohc_obs.yml
+    17_AnoCor_sst_alllead.yml
+    18_AnoCor_prec.yml
+    19_AnoCor_tsfc_obs.yml
+    1A_AnoCor_z700_obs.yml
+
+ShowInIndex: False
+    ## will not show in index page
+
+
+Scripts: # not use now
+-
+    plotScript: mk_html_page.sh
+    FIGFILES:
+    COLUMN: 
+    COMMENT: Not really.

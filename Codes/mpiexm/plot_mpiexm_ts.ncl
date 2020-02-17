@@ -3,15 +3,16 @@
 
 ;;DIAG_NORCPM; FIGFILENAME: fig
 ;;DIAG_NORCPM; CACHEFILENAME: FIGFILENAME
-;;DIAG_NORCPM; PLOTRES: ;; PLOTRES
-;;DIAG_NORCPM; TSPOSTPROC: ;; TSPOSTPROC
+;;DIAG_NORCPM; PLOTRES: ;; PLOTRES is not defined
+;;DIAG_NORCPM; TSMAINPROC: ts = read_mpiexm_season_ts(case,casedir,component,varname,years,months,latbe,lonbe,modeln)
+    ;; reading time series 
+;;DIAG_NORCPM; TSPOSTPROC: ;; TSPOSTPROC is not defined
 ;;DIAG_NORCPM; TITLE: title
 ;;DIAG_NORCPM; MONTHS: 0
     ;; 0, means all months
 ;;DIAG_NORCPM; MODELN: 0
 ;;DIAG_NORCPM; LATBE: 25.,55.
 ;;DIAG_NORCPM; LONBE: -50.,10.
-;;DIAG_NORCPM; STANDARIZED: True
 
 
 
@@ -22,8 +23,6 @@ begin
     title = "TITLE"
     varname = "VARIABLE"
     component = "COMPONENT"
-
-    isStandarized = STANDARIZED
 
     case = "CASE"
     casedir = "CASEDIR"
@@ -47,8 +46,8 @@ begin
             ts := ts(:,0)
         end if
     else
-        ;; daily ts;; ts = read_mpiexm_var_mean_daily_ts_seasonaly(case,casedir,component,varname,years,months,latbe,lonbe,modeln)
-        ts = read_mpiexm_season_ts(case,casedir,component,varname,years,months,latbe,lonbe,modeln)
+
+        TSMAINPROC 
 
         TSPOSTPROC
 

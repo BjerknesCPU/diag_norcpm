@@ -30,7 +30,7 @@ procedure add_lc_labels(wks,map,minlat,maxlat,minlon,maxlon)
       ;lat_values = ispan(toint(minlat),toint(maxlat),dlat) * 1.
       all_lat_values = ispan(-90,90,dlat)
       lat_values = all_lat_values(ind(all_lat_values.ge.minlat .and. all_lat_values.le.maxlat))
-      nlat       = dimsizes(lat_values)
+      nlat       = dimsizes(lat_values) -1
     ;
     ; We need to get the slope of the left and right min/max longitude lines.
     ; Use NDC coordinates to do this.
@@ -99,7 +99,7 @@ procedure add_lc_labels(wks,map,minlat,maxlat,minlon,maxlon)
     ;---Pick some "nice" values for the longitude labels.
       lon_values = ispan(toint(minlon-dlon),toint(maxlon+dlon),dlon) * 1.
       lon_values = lon_values - mod(lon_values,dlon)
-      nlon       = dimsizes(lon_values)
+      nlon       = dimsizes(lon_values) -1
       lon_values = where(lon_values.gt.180,360-lon_values,lon_values)
 
       dum_bot = new(nlon,graphic)    ; Dummy array to hold attached strings.

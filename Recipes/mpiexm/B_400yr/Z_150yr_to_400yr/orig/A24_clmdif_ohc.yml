@@ -1,0 +1,229 @@
+# plot data difference in mpiexm
+# mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
+
+Title: Ocean heat content 100m, 200m, 500m and 1000m (annual)
+Description: |
+    Monthly mean ocean heat conetnt of 100, 200, 500 and 1000m
+COMMENT: |
+    Monthly mean ocean heat conetnt of 100, 200, 500 and 1000m
+COMPONENT:  mpiom
+MODELN: 0
+GLOB: |
+    res@mpLimitMode = "LatLon"
+    res@mpMinLatF = -90.
+    res@mpMaxLatF = 90.
+    res@mpMinLonF = -330.
+    res@mpMaxLonF =   30.
+    res@pmTickMarkDisplayMode = "Always"
+    res@mpCenterLonF =   -150.
+NATL: |
+    res@mpLimitMode = "LatLon"
+    res@mpMinLatF = 20.
+    res@mpMaxLatF = 70.
+    res@mpMinLonF = -80.
+    res@mpMaxLonF =  10.
+    res@pmTickMarkDisplayMode = "Always"
+    res@mpCenterLatF = 50.
+    res@mpCenterLonF =  -35.
+    res@mpProjection = "LambertConformal"
+    res@mpGridAndLimbOn = True
+    res@gsnMaskLambertConformal = True
+    res@gsnRightString = "~F34~0~F~C"
+
+CLA: fspan(0.,12000,25)
+DLA: fspan(-200.,200.,21)
+CLB: fspan(0.,20000,25)
+DLB: fspan(-400.,400.,21)
+CLC: fspan(0.,40000,25)
+DLC: fspan(-1000.,1000.,21)
+CLD: fspan(0.,60000,25)
+DLD: fspan(-1000.,1000.,21)
+DIFRES: |
+    REGRES
+    res@cnLinesOn = False
+    res@cnFillOn = True
+    res@cnFillMode = "CellFill"
+    res@lbOrientation = "Vertical"
+    res@cnLevelSelectionMode = "ExplicitLevels"
+    res@cnLevels = LEVS
+    res@cnFillPalette = "BlAqGrWh2YeOrReVi22"
+CTLRES: |
+    REGRES
+    res@cnLinesOn = False
+    res@cnFillOn = True
+    res@cnFillMode = "CellFill"
+    res@cnFillPalette = "WhBlGrYeRe"
+    res@lbOrientation = "Vertical"
+    res@cnLevelSelectionMode = "ExplicitLevels"
+    res@cnLevels = LEVS
+
+
+
+CTN: f08_1AGCM
+    ## proxy of CCASE 'control case'
+CCASE: CTN
+CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
+YBEC: 1101,1250
+CONTROLYEARBE: YBEC
+NYC: 150
+
+CAD: f08_5AGCMs_NASPG_sample
+CND: CTL2
+YBED: 1101,1250
+NYD: 150
+
+CASEDIR: /projects/NS9207K/pgchiu/CASE
+    ## CASE define later
+CAA: f08_5AGCMs_NASPG_average
+CNA: IE-average
+YBEA: 1101,1250
+NYA: 150 
+CAS: f09_5AGCMs_NASPG_sample
+CNS: IE-sample
+YBES: 1101,1250
+NYS: 150
+
+
+Scripts:
+-  # OHC-100
+    plotScript: mpiexm/plot_mpiexm_climatology.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    VARIABLE: OHC-100
+    TITLE: "OHC-100 mean CTL (model year: NYC)"
+    FIGFILENAME: cli_OHC-100_CTN
+    PLOTRES: CTLRES
+    LEVS: CLA
+    REGRES: GLOB
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    VARIABLE: OHC-100
+    TITLE: "OHC-100 dif. CNA - CTL (model year: IE=NYA, CTL=NYC)"
+    FIGFILENAME: dif_OHC-100_average
+    PLOTRES: DIFRES
+    LEVS: DLA
+    REGRES: GLOB
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAS
+    YEARBE: YBES
+    VARIABLE: OHC-100
+    TITLE: "OHC-100 dif. CNS - CTL (model year: IE=NYS, CTL=NYC)"
+    FIGFILENAME: dif_OHC-100_sample
+    PLOTRES: DIFRES
+    LEVS: DLA
+    REGRES: GLOB
+
+-  # OHC-200
+    plotScript: mpiexm/plot_mpiexm_climatology.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    VARIABLE: OHC-200
+    TITLE: "OHC-200 mean CTL (model year: NYC)"
+    FIGFILENAME: cli_OHC-200_CTN
+    PLOTRES: CTLRES
+    LEVS: CLB
+    REGRES: GLOB
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    VARIABLE: OHC-200
+    TITLE: "OHC-200 dif. CNA - CTL (model year: IE=NYA, CTL=NYC)"
+    FIGFILENAME: dif_OHC-200_average
+    PLOTRES: DIFRES
+    LEVS: DLB
+    REGRES: GLOB
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAS
+    YEARBE: YBES
+    VARIABLE: OHC-200
+    TITLE: "OHC-200 dif. CNS - CTL (model year: IE=NYS, CTL=NYC)"
+    FIGFILENAME: dif_OHC-200_sample
+    PLOTRES: DIFRES
+    LEVS: DLB
+    REGRES: GLOB
+
+-  # OHC-500
+    plotScript: mpiexm/plot_mpiexm_climatology.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    VARIABLE: OHC-500
+    TITLE: "OHC-500 mean CTL (model year: NYC)"
+    FIGFILENAME: cli_OHC-500_CTN
+    PLOTRES: CTLRES
+    LEVS: CLC
+    REGRES: GLOB
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    VARIABLE: OHC-500
+    TITLE: "OHC-500 dif. CNA - CTL (model year: IE=NYA, CTL=NYC)"
+    FIGFILENAME: dif_OHC-500_average
+    PLOTRES: DIFRES
+    LEVS: DLC
+    REGRES: GLOB
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAS
+    YEARBE: YBES
+    VARIABLE: OHC-500
+    TITLE: "OHC-500 dif. CNS - CTL (model year: IE=NYS, CTL=NYC)"
+    FIGFILENAME: dif_OHC-500_sample
+    PLOTRES: DIFRES
+    LEVS: DLC
+    REGRES: GLOB
+
+-  # OHC-1000
+    plotScript: mpiexm/plot_mpiexm_climatology.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    VARIABLE: OHC-1000
+    TITLE: "OHC-1000 mean CTL (model year: NYC)"
+    FIGFILENAME: cli_OHC-1000_CTN
+    PLOTRES: CTLRES
+    LEVS: CLD
+    REGRES: GLOB
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    VARIABLE: OHC-1000
+    TITLE: "OHC-1000 dif. CNA - CTL (model year: IE=NYA, CTL=NYC)"
+    FIGFILENAME: dif_OHC-1000_average
+    PLOTRES: DIFRES
+    LEVS: DLD
+    REGRES: GLOB
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAS
+    YEARBE: YBES
+    VARIABLE: OHC-1000
+    TITLE: "OHC-1000 dif. CNS - CTL (model year: IE=NYS, CTL=NYC)"
+    FIGFILENAME: dif_OHC-1000_sample
+    PLOTRES: DIFRES
+    LEVS: DLD
+    REGRES: GLOB
+
+
+-  
+    plotScript: mk_html_page.sh
+    FIGFILES: 
+        cli_OHC-100_CTN
+        dif_OHC-100_sample
+        dif_OHC-100_average
+        cli_OHC-200_CTN
+        dif_OHC-200_sample
+        dif_OHC-200_average
+        cli_OHC-500_CTN
+        dif_OHC-500_sample
+        dif_OHC-500_average
+        cli_OHC-1000_CTN
+        dif_OHC-1000_sample
+        dif_OHC-1000_average
+    COLUMN: CTL CNS CNA 'tr' 'OHC 100m' 'tr' 3 'OHC 200m' 'tr' 3 'OHC 500m' 'tr' 3 'OHC 1000m' 'tr' 3 
+

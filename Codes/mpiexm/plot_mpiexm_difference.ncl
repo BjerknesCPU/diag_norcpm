@@ -3,6 +3,7 @@
 ;; only support mpiom(ocn) variable now.
 
 ;;DIAG_NORCPM; FIGFILENAME: fig
+;;DIAG_NORCPM; CACHEFILENAME: FIGFILENAME
 ;;DIAG_NORCPM; PLOTRES: ;; PLOTRES
 ;;DIAG_NORCPM; TITLE: title
 ;;DIAG_NORCPM; MONTHS: 0
@@ -10,7 +11,7 @@
 load "CODEDIR/mpiexm/func_read_mpiexm.ncl"
 begin
     figfn = "FIGFILENAME"
-    cachefile = figfn+".nc"
+    cachefile = "CACHEFILENAME.nc"
     title = "TITLE"
     varname = "VARIABLE"
     component = "COMPONENT"

@@ -49,6 +49,8 @@ begin
         vcor = recover_nc_lat2d_lon2d(f->vcor)
         ureg = recover_nc_lat2d_lon2d(f->ureg)
         vreg = recover_nc_lat2d_lon2d(f->vreg)
+        windreg = recover_nc_lat2d_lon2d(f->windreg)
+        windcor = recover_nc_lat2d_lon2d(f->windcor)
     else
         ;; given time series
         df = addfile(tsFn,"r")
@@ -64,12 +66,15 @@ begin
         vensTZLL = read_mpiexm_season_ensmean_YZLL(case,casedir,component,vname,years,months,modeln)
         uens = uensTZLL(:,ilev,:,:) ;; yearly(seasonal) data
         vens = vensTZLL(:,ilev,:,:) ;; yearly(seasonal) data
+        windens = sqrt(uens^2 + vens^2)
 
         ;; cal reg/cor map
         ureg = regCoef_n(ts,uens,0,0)
         vreg = regCoef_n(ts,vens,0,0)
+        windreg = regCoef_n(ts,windens,0,0)
         ucor = escorc_n(ts,uens,0,0)
         vcor = escorc_n(ts,vens,0,0)
+        windcor = escorc_n(ts,windens,0,0)
 
         ;; assign coordinate if those are 2d
         if(isatt(ureg,"lat2d"))then
@@ -81,11 +86,16 @@ begin
             ucor@lon2d = uens@lon2d
             vcor@lat2d = vens@lat2d
             vcor@lon2d = vens@lon2d
+            windreg@lat2d = uens@lat2d
+            windreg@lon2d = uens@lon2d
         else
             copy_VarCoords(uens(0,:,:),ureg)
             copy_VarCoords(vens(0,:,:),vreg)
             copy_VarCoords(uens(0,:,:),ucor)
             copy_VarCoords(vens(0,:,:),vcor)
+            copy_VarCoords(uens(0,:,:),vcor)
+            copy_VarCoords(uens(0,:,:),windreg)
+            copy_VarCoords(uens(0,:,:),windcor)
         end if
 
         f = addfile(cachefile,"c")
@@ -93,6 +103,8 @@ begin
         f->vreg = vreg
         f->ucor = ucor
         f->vcor = vcor
+        f->windreg = windreg
+        f->windcor = windcor
     end if
 
 

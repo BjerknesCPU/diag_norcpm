@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CAA='f08_5AGCMs_NASPG_average'
-CNA='IEave'
+CNA='IE-average'
 year=1180
 month=06
 metaRecipe=A99E_${CAA}_daily_weather_${year}_${month}.yml

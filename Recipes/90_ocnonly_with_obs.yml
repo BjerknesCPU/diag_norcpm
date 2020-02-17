@@ -1,0 +1,21 @@
+# Recipe to make life easier
+#
+Title: Compare with obs/reanalysis data
+Description: 
+    Just a meta recipe. 
+Depends: 
+    14_AnoCor_sst_obs.yml
+    16_AnoCor_ohc_obs.yml
+    21_rank_histogram_obs.yml
+    22_rank_histogram_ano_obs.yml
+    #13_nino34_predic_skill.yml
+ShowInIndex: False
+    ## will not show in index page
+
+
+Scripts: # not use now
+-
+    plotScript: mk_html_page.sh
+    FIGFILES:
+    COLUMN: 
+    COMMENT: Not really.

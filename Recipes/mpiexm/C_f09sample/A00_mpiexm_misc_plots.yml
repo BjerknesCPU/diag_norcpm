@@ -1,0 +1,19 @@
+Title: Misc plot for mpiexm
+Description: |
+    Misc plot for mpiexm
+COMMENT: |
+    Misc plot for mpiexm
+Thumbnail: weighting
+
+Scripts:
+-  
+    plotScript: mpiexm/plot_mpiexm_weighting.ncl
+    TITLE: "mpiexm weighting"
+    FIGFILENAME: weighting
+    
+-  
+    plotScript: mk_html_page.sh
+    FIGFILES: 
+        weighting
+    COLUMN: 1
+

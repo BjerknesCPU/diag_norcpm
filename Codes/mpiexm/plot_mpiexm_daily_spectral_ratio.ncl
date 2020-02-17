@@ -3,6 +3,7 @@
 
 ;;DIAG_NORCPM; FIGFILENAME: fig
 ;;DIAG_NORCPM; PLOTRES: ;; PLOTRES
+;;DIAG_NORCPM; OUTPUTFILENAME: FIGFILENAME
 ;;DIAG_NORCPM; TITLE: title
 ;;DIAG_NORCPM; DETREND: 0
 ;;DIAG_NORCPM; SMOOTH: 11
@@ -21,6 +22,7 @@ load "CODEDIR/mpiexm/func_read_mpiexm.ncl"
 begin
     figfn = "FIGFILENAME"
     title = "TITLE"
+    outputfn = "OUTPUTFILENAME.nc" ;; output data only
 
     redfn_frac = "REDNOISEFILEFRAC"
     redfn_deno = "REDNOISEFILEDENO"
@@ -133,6 +135,12 @@ begin
     PLOTRES
 
     plot = gsn_csm_xy(wks,freq,splt_ratio(CONFIDENCELINES,:),res)
+
+    ;; output plotted data
+    system("rm -f "+outputfn)
+    f = addfile(outputfn,"c")
+    f->freq = freq
+    f->splt_ratio = splt_ratio(CONFIDENCELINES,:)
 
     ;; reflines
     rpl = True

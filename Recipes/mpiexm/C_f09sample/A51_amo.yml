@@ -1,0 +1,272 @@
+Title: AMO index
+Description: |
+    Observed AMO index, 
+    defined as 10-year low-pass filtered annual mean area-averaged SST anomalies over the North Atlantic basin (0N-65N, 80W-0E). 
+    Use filwgts_lanczos() to apply low-pass filter the daily time series.
+    Parameters are filwgts_lanczos(21,0,1./10.,-999,1.)
+COMMENT: |
+    Observed AMO index, 
+    defined as 10-year low-pass filtered area-averaged SST anomalies over the North Atlantic basin (0N-65N, 80W-0E). 
+    Use filwgts_lanczos() to apply low-pass filter the daily time series.
+    Parameters of low-pass filter are 
+    filwgts_lanczos(21,0,1./10.,-999,1.)
+#Thumbnail: maxML_var_ratio_average_case_thumb.png
+COMPONENT:  mpiom
+MONTHS: 1,2,3,4,5,6,7,8,9,10,11,12
+VN: sst
+VARIABLE:  VN
+LATBE: 0.,65.
+LONBE: -80.,0.
+TSRES: |
+    res@vpHeightF = .3
+    res@trYMinF = -0.4
+    res@trYMaxF =  0.4
+    res@tmXBFormat = "f3.0"
+    ts_mean = avg(ts)
+    ts := ts - ts_mean ;; remove mean
+    res@gsnRightString = "avg="+sprintf("%3.2f",ts_mean)+" K"
+TSPOSTPROC: |
+    ;; low pass
+    wgt = filwgts_lanczos(21,0,1./10.,-999,1.)
+    ts := wgt_runave(ts,wgt,0)
+    x = ispan(min(ybe),max(ybe),1)
+REGRES: |
+    ;; REGRES
+    res@mpLimitMode = "LatLon"
+    res@mpMinLatF = -90.
+    res@mpMaxLatF = 90.
+    res@mpMinLonF = -330.
+    res@mpMaxLonF =   30.
+    res@pmTickMarkDisplayMode = "Always"
+    res@mpCenterLonF =   -150.
+    res@cnLinesOn = False
+    res@cnFillOn = True
+    res@lbOrientation = "Vertical"
+    res@pmLabelBarWidthF = 0.1
+    res@pmLabelBarOrthogonalPosF   = 0.01
+    res@cnLevelSelectionMode = "ExplicitLevels"
+    res@cnLevels = fspan(-1.2,1.2,13)
+RERRES: |
+    res@mpLimitMode = "LatLon"
+    res@mpMinLatF = 10.
+    res@mpMaxLatF = 80.
+    res@mpMinLonF = -100.
+    res@mpMaxLonF =  30.
+    res@pmTickMarkDisplayMode = "Always"
+    res@mpCenterLatF = 50.
+    res@mpCenterLonF =  -35.
+    res@mpProjection = "LambertConformal"
+    res@mpGridAndLimbOn = True
+    res@gsnMaskLambertConformal = True
+    res@cnLinesOn = False
+    res@cnFillOn = True
+    res@lbOrientation = "Vertical"
+    res@pmLabelBarWidthF = 0.1
+    res@pmLabelBarOrthogonalPosF   = 0.01
+    res@cnLevelSelectionMode = "ExplicitLevels"
+    res@cnLevels = fspan(-1.2,1.2,13)
+VRERES: |
+    ;; REGRES
+    res@mpLimitMode = "LatLon"
+    res@mpMinLatF = -90.
+    res@mpMaxLatF = 90.
+    res@mpMinLonF = -330.
+    res@mpMaxLonF =   30.
+    res@pmTickMarkDisplayMode = "Always"
+    res@mpCenterLonF =   -150.
+    res@mpOutlineOn = True
+    res@mpLandFillColor = "grey90"
+    res@mpGeophysicalLineColor = "grey60"
+    ;res@cnLinesOn = False
+    ;res@cnFillOn = True
+    ;res@lbOrientation = "Vertical"
+    ;res@pmLabelBarWidthF = 0.1
+    ;res@pmLabelBarOrthogonalPosF   = 0.01
+    ;res@cnLevelSelectionMode = "ExplicitLevels"
+    ;res@cnLevels = fspan(-1.2,1.2,13)
+    res@vcMinDistanceF = .02
+    res@vcRefLengthF = .05
+    res@vcRefMagnitudeF =  1.
+    res@vcGlyphStyle  = "CurlyVector"
+    res@vcMonoLineArrowColor  = True
+    res@vcLineArrowColor = "black"
+    res@vcLineArrowThicknessF = 1.5
+    res@vcRefAnnoString1  = res@vcRefMagnitudeF+" (m/s)/K"
+    res@lbBoxSeparatorLinesOn = False
+    res@vcRefAnnoOrthogonalPosF = -0.143
+    res@vcRefAnnoParallelPosF =  0.176
+    res@vcRefAnnoSide = "Left"
+CASEDIR: /projects/NS9207K/pgchiu/CASE
+    ## CASE define later
+
+CTN: f08_1AGCM
+    ## proxy of CCASE 'control case'
+CCASE: CTN
+CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
+YBEC: 1101,1250
+CONTROLYEARBE: YBEC
+NYC: 150
+
+CAA: f08_5AGCMs_NASPG_average
+CNA: IEave
+YBEA: 1101,1250
+NYA: 150 
+CAS: f09_5AGCMs_NASPG_sample
+CNS: IEsam
+YBES: 1101,1250
+NYS: 150
+
+
+Scripts:
+-  
+    plotScript: mpiexm/plot_mpiexm_ts.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    PLOTRES: TSRES
+    TITLE: "AMO index CTL (nyear: NYC)"
+    FIGFILENAME: CTN_VN_amo
+-  
+    plotScript: mpiexm/plot_mpiexm_ts.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    PLOTRES: TSRES
+    TITLE: "AMO index CNA (nyear: NYA)"
+    FIGFILENAME: CAA_VN_amo
+-  
+    plotScript: mpiexm/plot_mpiexm_ts.ncl
+    CASE: CAS
+    YEARBE: YBES
+    PLOTRES: TSRES
+    TITLE: "AMO index CNS (nyear: NYS)"
+    FIGFILENAME: CAS_VN_amo
+
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    TITLE: "AMO index reg. CTL (nyear: NYC)"
+    FIGFILENAME: CASE_VN_regmap
+    TSNETCDFFILE: CASE_VN_amo
+    TSVARNAME: ts
+    PLOTRES:  REGRES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    TITLE: "AMO index reg. CNA (nyear: NYA)"
+    FIGFILENAME: CASE_VN_regmap
+    TSNETCDFFILE: CASE_VN_amo
+    TSVARNAME: ts
+    PLOTRES:  REGRES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CAS
+    YEARBE: YBES
+    TITLE: "AMO index reg. CNS (nyear: NYS)"
+    FIGFILENAME: CASE_VN_regmap
+    TSNETCDFFILE: CASE_VN_amo
+    TSVARNAME: ts
+    PLOTRES:  REGRES
+
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    TITLE: "AMO index reg. CTL (nyear: NYC)"
+    FIGFILENAME: CASE_VN_regmap_natl
+    CACHEFILENAME: CASE_VN_regmap
+    TSNETCDFFILE: CASE_VN_amo
+    TSVARNAME: ts
+    PLOTRES:  RERRES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    TITLE: "AMO index reg. CNA (nyear: NYA)"
+    FIGFILENAME: CASE_VN_regmap_natl
+    CACHEFILENAME: CASE_VN_regmap
+    TSNETCDFFILE: CASE_VN_amo
+    TSVARNAME: ts
+    PLOTRES:  RERRES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CAS
+    YEARBE: YBES
+    TITLE: "AMO index reg. CNS (nyear: NYS)"
+    FIGFILENAME: CASE_VN_regmap_natl
+    CACHEFILENAME: CASE_VN_regmap
+    TSNETCDFFILE: CASE_VN_amo
+    TSVARNAME: ts
+    PLOTRES:  RERRES
+
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap_vect.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    TITLE: "AMO index 10m wind reg. CTL (nyear: NYC)"
+    COMPONENT: echam6
+    UVARIABLE: u10
+    VVARIABLE: v10
+    MODELN: 0
+    FIGFILENAME: CASE_VN_sfc_uv_reg
+    TSNETCDFFILE: CASE_VN_amo
+    TSVARNAME: ts
+    PLOTRES:  VRERES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap_vect.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    TITLE: "AMO index 10m wind reg. CNA (nyear: NYA)"
+    COMPONENT: echam6
+    UVARIABLE: u10
+    VVARIABLE: v10
+    MODELN: "(/1,2,3,4,5/)"
+    FIGFILENAME: CASE_VN_sfc_uv_reg
+    TSNETCDFFILE: CASE_VN_amo
+    TSVARNAME: ts
+    PLOTRES:  VRERES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap_vect.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    TITLE: "AMO index 10m wind reg. CNA (nyear: NYA)"
+    COMPONENT: echam6
+    UVARIABLE: u10
+    VVARIABLE: v10
+    MODELN: 1
+    FIGFILENAME: CASE_VN_sfc_uv_reg_1agcm
+    TSNETCDFFILE: CASE_VN_amo
+    TSVARNAME: ts
+    PLOTRES:  VRERES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap_vect.ncl
+    CASE: CAS
+    YEARBE: YBES
+    TITLE: "AMO index 10m wind reg. CNS (nyear: NYS)"
+    COMPONENT: echam6
+    UVARIABLE: u10
+    VVARIABLE: v10
+    MODELN: 1
+    FIGFILENAME: CASE_VN_sfc_uv_reg
+    TSNETCDFFILE: CASE_VN_amo
+    TSVARNAME: ts
+    PLOTRES:  VRERES
+
+-  
+    plotScript: mk_html_page.sh
+    FIGFILES: 
+        CTN_VN_amo
+        CAA_VN_amo
+        CAS_VN_amo
+        CTN_VN_regmap
+        CAA_VN_regmap
+        CAS_VN_regmap
+        CTN_VN_regmap_natl
+        CAA_VN_regmap_natl
+        CAS_VN_regmap_natl
+        CTN_VN_sfc_uv_reg
+        CAA_VN_sfc_uv_reg
+        CAS_VN_sfc_uv_reg
+        CAA_VN_sfc_uv_reg_1agcm
+    COLUMN: "'AMO index' 'tr' CTL CNA CNS 'tr' 3 'Regression map' 'tr' 3 3 3 '-' 1 "
+

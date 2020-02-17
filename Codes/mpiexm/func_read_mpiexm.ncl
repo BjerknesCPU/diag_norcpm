@@ -136,6 +136,57 @@ procedure add_lc_labels(wks,map,minlat,maxlat,minlon,maxlon)
       end do
     end
 
+undef("months_abbr")
+function months_abbr(months)
+begin
+    ;; continous months ,ex. 6,7,8 -> JJA 
+    ;; no-continous, ex. 1,3,5 -> 010305
+    ;; all year -> ANN
+
+    nm = dimsizes(months)
+
+    ;; is annual:
+    if (nm .eq. 12 .and. all(months .eq. ispan(1,12,1)))then
+        return "ANN"
+    end if
+
+    ;; is continous
+    dm = months(1:) - months(:nm-2)
+    if (all(dm.eq.1))then
+        abbrs = (/"D","J","F","M","A","M","J","J","A","S","O","N","D","J","F","M"/)
+        abbr = str_join(abbrs(months),"")
+        abbr = str_sub_str(abbr," ","")
+        return abbr
+    end if
+
+    ;; non of above
+    mstr = ""
+    do i = 0, nm-1
+        mstr = mstr+sprinti("%2.2d",months(i))
+    end do
+    return mstr
+end
+
+undef("cachefn")
+function cachefn(case, casedir,component,varname,years,months,modeln[1])
+begin
+    ;; assemble cache file name with variables to read
+    ;; case_component_varname_min(years)-max(years)_months(abbr)_modeln.nc
+    cachedir = casedir+"/cache"
+    system("mkdir -p"+cachedir)
+
+    ny = dimsizes(years)
+    dy = years(1:)-years(:ny-2)
+    if(any(dy.ne.1))then
+        print("cachefn(): years is not continuous, need to modify cachefn()")
+        exit
+    end if
+    fn = case+"_"+component+"_"+varname+"_"+min(years)+"-"+max(years)+"_"+months_abbr(months)+"_"+modeln+".nc"
+
+    fn = cachedir+"/"+fn
+    return fn
+end
+
 undef  ("cal_ohc_sal_with_temp_salinity_TZLL")
 function cal_ohc_sal_with_temp_salinity_TZLL(temp[*][*][*][*],salinity[*][*][*][*],to_depth,ohcorsal)
 begin
@@ -261,6 +312,7 @@ end
 undef("assign_ocn_grid")
 procedure assign_ocn_grid(var,gf:file)
 begin
+    ;;print("assign_ocn_grid(): ")
     if (isatt(var,"coordinates"))then ;; assign lat/lon to ocn variables
         coords = var@coordinates
         if(coords .eq. "plon plat")then ;; p cell
@@ -347,7 +399,9 @@ begin
 
     ;; weighting
 
-    ;; wrong!! grid size(lat/lon) is not constant!! wgt = where(vmask,cos(lat2d/180*get_pi("double")),0)
+    if(dimsizes(latdims).eq.1)then ;; incase 1d lat/lon
+        wgt = where(vmask,cos(lat2d/180*get_pi("double")),0)
+    end if
     ;; read area.nc, bad idea but should work, need modify
     dims = dimsizes(lat2d)
     if(all(dims.eq.(/96,192/)))then  ;; for atm, need modify
@@ -370,6 +424,7 @@ begin
         wgt = wgt / max(wgt)
     end if
     if(.not.isvar("wgt"))then
+        print("mask_with_latbe_lonbe(): no wgt defined...")
         print(dims)
         print(lon2d(0,0)+" "+lon2d(0,1))
         print(lon2d(0,254)+" "+lon2d(0,255))
@@ -402,6 +457,11 @@ begin
     lmask = mask_with_latbe_lonbe(lat2d,lon2d,latbe,lonbe)
     wgt = lmask@wgt
     varts = wgt_areaave2(var,wgt,0) ;; 0 means use non-missing value only
+    if(False)then ;; debug
+        system("rm -f wgt.nc")
+        f = addfile("wgt.nc","c")
+        f->wgt = wgt
+    end if
     return varts
 end
 
@@ -462,6 +522,32 @@ begin
     end if
 end
 
+procedure align_year_month(year,month)
+begin
+    ;; month = 13 -> year+1, month=1
+    ;; month =  0 -> year-1, month=12
+    ;; reaction sytle coding
+    orig_year = year
+    orig_month = month
+    do i = 0, 20
+        if(month.ge.1 .and. month.le.12)then
+            return
+        end if
+
+        if(month.gt.12)then
+            month = month-12
+            year = year+1
+            continue
+        end if
+        if(month.lt.1)then
+            month = month+12
+            year = year-1
+            continue
+        end if
+    end do
+    print("align_year_month(): failed to align year month, year/month = "+orig_year+"/"+orig_month)
+    exit
+end
 function fn_mpiexm(case, casedir,component,varname,year[1],imonth[*],modeln)
 begin
     ;; get data file name
@@ -500,29 +586,28 @@ begin
             print("read multiple model runs is not applied here.")
             print("use read_mpiexm_season_mean_ensmean_ZLL()")
             return False
-        else
-            if(modeln .eq.0)then
-                dailyfn = casedir+"/outdata/"+component+"/"+case+"_"+component+where(varname.eq."slp","_slp_","_echam_")+yyyymm+".nc"
-                fns = case+"_"+varname+"_"+str_sub_str(cdoop," ","_")+"_"+component+"_"+"_echam_"+yyyymm+".nc"
-            else
-                dailyfn = casedir+"/outdata/"+component+"/"+case+sprinti("%2.2d",modeln)+"_"+component+where(varname.eq."slp","_slp_","_echam_")+yyyymm+".nc"
-                fns = case+"_"+varname+"_"+str_sub_str(cdoop," ","_")+"_"+component+"_"+sprinti("%2.2d",modeln)+"_echam_"+yyyymm+".nc"
-            end if
-            ;; make tmp nc file
-            nf = dimsizes(dailyfn)
-            system("rm -rf datatmp")
-            system("mkdir -p datatmp")
-            do i =0, nf-1
-                if(isfilepresent(fns(i)))then
-                    continue
-                end if
-                print("cdo --silent -t echam6 -f nc "+cdoop+" -select,name="+varname+" "+dailyfn(i)+" 'datatmp/tmp_"+fns(i)+"' && mv 'datatmp/tmp_"+fns(i)+"'  'datatmp/"+fns(i)+"'")
-                system("cdo --silent -t echam6 -f nc "+cdoop+" -select,name="+varname+" "+dailyfn(i)+" 'datatmp/tmp_"+fns(i)+"' && mv 'datatmp/tmp_"+fns(i)+"'  'datatmp/"+fns(i)+"'")
-            end do
-            fns = "datatmp/"+fns
-            return fns
-
         end if
+        if(modeln .eq.0)then
+            dailyfn = casedir+"/outdata/"+component+"/"+case+"_"+component+where(varname.eq."slp","_slp_","_echam_")+yyyymm+".nc"
+            fns = case+"_"+varname+"_"+str_sub_str(cdoop," ","_")+"_"+component+"_"+"_echam_"+yyyymm+".nc"
+        else
+            dailyfn = casedir+"/outdata/"+component+"/"+case+sprinti("%2.2d",modeln)+"_"+component+where(varname.eq."slp","_slp_","_echam_")+yyyymm+".nc"
+            fns = case+"_"+varname+"_"+str_sub_str(cdoop," ","_")+"_"+component+"_"+sprinti("%2.2d",modeln)+"_echam_"+yyyymm+".nc"
+        end if
+        ;; make tmp nc file
+        nf = dimsizes(dailyfn)
+        system("rm -rf datatmp")
+        system("mkdir -p datatmp")
+        do i =0, nf-1
+            if(isfilepresent(fns(i)))then
+                continue
+            end if
+            print("cdo --silent -t echam6 -f nc "+cdoop+" -select,name="+varname+" "+dailyfn(i)+" 'datatmp/tmp_"+fns(i)+"' && mv 'datatmp/tmp_"+fns(i)+"'  'datatmp/"+fns(i)+"'")
+            system("cdo --silent -t echam6 -f nc "+cdoop+" -select,name="+varname+" "+dailyfn(i)+" 'datatmp/tmp_"+fns(i)+"' && mv 'datatmp/tmp_"+fns(i)+"'  'datatmp/"+fns(i)+"'")
+        end do
+        fns = "datatmp/"+fns
+        return fns
+
     end if
     if (component.eq."mpiom")then
         ;; "_data_2d_dm_", "_data_2d_mm_", "_data_3du_mm_", "_data_3dw_mm_", "_monitorig_ym_", "_timeser_dm_"
@@ -916,9 +1001,12 @@ begin
     print("read_mpiexm_var_mean_daily_ts_seasonaly(): should not be here...")
     exit
 end
-function read_mpiexm_filevar_daily_1m(case, casedir,component,varname,year,month,modeln)
+function read_mpiexm_filevar_daily_1m(case, casedir,component,varname,iyear,imonth,modeln)
 begin
     ;; read daily data 1 month
+    month = imonth
+    year = iyear
+    align_year_month(year,month)
     fn = mpiexm_daily_fn(case, casedir,component,varname,year,month,1,modeln)
     f = addfile(fn,"r")
     time = f->time
@@ -1035,6 +1123,34 @@ begin
     end if
 
     if(component.eq."mpiom")then ;; yearly file
+        if(any(months.gt.12 .or. months.lt.1))then ;; next or prev year
+            nmonth = dimsizes(months)
+            do m = 0, nmonth-1
+                ryear = year
+                rmonth = months(m)
+                align_year_month(ryear,rmonth)
+                fn = fn_mpiexm(case, casedir,component,varname,ryear,0,modeln)
+                f = addfile(fn,"r")
+                var = f->$varname$(rmonth-1,:,:,:)
+                if(isvar("var1"))then
+                    var1(m,:,:,:) = var
+                    time := array_append_record(time,cd_convert(f->time(rmonth-1),time@units),0)
+                    delete(var)
+                    continue
+                end if
+                dims = dimsizes(var)
+                dims := array_append_record(nmonth,dims,0)
+                var1 = new(dims,typeof(var))
+                var1(m,:,:,:) = var
+                time = f->time(rmonth-1)
+                if(isatt(var,"coordinates").and.var@coordinates .eq. "lon lat")then
+                    var1@lat2d = f->lat
+                    var1@lon2d = f->lon
+                end if
+
+            end do
+            return var1
+        end if
         fn = fn_mpiexm(case, casedir,component,varname,year,0,modeln)
         f = addfile(fn,"r")
         var = f->$varname$
@@ -1243,6 +1359,13 @@ begin
         months = imonths
     end if
 
+    ;; check cache
+    cache = cachefn(case, casedir,component,varname,years,months,modeln)
+    if(isfilepresent(cache))then
+        f = addfile(cache,"r")
+        return f->$varname$
+    end if
+
     ny = dimsizes(years)
     nmonth = dimsizes(months)
     var1y = dim_avg_n_Wrap(read_mpiexm_season_1y(case,casedir,component,varname,years(0),months,modeln),0)
@@ -1272,6 +1395,17 @@ begin
     varyr!0 = "year"
     varyr&year = years
     varyr@months = months
+
+    ;; assign grid
+    if(component.eq."mpiom")then
+        fn = fn_mpiexm(case, casedir,component,varname,years(0),1,modeln)
+        assign_ocn_grid(varyr,addfile(fn,"r"))
+    end if
+
+    ;; save cache 
+    f = addfile(cache,"c")
+    f->$varname$ = varyr
+
     return varyr
 end
 function read_mpiexm_YZLL(case, casedir,component,varname,years,modeln)
@@ -1322,11 +1456,15 @@ begin
     var1y = var1y/ny
 
     do y =  1,ny-1
-        ;;print("read_mpiexm_season_YZLL(): reading "+years(y))
         var1y = var1y + (dim_avg_n_Wrap(read_mpiexm_season_1y(case,casedir,component,varname,years(y),months,modeln),0)/ny)
     end do
     var1y@months = months
     var1y@years = years
+    ;; assign grid
+    if(component.eq."mpiom")then
+        fn = fn_mpiexm(case, casedir,component,varname,years(0),1,modeln)
+        assign_ocn_grid(var1y,addfile(fn,"r"))
+    end if
     return var1y
 end
 function read_mpiexm_season_mean_ensmean_ZLL(case, casedir,component,varname,years,imonths,modeln[*]:integer)
@@ -1342,41 +1480,54 @@ begin
     do i = 1, nmodel-1
         m1 = m1+ (read_mpiexm_season_mean_ZLL(case, casedir,component,varname,years,imonths,modeln(i))/nmodel)
     end do
+
+    ;; assign grid
+    if(component.eq."mpiom")then
+        fn = fn_mpiexm(case, casedir,component,varname,years(0),1,modeln)
+        assign_ocn_grid(m1,addfile(fn,"r"))
+    end if
+
     m1@modeln = modeln
     return m1
 end
 
 ;; test
-;a = read_mpiexm_season_mean_ZLL("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",ispan(1060,1062,1),(/4,5,6/),1)
-;a = read_mpiexm_season_YZLL("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",ispan(1060,1062,1),(/12,13,14/),1)
-;a = read_mpiexm_season_mean_ensmean_ZLL("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",ispan(1060,1062,1),(/4,5,6/),ispan(1,5,1))
-;a = mpiexm_daily_fn("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",1060,1,15,1)
-;a = mpiexm_daily_fn("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",1060,1,15,1)
-;a = read_mpiexm_filevar_1day("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",1060,1,15,1)
+;a = read_mpiexm_season_mean_ZLL("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",ispan(1060,1062,1),(/4,5,6/),1)
+;a = read_mpiexm_season_YZLL("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",ispan(1060,1062,1),(/12,13,14/),1)
+;a = read_mpiexm_season_mean_ensmean_ZLL("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",ispan(1060,1062,1),(/4,5,6/),ispan(1,5,1))
+;a = mpiexm_daily_fn("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",1060,1,15,1)
+;a = mpiexm_daily_fn("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",1060,1,15,1)
+;a = read_mpiexm_filevar_1day("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",1060,1,15,1)
 
-;a = read_mpiexm_filevar_daily_1m("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","amld",1061,2,1)
-;a = read_mpiexm_season_mean_ZLL("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","amld",ispan(1060,1062,1),(/8,9,10/),1)
-;a = read_mpiexm_season_mean_ZLL("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","amld_var",ispan(1060,1062,1),(/8,9,10/),1)
+;a = read_mpiexm_filevar_daily_1m("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","amld",1061,2,1)
+;a = read_mpiexm_season_mean_ZLL("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","amld",ispan(1060,1062,1),(/8,9,10/),1)
+;a = read_mpiexm_season_mean_ZLL("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","amld_var",ispan(1060,1062,1),(/8,9,10/),1)
+;a = read_mpiexm_season_mean_ZLL("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",ispan(1060,1062,1),(/8,9,10/),1)
+;printVarSummary(a)
 ;print(a)
-;a = read_mpiexm_season_mean_ensmean_ZLL("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","OHC-500",ispan(1060,1062,1),(/4,5,6/),0)
+;a = read_mpiexm_season_mean_ensmean_ZLL("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","OHC-500",ispan(1060,1062,1),(/4,5,6/),0)
 ;printVarSummary(a)
 ;system("rm -f tmp.nc")
 ;f =addfile("tmp.nc","c")
 ;f->var = a
 
-;a = read_mpiexm_season_mean_ensmean_ZLL("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","atlantic_moc",(/1060,1061,1062,1063/),(/6/),0) ;; atlantic_moc in monitoring_ym, yearly, (time,depth,lat,1)
+;a = read_mpiexm_season_mean_ensmean_ZLL("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","atlantic_moc",(/1060,1061,1062,1063/),(/6/),0) ;; atlantic_moc in monitoring_ym, yearly, (time,depth,lat,1)
 ;printVarSummary(a)
 ;printMinMax(a,0)
 ;exit
 
-;a = read_mpiexm_filevar_1day("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",1060,04,30,1)
-;a = read_mpiexm_filevar_1day("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","relhums",1060,04,30,1)
+;a = read_mpiexm_filevar_1day("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",1060,04,30,1)
+;a = read_mpiexm_filevar_1day("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","relhums",1060,04,30,1)
 ;printVarSummary(a)
 
-;a = read_mpiexm_filevar_mean_daily_ts_1m("f08_5AGCMs_NASPG_average","/tos-project4//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",1060,05,(/-30.,-40./),(/0.,10./),0)
+;a = read_mpiexm_filevar_mean_daily_ts_1m("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",1060,05,(/-30.,-40./),(/0.,10./),0)
 ;a = read_mpiexm_filevar_mean_daily_ts_seasonaly("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",ispan(1061,1070,1),(/1,2,3/),(/-30.,-40./),(/0.,10./),0)
 ;a = read_mpiexm_var_mean_daily_ts_seasonaly("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",ispan(1061,1070,1),(/1,2,3/),(/-30.,-40./),(/0.,10./),0)
 ;;a = read_mpiexm_season_ts("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",ispan(1060,1062,1),(/12,13,14/),(/-10.,10./),(/120.,180./),1)
 ;;a = read_mpiexm_season_ts("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","sst",ispan(1060,1062,1),(/10,11,12/),(/-10.,10./),(/120.,180./),1)
 ;;printVarSummary(a)
 
+;a = fn_mpiexm("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",1060,12,1)
+;print(a)
+;a = read_mpiexm_season_mean_ensmean_ZLL("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","psitro",(/1060,1061,1062,1063/),(/6/),0) 
+;printVarSummary(a)

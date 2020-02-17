@@ -1,0 +1,410 @@
+# plot dailay spectral in mpiexm
+# mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
+
+Title: Daily 10m wind speed spectral 
+Description: Daily 10m wind speed spectral
+COMMENT: Daily 10m wind speed spectral
+#Thumbnail: maxML_var_ratio_average_case_thumb.png
+COMPONENT:  echam6
+VN: wind10
+VARIABLE:  VN
+PLOTRES: |
+    res@trYMinF = 1.e-8
+    res@trYMaxF = 1.e5
+    res@trXMinF = 1.e-3
+    res@trXMaxF = 2.e2
+CONFIDENCEHIGH: .5
+CONFIDENCELOW: .5
+CONFIDENCELINES: 0
+
+CASEDIR: /projects/NS9207K/pgchiu/CASE
+    ## CASE define later
+
+CTN: f08_1AGCM
+    ## proxy of CCASE 'control case'
+CCASE: CTN
+CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
+YBEC: 1101,1250
+CONTROLYEARBE: YBEC
+NYC: 150
+MODNC: 0
+
+CAD: f08_5AGCMs_NASPG_sample
+CND: CTL2
+YBED: 1101,1250
+NYD: 150
+MODND: 1
+
+CAA: f08_5AGCMs_NASPG_average
+CNA: IE-average
+YBEA: 1101,1250
+NYA: 150 
+MODNA: (/1,2,3,4,5/)
+CAS: f09_5AGCMs_NASPG_sample
+CNS: IE-sample
+YBES: 1101,1250
+NYS: 150
+MODNS: 1
+
+Scripts:
+# subtropical gyre region(stgyre) (70W-20W, 20N-40N)
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MODELN: MODNC
+    LATBE: '20,40'
+    LONBE: '-70,-20'
+    TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
+    TAG: stgyre
+    TITLE: "Daily SST spectral CTL (model year: NYC) TTAG"
+    FIGFILENAME: CTN_VN_daily_spect_TAG
+    OUTPUTREDNOISE: True
+    REDNOISEFILE: CTN_noise_TAG.nc
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MODELN: MODNA
+    LATBE: '20,40'
+    LONBE: '-70,-20'
+    TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
+    TAG: stgyre
+    TITLE: "Daily SST spectral CNA(model year: NYA) TTAG"
+    FIGFILENAME: CAA_VN_daily_spect_TAG
+    REDNOISEFILE: CTN_noise_TAG.nc
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MODELN: MODNS
+    LATBE: '20,40'
+    LONBE: '-70,-20'
+    TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
+    TAG: stgyre
+    TITLE: "Daily SST spectral CNS (model year: NYS) TTAG"
+    FIGFILENAME: CAS_VN_daily_spect_TAG
+    REDNOISEFILE: CTN_noise_TAG.nc
+
+# stgyre, annual cycle remove(acr)
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MODELN: MODNC
+    LATBE: '20,40'
+    LONBE: '-70,-20'
+    TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
+    TAG: stgyre
+    TITLE: "Daily SST ACR spectral CTL (model year: NYC) TTAG"
+    CACHEFILENAME: CTN_VN_daily_spect_TAG
+    FIGFILENAME: CTN_VN_daily_acr_spect_TAG
+    OUTPUTREDNOISE: True
+    REDNOISEFILE: CTN_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MODELN: MODNA
+    LATBE: '20,40'
+    LONBE: '-70,-20'
+    TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
+    TAG: stgyre
+    TITLE: "Daily SST ACR spectral CNA(model year: NYA) TTAG"
+    CACHEFILENAME: CAA_VN_daily_spect_TAG
+    FIGFILENAME: CAA_VN_daily_acr_spect_TAG
+    REDNOISEFILE: CTN_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MODELN: MODNS
+    LATBE: '20,40'
+    LONBE: '-70,-20'
+    TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
+    TAG: stgyre
+    TITLE: "Daily SST ACR spectral CNS(model year: NYS) TTAG"
+    CACHEFILENAME: CAS_VN_daily_spect_TAG
+    FIGFILENAME: CAS_VN_daily_acr_spect_TAG
+    REDNOISEFILE: CTN_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+
+# stgyre, acr and JJA
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MODELN: MODNC
+    PICKMONTHS: "(/6,7,8/)"
+    LATBE: '20,40'
+    LONBE: '-70,-20'
+    TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
+    TAG: stgyre
+    TITLE: "Daily SST ACR JJA spectral CTL (model year: NYC) TTAG"
+    CACHEFILENAME: CTN_VN_daily_spect_TAG
+    FIGFILENAME: CTN_VN_daily_acr_JJA_spect_TAG
+    OUTPUTREDNOISE: True
+    REDNOISEFILE: CTN_acr_JJA_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MODELN: MODNA
+    PICKMONTHS: "(/6,7,8/)"
+    LATBE: '20,40'
+    LONBE: '-70,-20'
+    TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
+    TAG: stgyre
+    TITLE: "Daily SST ACR JJA spectral CNA(model year: NYA) TTAG"
+    CACHEFILENAME: CAA_VN_daily_spect_TAG
+    FIGFILENAME: CAA_VN_daily_acr_JJA_spect_TAG
+    REDNOISEFILE: CTN_acr_JJA_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MODELN: MODNS
+    PICKMONTHS: "(/6,7,8/)"
+    LATBE: '20,40'
+    LONBE: '-70,-20'
+    TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
+    TAG: stgyre
+    TITLE: "Daily SST ACR JJA spectral CNS(model year: NYS) TTAG"
+    CACHEFILENAME: CAS_VN_daily_spect_TAG
+    FIGFILENAME: CAS_VN_daily_acr_JJA_spect_TAG
+    REDNOISEFILE: CTN_acr_JJA_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+
+
+# nino34(170W-120W, 5S-5N), (acr)
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MODELN: MODNC
+    LATBE: '-5,5'
+    LONBE: '-170,-120'
+    TTAG: '170~F34~0~F~W-120~F34~0~F~W, 5~F34~0~F~S-5~F34~0~F~N'
+    TAG: nino34
+    TITLE: "Daily SST ACR spectral CTL (model year: NYC) TTAG"
+    CACHEFILENAME: CTN_VN_daily_spect_TAG
+    FIGFILENAME: CTN_VN_daily_acr_spect_TAG
+    OUTPUTREDNOISE: True
+    REDNOISEFILE: CTN_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MODELN: MODNA
+    LATBE: '-5,5'
+    LONBE: '-170,-120'
+    TTAG: '170~F34~0~F~W-120~F34~0~F~W, 5~F34~0~F~S-5~F34~0~F~N'
+    TAG: nino34
+    TITLE: "Daily SST ACR spectral CNA(model year: NYA) TTAG"
+    CACHEFILENAME: CAA_VN_daily_spect_TAG
+    FIGFILENAME: CAA_VN_daily_acr_spect_TAG
+    REDNOISEFILE: CTN_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MODELN: MODNS
+    LATBE: '-5,5'
+    LONBE: '-170,-120'
+    TTAG: '170~F34~0~F~W-120~F34~0~F~W, 5~F34~0~F~S-5~F34~0~F~N'
+    TAG: nino34
+    TITLE: "Daily SST ACR spectral CNS(model year: NYS) TTAG"
+    CACHEFILENAME: CAS_VN_daily_spect_TAG
+    FIGFILENAME: CAS_VN_daily_acr_spect_TAG
+    REDNOISEFILE: CTN_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+
+# subpolar gyre(spgyre)(50W-15W, 45N-57N), (acr)
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MODELN: MODNC
+    LATBE: '45,57'
+    LONBE: '-50,-15'
+    TTAG: '50~F34~0~F~W-15~F34~0~F~W, 45~F34~0~F~N-57~F34~0~F~N'
+    TAG: spgyre
+    TITLE: "Daily SST ACR spectral CTL (model year: NYC) TTAG"
+    CACHEFILENAME: CTN_VN_daily_spect_TAG
+    FIGFILENAME: CTN_VN_daily_acr_spect_TAG
+    OUTPUTREDNOISE: True
+    REDNOISEFILE: CTN_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MODELN: MODNA
+    LATBE: '45,57'
+    LONBE: '-50,-15'
+    TTAG: '50~F34~0~F~W-15~F34~0~F~W, 45~F34~0~F~N-57~F34~0~F~N'
+    TAG: spgyre
+    TITLE: "Daily SST ACR spectral CNA(model year: NYA) TTAG"
+    CACHEFILENAME: CAA_VN_daily_spect_TAG
+    FIGFILENAME: CAA_VN_daily_acr_spect_TAG
+    REDNOISEFILE: CTN_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MODELN: MODNS
+    LATBE: '45,57'
+    LONBE: '-50,-15'
+    TTAG: '50~F34~0~F~W-15~F34~0~F~W, 45~F34~0~F~N-57~F34~0~F~N'
+    TAG: spgyre
+    TITLE: "Daily SST ACR spectral CNS(model year: NYS) TTAG"
+    CACHEFILENAME: CAS_VN_daily_spect_TAG
+    FIGFILENAME: CAS_VN_daily_acr_spect_TAG
+    REDNOISEFILE: CTN_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+
+
+# subtropical gyre small(stgsmall)(47.5W-42.5W, 27.5N-32.5N), (acr)
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MODELN: MODNC
+    LATBE: '27.5,32.5'
+    LONBE: '-47.5,-42.5'
+    TTAG: '47.5~F34~0~F~W-42.5~F34~0~F~W, 27.5~F34~0~F~S-32.5~F34~0~F~N'
+    TAG: stgsmall
+    TITLE: "Daily SST ACR spectral CTL (model year: NYC) TTAG"
+    CACHEFILENAME: CTN_VN_daily_spect_TAG
+    FIGFILENAME: CTN_VN_daily_acr_spect_TAG
+    OUTPUTREDNOISE: True
+    REDNOISEFILE: CTN_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MODELN: MODNA
+    LATBE: '27.5,32.5'
+    LONBE: '-47.5,-42.5'
+    TTAG: '47.5~F34~0~F~W-42.5~F34~0~F~W, 27.5~F34~0~F~S-32.5~F34~0~F~N'
+    TAG: stgsmall
+    TITLE: "Daily SST ACR spectral CNA(model year: NYA) TTAG"
+    CACHEFILENAME: CAA_VN_daily_spect_TAG
+    FIGFILENAME: CAA_VN_daily_acr_spect_TAG
+    REDNOISEFILE: CTN_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MODELN: MODNS
+    LATBE: '27.5,32.5'
+    LONBE: '-47.5,-42.5'
+    TTAG: '47.5~F34~0~F~W-42.5~F34~0~F~W, 27.5~F34~0~F~S-32.5~F34~0~F~N'
+    TAG: stgsmall
+    TITLE: "Daily SST ACR spectral CNS(model year: NYS) TTAG"
+    CACHEFILENAME: CAS_VN_daily_spect_TAG
+    FIGFILENAME: CAS_VN_daily_acr_spect_TAG
+    REDNOISEFILE: CTN_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+
+
+# subtropical gyre medium(stgmedium)(57.5W-32.5W, 25N-35N), (acr)
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MODELN: MODNC
+    LATBE: '25,35'
+    LONBE: '-57.5,-32.5'
+    TTAG: '57.5~F34~0~F~W-32.5~F34~0~F~W, 25~F34~0~F~S-35~F34~0~F~N'
+    TAG: stgmedium
+    TITLE: "Daily SST ACR spectral CTL (model year: NYC) TTAG"
+    CACHEFILENAME: CTN_VN_daily_spect_TAG
+    FIGFILENAME: CTN_VN_daily_acr_spect_TAG
+    OUTPUTREDNOISE: True
+    REDNOISEFILE: CTN_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MODELN: MODNA
+    LATBE: '25,35'
+    LONBE: '-57.5,-32.5'
+    TTAG: '57.5~F34~0~F~W-32.5~F34~0~F~W, 25~F34~0~F~S-35~F34~0~F~N'
+    TAG: stgmedium
+    TITLE: "Daily SST ACR spectral CNA(model year: NYA) TTAG"
+    CACHEFILENAME: CAA_VN_daily_spect_TAG
+    FIGFILENAME: CAA_VN_daily_acr_spect_TAG
+    REDNOISEFILE: CTN_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MODELN: MODNS
+    LATBE: '25,35'
+    LONBE: '-57.5,-32.5'
+    TTAG: '57.5~F34~0~F~W-32.5~F34~0~F~W, 25~F34~0~F~S-35~F34~0~F~N'
+    TAG: stgmedium
+    TITLE: "Daily SST ACR spectral CNS(model year: NYS) TTAG"
+    CACHEFILENAME: CAS_VN_daily_spect_TAG
+    FIGFILENAME: CAS_VN_daily_acr_spect_TAG
+    REDNOISEFILE: CTN_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+
+
+
+-  
+    plotScript: mk_html_page.sh
+    FIGFILES: 
+        CTN_VN_daily_spect_stgyre
+        CAA_VN_daily_spect_stgyre
+        CAS_VN_daily_spect_stgyre
+
+        CTN_VN_daily_acr_spect_spgyre
+        CAA_VN_daily_acr_spect_spgyre
+        CAS_VN_daily_acr_spect_spgyre
+
+        CTN_VN_daily_acr_spect_stgyre
+        CAA_VN_daily_acr_spect_stgyre
+        CAS_VN_daily_acr_spect_stgyre
+
+        CTN_VN_daily_acr_spect_nino34
+        CAA_VN_daily_acr_spect_nino34
+        CAS_VN_daily_acr_spect_nino34
+
+        CTN_VN_daily_acr_spect_stgsmall
+        CAA_VN_daily_acr_spect_stgsmall
+        CAS_VN_daily_acr_spect_stgsmall
+
+        CTN_VN_daily_acr_spect_stgmedium
+        CAA_VN_daily_acr_spect_stgmedium
+        CAS_VN_daily_acr_spect_stgmedium
+
+        CTN_VN_daily_acr_JJA_spect_stgyre
+        CAA_VN_daily_acr_JJA_spect_stgyre
+        CAS_VN_daily_acr_JJA_spect_stgyre
+
+    COLUMN: 
+        Spectral Control CNA CNS 'tr' 
+        'With annual cycle' 'tr' 
+        'Subtropical gyre <br> (70DEGW-20DEGW, 20DEGN-40DEGN)' 3 
+        'Annual cycle removed' 'tr' 
+        'Subpolar gyre <br> (50DEGW-15DEGW, 45DEGN-57DEGN)' 3 
+        'Subtropical gyre <br> (70DEGW-20DEGW, 20DEGN-40DEGN)' 3 
+        'NINO 3.4 <br> (170DEGW-120DEGW, 5DEGS-5DEGN)' 3 
+        'Subtropical gyre (small) <br> (47.5DEGW-42.5DEGW, 27.5DEGN-32.5DEGN)' 3
+        'Subtropical gyre (medium) <br> (57.5DEGW-32.5DEGW, 25DEGN-35DEGN)' 3
+        'Annual cycle removed and JJA only' 'tr' 
+        'Subtropical gyre <br> (70DEGW-20DEGW, 20DEGN-40DEGN)' 3 
+    DEG: '&#deg;'

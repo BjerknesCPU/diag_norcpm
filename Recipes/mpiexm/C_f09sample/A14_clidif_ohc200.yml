@@ -1,0 +1,191 @@
+# plot data difference in mpiexm
+# mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
+
+Title: Ocean heat content 200m
+Description: 
+    Monthly mean ocean heat conetnt 200m
+COMMENT: Monthly mean ocean heat conetnt 200m
+COMPONENT:  mpiom
+MODELN: 1
+VARI: OHC-200
+VARIABLE: VARI
+VN: OHC 200m
+RG:  |
+    res@mpLimitMode = "LatLon"
+    res@mpMinLatF = -90.
+    res@mpMaxLatF = 90.
+    res@mpMinLonF = -330.
+    res@mpMaxLonF =   30.
+    res@pmTickMarkDisplayMode = "Always"
+    res@mpCenterLonF =   -150.
+PLOTRES:   |
+    RG
+    res@cnLinesOn = False
+    res@cnFillOn = True
+    res@cnFillMode = "CellFill"
+    res@lbOrientation = "Vertical"
+    res@cnLevelSelectionMode = "ExplicitLevels"
+    res@cnLevels = fspan(-400.,400.,21)
+    res@cnFillPalette = "BlAqGrWh2YeOrReVi22"
+CRES:  |
+    RG
+    res@cnLinesOn = False
+    res@cnFillOn = True
+    res@cnFillMode = "CellFill"
+    res@cnFillPalette = "WhBlGrYeRe"
+    res@lbOrientation = "Vertical"
+    res@cnLevelSelectionMode = "ExplicitLevels"
+    res@cnLevels = fspan(0.,20000,25)
+
+
+
+CTN: f08_1AGCM
+    ## proxy of CCASE 'control case'
+CCASE: CTN
+CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
+YBEC: 1101,1250
+CONTROLYEARBE: YBEC
+NYC: 150
+
+CASEDIR: /projects/NS9207K/pgchiu/CASE
+    ## CASE define later
+CAA: f08_5AGCMs_NASPG_average
+CNA: IEave
+YBEA: 1101,1250
+NYA: 150 
+CAS: f09_5AGCMs_NASPG_sample
+CNS: IEsam
+YBES: 1101,1250
+NYS: 150
+
+
+Scripts:
+-  
+    plotScript: mpiexm/plot_mpiexm_climatology.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    TITLE: "VN cli. CTL (nyear: NYC)"
+    FIGFILENAME: cli_VARI_CTN
+    PLOTRES: CRES
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    TITLE: "VN dif. CNA-CTL (nyear: IE=NYA, CTL=NYC)"
+    FIGFILENAME: dif_VARI_average_case
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAS
+    YEARBE: YBES
+    TITLE: "VN dif. CNS-CTL (nyear: IE=NYS, CTL=NYC)"
+    FIGFILENAME: dif_VARI_sample_case
+
+-  # DJF
+    plotScript: mpiexm/plot_mpiexm_climatology.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MONTHS: "12,1,2"
+    TITLE: "DJF VN cli. CTL (nyear: NYC)"
+    FIGFILENAME: cli_VARI_CTN_DJF
+    PLOTRES: CRES
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: "12,1,2"
+    TITLE: "DJF VN dif. CNA-CTL (nyear: IE=NYA, CTL=NYC)"
+    FIGFILENAME: dif_VARI_average_case_DJF
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: "12,1,2"
+    TITLE: "DJF VN dif. CNS-CTL (nyear: IE=NYS, CTL=NYC)"
+    FIGFILENAME: dif_VARI_sample_case_DJF
+-  # MAM
+    plotScript: mpiexm/plot_mpiexm_climatology.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MONTHS: "3,4,5"
+    TITLE: "MAM VN cli. CTL (nyear: NYC)"
+    FIGFILENAME: cli_VARI_CTN_MAM
+    PLOTRES: CRES
+-
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: "3,4,5"
+    TITLE: "MAM VN dif. CNA-CTL (nyear: IE=NYA, CTL=NYC)"
+    FIGFILENAME: dif_VARI_average_case_MAM
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: "3,4,5"
+    TITLE: "MAM VN dif. CNS-CTL (nyear: IE=NYS, CTL=NYC)"
+    FIGFILENAME: dif_VARI_sample_case_MAM
+-  # JJA
+    plotScript: mpiexm/plot_mpiexm_climatology.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MONTHS: "6,7,8"
+    TITLE: "JJA VN cli. CTL (nyear: NYC)"
+    FIGFILENAME: cli_VARI_CTN_JJA
+    PLOTRES: CRES
+-
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: "6,7,8"
+    TITLE: "JJA VN dif. CNA-CTL (nyear: IE=NYA, CTL=NYC)"
+    FIGFILENAME: dif_VARI_average_case_JJA
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: "6,7,8"
+    TITLE: "JJA VN dif. CNS-CTL (nyear: IE=NYS, CTL=NYC)"
+    FIGFILENAME: dif_VARI_sample_case_JJA
+-  # SON
+    plotScript: mpiexm/plot_mpiexm_climatology.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MONTHS: "9,10,11"
+    TITLE: "SON VN cli. CTL (nyear: NYC)"
+    FIGFILENAME: cli_VARI_CTN_SON
+    PLOTRES: CRES
+- 
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: "9,10,11"
+    TITLE: "SON VN dif. CNA-CTL (nyear: IE=NYA, CTL=NYC)"
+    FIGFILENAME: dif_VARI_average_case_SON
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: "9,10,11"
+    TITLE: "SON VN dif. CNS-CTL (nyear: IE=NYS, CTL=NYC)"
+    FIGFILENAME: dif_VARI_sample_case_SON
+
+-  
+    plotScript: mk_html_page.sh
+    FIGFILES: 
+        cli_VARI_CTN
+        dif_VARI_sample_case
+        dif_VARI_average_case
+        cli_VARI_CTN_DJF
+        dif_VARI_sample_case_DJF
+        dif_VARI_average_case_DJF
+        cli_VARI_CTN_MAM
+        dif_VARI_sample_case_MAM
+        dif_VARI_average_case_MAM
+        cli_VARI_CTN_JJA
+        dif_VARI_sample_case_JJA
+        dif_VARI_average_case_JJA
+        cli_VARI_CTN_SON
+        dif_VARI_sample_case_SON
+        dif_VARI_average_case_SON
+        
+    COLUMN: figures CTL CNS CNA '</tr><tr>' ANN 3 DJF 3 MAM 3 JJA 3 SON 3

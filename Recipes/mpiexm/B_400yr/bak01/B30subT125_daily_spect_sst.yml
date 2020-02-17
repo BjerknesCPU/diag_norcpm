@@ -1,0 +1,141 @@
+# plot dailay spectral in mpiexm
+# mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
+
+Title: Daily SST spectral at subtropical gyre (Medium) region (57.5W-32.5W, 25N-35N)
+Description: Daily SST spectral at subtropical gyre (Medium) region (57.5W-32.5W, 25N-35N)
+COMMENT: Daily SST spectral at subtropical gyre (Medium) region (57.5W-32.5W, 25N-35N)
+#Thumbnail: maxML_var_ratio_average_case_thumb.png
+COMPONENT:  mpiom
+VN: sst
+VARIABLE:  VN
+MODELN: 0
+LATBE: '25,35'
+LONBE: '-57.5,-32.5'
+PLOTRES: |
+    res@trYMinF = 1.e-8
+    res@trYMaxF = 1.e5
+    res@trXMinF = 1.e-3
+    res@trXMaxF = 2.e2
+CONFIDENCEHIGH: .5
+CONFIDENCELOW: .5
+CONFIDENCELINES: 0
+REDNOISEFILE: CTL_noise.nc
+
+CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+    ## CASE define later
+
+CTN: f08_1AGCM
+    ## proxy of CCASE 'control case'
+CCASE: CTN
+CONTROLDIR: /tos-project4/NS9207K/pgchiu/CCASE
+YBEC: 1101,1500
+CONTROLYEARBE: YBEC
+NYC: 400
+
+CAA: f08_5AGCMs_NASPG_average
+CNA: IEave
+YBEA: 1101,1500
+NYA: 400 
+CAS: f08_5AGCMs_NASPG_sample
+CNS: IEsam
+YBES: 1101,1500
+NYS: 400
+
+
+Scripts:
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    TITLE: "Daily SST spectral CTL (nyear: NYC)"
+    FIGFILENAME: CTN_VN_daily_spectral
+    OUTPUTREDNOISE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    TITLE: "Daily SST spectral CNA(nyear: NYA)"
+    FIGFILENAME: CAA_VN_daily_spectral
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAS
+    YEARBE: YBES
+    TITLE: "Daily SST spectral CNS (nyear: NYS)"
+    FIGFILENAME: CAS_VN_daily_spectral
+
+# annual cycle remove
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    TITLE: "Daily SST acr spectral CTL (nyear: NYC)"
+    CACHEFILENAME: CTN_VN_daily_spectral
+    FIGFILENAME: CTN_VN_daily_acr_spectral
+    OUTPUTREDNOISE: True
+    REDNOISEFILE: CTL_acr_noise.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    TITLE: "Daily SST acr spectral CNA(nyear: NYA)"
+    CACHEFILENAME: CAA_VN_daily_spectral
+    FIGFILENAME: CAA_VN_daily_acr_spectral
+    REDNOISEFILE: CTL_acr_noise.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAS
+    YEARBE: YBES
+    TITLE: "Daily SST acr spectral CNS(nyear: NYS)"
+    CACHEFILENAME: CAS_VN_daily_spectral
+    FIGFILENAME: CAS_VN_daily_acr_spectral
+    REDNOISEFILE: CTL_acr_noise.nc
+    REMOVEDAILYCLIMATE: True
+
+# annual cycle remove and JJA
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    PICKMONTHS: "(/6,7,8/)"
+    TITLE: "Daily SST acr JJA spectral CTL (nyear: NYC)"
+    CACHEFILENAME: CTN_VN_daily_spectral
+    FIGFILENAME: CTN_VN_daily_acr_JJA_spectral
+    OUTPUTREDNOISE: True
+    REDNOISEFILE: CTL_acr_JJA_noise.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    PICKMONTHS: "(/6,7,8/)"
+    TITLE: "Daily SST acr JJA spectral CNA(nyear: NYA)"
+    CACHEFILENAME: CAA_VN_daily_spectral
+    FIGFILENAME: CAA_VN_daily_acr_JJA_spectral
+    REDNOISEFILE: CTL_acr_JJA_noise.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral.ncl
+    CASE: CAS
+    YEARBE: YBES
+    PICKMONTHS: "(/6,7,8/)"
+    TITLE: "Daily SST acr JJA spectral CNS(nyear: NYS)"
+    CACHEFILENAME: CAS_VN_daily_spectral
+    FIGFILENAME: CAS_VN_daily_acr_JJA_spectral
+    REDNOISEFILE: CTL_acr_JJA_noise.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mk_html_page.sh
+    FIGFILES: 
+        CTN_VN_daily_spectral
+        CAA_VN_daily_spectral
+        CAS_VN_daily_spectral
+        CTN_VN_daily_acr_spectral
+        CAA_VN_daily_acr_spectral
+        CAS_VN_daily_acr_spectral
+        CTN_VN_daily_acr_JJA_spectral
+        CAA_VN_daily_acr_JJA_spectral
+        CAS_VN_daily_acr_JJA_spectral
+
+    COLUMN: Spectral '</tr><tr>' CNS CNA Control '</tr><tr>' 3 'Sepctral of annual cycle removed' '</tr><tr>' 3 'Sepctral of annual cycle removed, JJA only' '</tr><tr>' 3 

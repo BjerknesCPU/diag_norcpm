@@ -54,11 +54,11 @@ A set of plot script: Codes/
 ```
 
 # plotCase.yml
-    It is a yml file which contains all variables defined in diag_norcpm.sh.
-    So if there is a plotCase.yml in output directory, than doplot.py can be executed directly.
-    plotCase.yml will be generated automatically when running doplot.py.
+It is a yml file which contains all variables defined in diag_norcpm.sh.
+So if there is a plotCase.yml in output directory, than doplot.py can be executed directly.
+plotCase.yml will be generated automatically when running doplot.py.
 
-    Here is an example of plotCase.yml
+Here is an example of plotCase.yml
 ```
 plotCase: NorCPM-Anomaly_coupled
 BASEDIR: /tos-project4/NS9039K/shared/norcpm/cases/NorCPM/Anomaly_coupled

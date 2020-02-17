@@ -230,11 +230,21 @@ for recipe in Recipes:
     for i in  recipe.keys():
         if i.isupper(): baseDict.update({i:recipe.get(i)})
 
-    # make scriptDict
+    # make scriptDict and generate plot script
     num = 0
     for script in scripts:
-        scriptDict = Defaults.copy()
-        scriptDict.update(baseDict.copy())
+        scriptDict = Defaults.copy() ## apply Defaults.yml
+        scriptDict.update(baseDict.copy()) ## apply recipe
+        ## unpack varPack, which is an array, used to apply variable set in recipe
+        if script.get('varPack'):
+            vp = script.get('varPack')
+            if type(vp) == type('str'):  # only one varPack
+                for i in recipe.get(vp):
+                    if i.isupper(): scriptDict.update({i:script.get(i)})
+            else: ## if it is an array
+                for j in vp:
+                    for i in recipe.get(j):
+                        if i.isupper(): scriptDict.update({i:script.get(i)})
         for i in  script.keys():
             if i.isupper(): scriptDict.update({i:script.get(i)})
         
@@ -320,7 +330,7 @@ def run_seq(workdir,scripts,logfile):
             #sp.run([cmd,fn],stdout=logf,stderr=logf)
             sp.run(' '.join([cmd,fn]),shell=True,stdout=logf,stderr=logf)
             end = time.perf_counter()
-            logf.write('>>>>>>>>>>>>>>>> '+cmd+' '+fn+' done with %2.2f secs.\n'%(end-start))
+            logf.write('>>>>>>>>>>>>>>>> '+cmd+' '+fn+' [done with %2.2f secs.]\n'%(end-start))
             logf.flush()
     logf.close()
 
@@ -404,15 +414,16 @@ for i in subdirs:
             description = ''
 
     # try README in yaml format
-    with open(i+'/README','r') as j:
-        try:
+    try:
+        with open(i+'/README','r') as j:
             readme = yaml.load(j,Loader=yaml.BaseLoader)
             if readme.get('Title'): title = readme.get('Title')
             if readme.get('Description'): description = readme.get('Description')
             if readme.get('Thumbnail'): thumbnail = readme.get('Thumbnail')
             if readme.get('ShowInIndex'): showinindex = readme.get('ShowInIndex')
-        except:
-            pass
+    except:
+        ## no README or not plot directory
+        continue
 
     # if none of above
     if not thumbnail: 
