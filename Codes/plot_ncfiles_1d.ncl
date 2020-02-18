@@ -23,6 +23,19 @@ begin
 
     nf = dimsizes(ncfiles)
 
+    ;; check file presnt
+    allpresent = True
+    do i = 0, nf-1
+        if(.not.isfilepresent(ncfiles(i)))then
+            print("    File is not present: "+ncfiles(i))
+            allpresent = False
+        end if
+    end do
+    if(.not.allpresent)then
+        print("    Error, file(s) absent, exit...")
+        exit
+    end if
+
     res = True
         if(subtitle.eq."none")then
             res@gsnLeftString = title

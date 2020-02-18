@@ -12,7 +12,7 @@ MONTHS: 0
 VARI: atlantic_moc
 VARIABLE: VARI
 VN: AMOC
-RERES:  |
+REGRES:  |
     ;; Coordinates
     res@trYReverse = True
     res@gsnYAxisIrregular2Linear = True ; converts irreg depth to linear 
@@ -20,7 +20,7 @@ RERES:  |
     res@trYMaxF = 5000.
     res@trYMinF =    0.
 DIFRES:  | ## for dif plot
-    RERES
+    REGRES
     res@cnLinesOn = False
     res@cnFillOn = True
     res@cnFillMode = "CellFill"
@@ -33,7 +33,7 @@ DIFRES:  | ## for dif plot
     vardif = vardif* 1.e-9
     vardif@units = "Sv"
 CTLRES:  |
-    RERES
+    REGRES
     res@cnLinesOn = False
     res@cnFillOn = True
     res@cnFillMode = "CellFill"
@@ -67,7 +67,7 @@ CAA: f08_5AGCMs_NASPG_average
 CNA: IE-average
 YBEA: 1101,1500
 NYA: 400 
-CAS: f09_5AGCMs_NASPG_sample
+CAS: f09_5AGCMs_NASPG_sample_notdon
 CNS: IE-sample
 YBES: 1101,1500
 NYS: 400

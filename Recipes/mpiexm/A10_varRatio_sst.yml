@@ -124,7 +124,7 @@ Scripts:
     YEARBE: YBED
     MONTHS: 12,13,14
     PLOTRES: GLORES
-    TITLE: "yearly SST variance ratio CND/CTL DJF (model year: IE=NYD, CTL=NYC)"
+    TITLE: "yearly SST variance ratio CND/CTL DJF (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: sst_var_ratio_CAD_DJF
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
@@ -148,7 +148,7 @@ Scripts:
     YEARBE: YBED
     MONTHS: 3,4,5
     PLOTRES: GLORES
-    TITLE: "yearly SST variance ratio CND/CTL MAM (model year: IE=NYD, CTL=NYC)"
+    TITLE: "yearly SST variance ratio CND/CTL MAM (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: sst_var_ratio_CAD_MAM
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
@@ -172,7 +172,7 @@ Scripts:
     YEARBE: YBED
     MONTHS: 6,7,8
     PLOTRES: GLORES
-    TITLE: "yearly SST variance ratio CND/CTL JJA (model year: IE=NYD, CTL=NYC)"
+    TITLE: "yearly SST variance ratio CND/CTL JJA (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: sst_var_ratio_CAD_JJA
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
@@ -196,7 +196,7 @@ Scripts:
     YEARBE: YBED
     MONTHS: 9,10,11
     PLOTRES: GLORES
-    TITLE: "yearly SST variance ratio CND/CTL SON (model year: IE=NYD, CTL=NYC)"
+    TITLE: "yearly SST variance ratio CND/CTL SON (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: sst_var_ratio_CAD_SON
 -  
     plotScript: mpiexm/plot_mpiexm_variance.ncl
@@ -246,7 +246,7 @@ Scripts:
     YEARBE: YBED
     MONTHS: 12,13,14
     PLOTRES: NATRES
-    TITLE: "yearly SST variance ratio CND/CTL DJF (model year: IE=NYD, CTL=NYC)"
+    TITLE: "yearly SST variance ratio CND/CTL DJF (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: sst_var_ratio_CAD_DJF_natl
     CACHEFILENAME: sst_var_ratio_CAD_DJF
 -  
@@ -273,7 +273,7 @@ Scripts:
     YEARBE: YBED
     MONTHS: 3,4,5
     PLOTRES: NATRES
-    TITLE: "yearly SST variance ratio CND/CTL MAM (model year: IE=NYD, CTL=NYC)"
+    TITLE: "yearly SST variance ratio CND/CTL MAM (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: sst_var_ratio_CAD_MAM_natl
     CACHEFILENAME: sst_var_ratio_CAD_MAM
 -  
@@ -300,7 +300,7 @@ Scripts:
     YEARBE: YBED
     MONTHS: 6,7,8
     PLOTRES: NATRES
-    TITLE: "yearly SST variance ratio CND/CTL JJA (model year: IE=NYD, CTL=NYC)"
+    TITLE: "yearly SST variance ratio CND/CTL JJA (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: sst_var_ratio_CAD_JJA_natl
     CACHEFILENAME: sst_var_ratio_CAD_JJA
 -  
@@ -327,7 +327,7 @@ Scripts:
     YEARBE: YBED
     MONTHS: 9,10,11
     PLOTRES: NATRES
-    TITLE: "yearly SST variance ratio CND/CTL SON (model year: IE=NYD, CTL=NYC)"
+    TITLE: "yearly SST variance ratio CND/CTL SON (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: sst_var_ratio_CAD_SON_natl
     CACHEFILENAME: sst_var_ratio_CAD_SON
 -  

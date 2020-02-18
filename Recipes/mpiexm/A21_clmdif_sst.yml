@@ -87,7 +87,7 @@ Scripts:
     plotScript: mpiexm/plot_mpiexm_difference.ncl
     CASE: CAD
     YEARBE: YBED
-    TITLE: "VN dif. CND - CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "VN dif. CND - CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD
     PLOTRES: DIFRES
     REGRES: GLOB
@@ -122,7 +122,7 @@ Scripts:
     CASE: CAD
     YEARBE: YBED
     MONTHS: "12,13,14"
-    TITLE: "DJF VN dif. CND - CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "DJF VN dif. CND - CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_DJF
     PLOTRES: DIFRES
     REGRES: GLOB
@@ -158,7 +158,7 @@ Scripts:
     CASE: CAD
     YEARBE: YBED
     MONTHS: "3,4,5"
-    TITLE: "MAM VN dif. CND - CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "MAM VN dif. CND - CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_MAM
     PLOTRES: DIFRES
     REGRES: GLOB
@@ -194,7 +194,7 @@ Scripts:
     CASE: CAD
     YEARBE: YBED
     MONTHS: "6,7,8"
-    TITLE: "JJA VN dif. CND - CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "JJA VN dif. CND - CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_JJA
     PLOTRES: DIFRES
     REGRES: GLOB
@@ -230,7 +230,7 @@ Scripts:
     CASE: CAD
     YEARBE: YBED
     MONTHS: "9,10,11"
-    TITLE: "SON VN dif. CND - CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "SON VN dif. CND - CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_SON
     PLOTRES: DIFRES
     REGRES: GLOB
@@ -267,7 +267,7 @@ Scripts:
     plotScript: mpiexm/plot_mpiexm_difference.ncl
     CASE: CAD
     YEARBE: YBED
-    TITLE: "VN dif. CND - CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "VN dif. CND - CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_natl
     CACHEFILENAME: dif_VARI_CAD
     PLOTRES: DIFRES
@@ -305,9 +305,9 @@ Scripts:
     CASE: CAD
     YEARBE: YBED
     MONTHS: "12,13,14"
-    TITLE: "DJF VN dif. CND - CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "DJF VN dif. CND - CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_DJF_natl
-    CACHEFILENAME: dif_VARI_average_DJF
+    CACHEFILENAME: dif_VARI_CAD_DJF
     PLOTRES: DIFRES
     REGRES: NATL
 -  
@@ -345,9 +345,9 @@ Scripts:
     CASE: CAD
     YEARBE: YBED
     MONTHS: "3,4,5"
-    TITLE: "MAM VN dif. CND - CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "MAM VN dif. CND - CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_MAM_natl
-    CACHEFILENAME: dif_VARI_average_MAM
+    CACHEFILENAME: dif_VARI_CAD_MAM
     PLOTRES: DIFRES
     REGRES: NATL
 -
@@ -385,9 +385,9 @@ Scripts:
     CASE: CAD
     YEARBE: YBED
     MONTHS: "6,7,8"
-    TITLE: "JJA VN dif. CND - CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "JJA VN dif. CND - CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_JJA_natl
-    CACHEFILENAME: dif_VARI_average_JJA
+    CACHEFILENAME: dif_VARI_CAD_JJA
     PLOTRES: DIFRES
     REGRES: NATL
 -
@@ -425,9 +425,9 @@ Scripts:
     CASE: CAD
     YEARBE: YBED
     MONTHS: "9,10,11"
-    TITLE: "SON VN dif. CND - CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "SON VN dif. CND - CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_SON_natl
-    CACHEFILENAME: dif_VARI_average_SON
+    CACHEFILENAME: dif_VARI_CAD_SON
     PLOTRES: DIFRES
     REGRES: NATL
 - 

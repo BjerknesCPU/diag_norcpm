@@ -173,7 +173,7 @@ begin
     ;; assemble cache file name with variables to read
     ;; case_component_varname_min(years)-max(years)_months(abbr)_modeln.nc
     cachedir = casedir+"/cache"
-    system("mkdir -p"+cachedir)
+    system("mkdir -p "+cachedir)
 
     ny = dimsizes(years)
     dy = years(1:)-years(:ny-2)
@@ -1363,7 +1363,14 @@ begin
     cache = cachefn(case, casedir,component,varname,years,months,modeln)
     if(isfilepresent(cache))then
         f = addfile(cache,"r")
-        return f->$varname$
+        var = f->$varname$
+        if(isatt(var,"lat2d"))then
+            dims = dimsizes(var)
+            ndim = dimsizes(dims)
+            var@lat2d := onedtond(var@lat2d,dims(ndim-2:))
+            var@lon2d := onedtond(var@lon2d,dims(ndim-2:))
+        end if
+        return var
     end if
 
     ny = dimsizes(years)
@@ -1450,6 +1457,20 @@ begin
         months = imonths
     end if
 
+    ;; check cache
+    cache = cachefn(case, casedir,component,varname,years,months,modeln)
+    if(isfilepresent(cache))then
+        f = addfile(cache,"r")
+        var = f->$varname$
+        if(isatt(var,"lat2d"))then
+            dims = dimsizes(var)
+            ndim = dimsizes(dims)
+            var@lat2d := onedtond(var@lat2d,dims(ndim-2:))
+            var@lon2d := onedtond(var@lon2d,dims(ndim-2:))
+        end if
+        return var
+    end if
+
     ny = dimsizes(years)
     nmonth = dimsizes(months)
     var1y = dim_avg_n_Wrap(read_mpiexm_season_1y(case,casedir,component,varname,years(0),months,modeln),0)
@@ -1465,6 +1486,12 @@ begin
         fn = fn_mpiexm(case, casedir,component,varname,years(0),1,modeln)
         assign_ocn_grid(var1y,addfile(fn,"r"))
     end if
+
+    ;; save cache 
+    f = addfile(cache,"c")
+    f->$varname$ = var1y
+
+
     return var1y
 end
 function read_mpiexm_season_mean_ensmean_ZLL(case, casedir,component,varname,years,imonths,modeln[*]:integer)

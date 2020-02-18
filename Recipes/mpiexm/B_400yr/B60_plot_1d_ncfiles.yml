@@ -32,24 +32,24 @@ ATTACHRES: |
     res@amOrthogonalPosF =  .31
 
 WDIR: /nird/home/pgchiu/scratch/work
-PLOT: work03_test_new
+PLOT: STERCP-400yr-02
 PLTT: work_20agcm
 CAPTA: '5 member IE-average and CTL' # over subtropical gyre'
-FILEA: 'WDIR/PLOT/A30_spectral_sst/f08_5AGCMs_NASPG_average-f08_1AGCM_sst_spectral_ratio_stgyre.nc'
+FILEA: 'WDIR/PLOT/B30_spectral_sst/f08_5AGCMs_NASPG_average-f08_1AGCM_sst_spectral_ratio_stgyre.nc'
 CAPTB: 'CTL2 and CTL' # over subtropical gyre'
-FILEB: 'WDIR/PLOT/A30_spectral_sst/f08_5AGCMs_NASPG_sample-f08_1AGCM_sst_spectral_ratio_stgyre.nc'
+FILEB: 'WDIR/PLOT/B30_spectral_sst/f08_5AGCMs_NASPG_sample-f08_1AGCM_sst_spectral_ratio_stgyre.nc'
 CAPTC: '5 member IE-average and CTL' # over subpolar gyre'
-FILEC: 'WDIR/PLOT/A30_spectral_sst/f08_5AGCMs_NASPG_average-f08_1AGCM_sst_spectral_ratio_spgyre.nc'
+FILEC: 'WDIR/PLOT/B30_spectral_sst/f08_5AGCMs_NASPG_average-f08_1AGCM_sst_spectral_ratio_spgyre.nc'
 CAPTD: 'CTL2 and CTL' # over subpolar gyre'
-FILED: 'WDIR/PLOT/A30_spectral_sst/f08_5AGCMs_NASPG_sample-f08_1AGCM_sst_spectral_ratio_spgyre.nc'
+FILED: 'WDIR/PLOT/B30_spectral_sst/f08_5AGCMs_NASPG_sample-f08_1AGCM_sst_spectral_ratio_spgyre.nc'
 CAPTE: '20 member IE-average and CTL' # over subtropical gyre'
-FILEE: 'WDIR/PLTT/A30_spectral_sst_20AGCM/IEave20-f08_1AGCM_sst_spectral_ratio_stgyre.nc'
+FILEE: 'WDIR/PLTT/B30_spectral_sst_20AGCM/IEave20-f08_1AGCM_sst_spectral_ratio_stgyre.nc'
 CAPTF: '20 member IE-average and CTL' # over subpolar gyre'
-FILEF: 'WDIR/PLTT/A30_spectral_sst_20AGCM/IEave20-f08_1AGCM_sst_spectral_ratio_spgyre.nc'
+FILEF: 'WDIR/PLTT/B30_spectral_sst_20AGCM/IEave20-f08_1AGCM_sst_spectral_ratio_spgyre.nc'
 CAPTG: '5 member IE-sample and CTL' # over subtropical gyre'
-FILEG: 'WDIR/PLOT/A30_spectral_sst/f09_5AGCMs_NASPG_sample-f08_1AGCM_sst_spectral_ratio_stgyre.nc'
+FILEG: 'WDIR/PLOT/B30_spectral_sst/f09_5AGCMs_NASPG_sample-f08_1AGCM_sst_spectral_ratio_stgyre.nc'
 CAPTH: '5 member IE-sample and CTL' # over subpolar gyre'
-FILEH: 'WDIR/PLOT/A30_spectral_sst/f09_5AGCMs_NASPG_sample-f08_1AGCM_sst_spectral_ratio_spgyre.nc'
+FILEH: 'WDIR/PLOT/B30_spectral_sst/f09_5AGCMs_NASPG_sample-f08_1AGCM_sst_spectral_ratio_spgyre.nc'
 
 Scripts:
 -  

@@ -130,19 +130,19 @@ Scripts:
     REGRES: GLOB
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_CTL2, Month_DJF]
+    varPack: Case_CTL2, Month_DJF
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA
     REGRES: GLOB
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_IEave, Month_DJF]
+    varPack: Case_IEave, Month_DJF
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA
     REGRES: GLOB
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_IEsam, Month_DJF]
+    varPack: Case_IEsam, Month_DJF
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA
     REGRES: GLOB
@@ -157,19 +157,19 @@ Scripts:
     REGRES: GLOB
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_CTL2, Month_MAM]
+    varPack: Case_CTL2, Month_MAM
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA
     REGRES: GLOB
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_IEave, Month_MAM]
+    varPack: Case_IEave, Month_MAM
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA
     REGRES: GLOB
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_IEsam, Month_MAM]
+    varPack: Case_IEsam, Month_MAM
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA
     REGRES: GLOB
@@ -184,19 +184,19 @@ Scripts:
     REGRES: GLOB
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_CTL2, Month_JJA]
+    varPack: Case_CTL2, Month_JJA
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA
     REGRES: GLOB
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_IEave, Month_JJA]
+    varPack: Case_IEave, Month_JJA
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA
     REGRES: GLOB
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_IEsam, Month_JJA]
+    varPack: Case_IEsam, Month_JJA
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA
     REGRES: GLOB
@@ -211,19 +211,19 @@ Scripts:
     REGRES: GLOB
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_CTL2, Month_SON]
+    varPack: Case_CTL2, Month_SON
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA
     REGRES: GLOB
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_IEave, Month_SON]
+    varPack: Case_IEave, Month_SON
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA
     REGRES: GLOB
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_IEsam, Month_SON]
+    varPack: Case_IEsam, Month_SON
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA
     REGRES: GLOB
@@ -266,19 +266,19 @@ Scripts:
     REGRES: NATL
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_CTL2, Month_DJF]
+    varPack: Case_CTL2, Month_DJF
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA_natl
     REGRES: NATL
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_IEave, Month_DJF]
+    varPack: Case_IEave, Month_DJF
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA_natl
     REGRES: NATL
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_IEsam, Month_DJF]
+    varPack: Case_IEsam, Month_DJF
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA_natl
     REGRES: NATL
@@ -293,19 +293,19 @@ Scripts:
     REGRES: NATL
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_CTL2, Month_MAM]
+    varPack: Case_CTL2, Month_MAM
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA_natl
     REGRES: NATL
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_IEave, Month_MAM]
+    varPack: Case_IEave, Month_MAM
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA_natl
     REGRES: NATL
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_IEsam, Month_MAM]
+    varPack: Case_IEsam, Month_MAM
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA_natl
     REGRES: NATL
@@ -320,19 +320,19 @@ Scripts:
     REGRES: NATL
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_CTL2, Month_JJA]
+    varPack: Case_CTL2, Month_JJA
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA_natl
     REGRES: NATL
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_IEave, Month_JJA]
+    varPack: Case_IEave, Month_JJA
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA_natl
     REGRES: NATL
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_IEsam, Month_JJA]
+    varPack: Case_IEsam, Month_JJA
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA_natl
     REGRES: NATL
@@ -347,19 +347,19 @@ Scripts:
     REGRES: NATL
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_CTL2, Month_SON]
+    varPack: Case_CTL2, Month_SON
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA_natl
     REGRES: NATL
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_IEave, Month_SON]
+    varPack: Case_IEave, Month_SON
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA_natl
     REGRES: NATL
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
-    varPack: [Case_IEsam, Month_SON]
+    varPack: Case_IEsam, Month_SON
     TITLE: "TSEA VN dif. CASE - CTL (model year: IE=NYEAR, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_TSEA_natl
     REGRES: NATL

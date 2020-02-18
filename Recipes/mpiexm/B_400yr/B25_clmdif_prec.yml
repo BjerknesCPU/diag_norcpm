@@ -83,7 +83,7 @@ CAA: f08_5AGCMs_NASPG_average
 CNA: IE-average
 YBEA: 1101,1500
 NYA: 400 
-CAS: f09_5AGCMs_NASPG_sample
+CAS: f09_5AGCMs_NASPG_sample_notdon
 CNS: IE-sample
 YBES: 1101,1500
 NYS: 400
@@ -105,7 +105,7 @@ Scripts:
     CASE: CAD
     MODELN: 1
     YEARBE: YBED
-    TITLE: "VN dif. CND-CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "VN dif. CND-CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD
     PLOTRES: DIFRES
     REGRES: GLOB
@@ -142,7 +142,7 @@ Scripts:
     MODELN: 1
     YEARBE: YBED
     MONTHS: "12,13,14"
-    TITLE: "DJF VN dif. CND-CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "DJF VN dif. CND-CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_DJF
     PLOTRES: DIFRES
     REGRES: GLOB
@@ -180,7 +180,7 @@ Scripts:
     MODELN: 1
     YEARBE: YBED
     MONTHS: "3,4,5"
-    TITLE: "MAM VN dif. CND-CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "MAM VN dif. CND-CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_MAM
     PLOTRES: DIFRES
     REGRES: GLOB
@@ -218,7 +218,7 @@ Scripts:
     MODELN: 1
     YEARBE: YBED
     MONTHS: "6,7,8"
-    TITLE: "JJA VN dif. CND-CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "JJA VN dif. CND-CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_JJA
     PLOTRES: DIFRES
     REGRES: GLOB
@@ -256,7 +256,7 @@ Scripts:
     MODELN: 1
     YEARBE: YBED
     MONTHS: "9,10,11"
-    TITLE: "SON VN dif. CND-CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "SON VN dif. CND-CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_SON
     PLOTRES: DIFRES
     REGRES: GLOB
@@ -294,7 +294,7 @@ Scripts:
     CASE: CAD
     MODELN: 1
     YEARBE: YBED
-    TITLE: "VN dif. CND-CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "VN dif. CND-CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_natl
     CACHEFILENAME: dif_VARI_CAD
     PLOTRES: DIFRES
@@ -335,7 +335,7 @@ Scripts:
     MODELN: 1
     YEARBE: YBED
     MONTHS: "12,13,14"
-    TITLE: "DJF VN dif. CND-CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "DJF VN dif. CND-CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_DJF_natl
     CACHEFILENAME: dif_VARI_CAD_DJF
     PLOTRES: DIFRES
@@ -377,7 +377,7 @@ Scripts:
     MODELN: 1
     YEARBE: YBED
     MONTHS: "3,4,5"
-    TITLE: "MAM VN dif. CND-CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "MAM VN dif. CND-CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_MAM_natl
     CACHEFILENAME: dif_VARI_CAD_MAM
     PLOTRES: DIFRES
@@ -419,7 +419,7 @@ Scripts:
     MODELN: 1
     YEARBE: YBED
     MONTHS: "6,7,8"
-    TITLE: "JJA VN dif. CND-CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "JJA VN dif. CND-CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_JJA_natl
     CACHEFILENAME: dif_VARI_CAD_JJA
     PLOTRES: DIFRES
@@ -461,7 +461,7 @@ Scripts:
     MODELN: 1
     YEARBE: YBED
     MONTHS: "9,10,11"
-    TITLE: "SON VN dif. CND-CTL (model year: IE=NYD, CTL=NYC)"
+    TITLE: "SON VN dif. CND-CTL (model year: CND=NYD, CTL=NYC)"
     FIGFILENAME: dif_VARI_CAD_SON_natl
     CACHEFILENAME: dif_VARI_CAD_SON
     PLOTRES: DIFRES

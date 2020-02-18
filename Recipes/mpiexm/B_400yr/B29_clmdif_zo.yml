@@ -1,15 +1,15 @@
 # plot data difference in mpiexm
 # mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
 
-Title: Ocean barotropic mass streamfunction (psitro) difference
+Title: Sea surface height(zo) difference
 Description: 
-    Ocean barotropic mass streamfunction of Cases minus control run
-COMMENT: Ocean barotropic mass streamfunction of Cases minus control run
+    Sea surface height.
+COMMENT: Sea surface height.
 COMPONENT:  mpiom
 MODELN: 1
-VARI: psitro
+VARI: zo
 VARIABLE: VARI
-VN: Ocean barotropic mass streamfunction
+VN: SSH
 GLOB: |
     res@mpLimitMode = "LatLon"
     res@mpMinLatF = -90.
@@ -42,11 +42,9 @@ DIFRES: |
     title2 = str_split(title,"()")
     res@tiMainString = title2(0)
     res@tiMainOffsetYF = -.04
-    ;;res@gsnRightString = "10~S~9~N~ kg s~S~-1" ;;+vardif@units
-    res@gsnRightString = "Sv"
+    res@gsnRightString = vardif@units
     res@gsnLeftString = title2(1)
-    vardif = vardif/1.e9
-    res@cnLevels = fspan(-2.0,2.0,21)
+    res@cnLevels = fspan(-0.1,0.1,21)
     REGRES
 
 CTLRES: |
@@ -55,15 +53,13 @@ CTLRES: |
     res@cnFillMode = "CellFill"
     res@lbOrientation = "Vertical"
     res@cnLevelSelectionMode = "ExplicitLevels"
-    res@cnLevels = fspan(-50.,50.,21)
+    res@cnLevels = fspan(-1.5,1.5,21)
 
     title2 = str_split(title,"()")
     res@tiMainString = title2(0)
     res@tiMainOffsetYF = -.04
-    ;;res@gsnRightString = "10~S~9~N~ kg s~S~-1" ;;+varens@units
-    res@gsnRightString = "Sv" ;;+varens@units
+    res@gsnRightString = varens@units
     res@gsnLeftString = title2(1)
-    varens = varens/1.e9
     ;; colormap
     cmap       = read_colormap_file("ncl_default")
     cmap(0,:) = 1. ;; change first to white
@@ -77,25 +73,25 @@ CTN: f08_1AGCM
     ## proxy of CCASE 'control case'
 CCASE: CTN
 CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
-YBEC: 1101,1250
+YBEC: 1101,1500
 CONTROLYEARBE: YBEC
-NYC: 150
+NYC: 400
 
 CAD: f08_5AGCMs_NASPG_sample
 CND: CTL2
-YBED: 1101,1250
-NYD: 150
+YBED: 1101,1500
+NYD: 400
 
 CASEDIR: /projects/NS9207K/pgchiu/CASE
     ## CASE define later
 CAA: f08_5AGCMs_NASPG_average
 CNA: IE-average
-YBEA: 1101,1250
-NYA: 150 
-CAS: f09_5AGCMs_NASPG_sample
+YBEA: 1101,1500
+NYA: 400 
+CAS: f09_5AGCMs_NASPG_sample_notdon
 CNS: IE-sample
-YBES: 1101,1250
-NYS: 150
+YBES: 1101,1500
+NYS: 400
 
 
 Scripts:
