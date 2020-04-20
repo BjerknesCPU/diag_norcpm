@@ -1,0 +1,52 @@
+# plot for seasonal hindcasts
+#   Anomaly Correlation(AC)
+#       see predictability and Forecast Skill in NMME (Becker etal 2014, doi: 10.1175/JCLI-D-13-00597.1)
+#       1 lead seasonal forecast ( ex. use Jan data forecast FMA)
+#   data ex.  NorCPM_V1c/ana_19800115_me_hindcasts/
+#       104 forecasts with 4 runs per year, 9 members, 13 month simulation
+#       var(initTime, member, time,lev,lat,lon)
+Title: Tsfc Anomaly Correlation(AC), 2 lead season
+Description: 
+    From Becker etal 2014. 2 lead seasonal forecast correlation. 
+    The homogeneous anomaly correlation use first member as true solution, exmining the predictability of model.
+COMPONENT:  atm
+VARIABLE:  TS
+TITLE: Tsfc homogeneous Anomaly Correlation
+LEADSEASON: 2
+BEFOREPLOT: |
+    res@mpMaxLatF = 75.
+    res@mpMinLatF = -60.
+# BaseDir: /cluster/home/pgchiu/NS9039K/shared/norcpm/cases/NorCPM/NorCPM_V1c/ana_19800115_me_hindcasts
+
+Scripts:
+# proc section
+-  # this dash line is necessary for yaml parser, do not remove it.
+    plotScript: plot_anomaly_correlation.ncl
+    FIGFILENAME: ana_hindcasts_AC_sst_MJJ
+    # for all forecast start from Jan
+    FORECASTDIRS: BASEDIR/RUNPRE{1,2}???01??
+
+-  # this dash line is necessary for yaml parser, do not remove it.
+    plotScript: plot_anomaly_correlation.ncl
+    FIGFILENAME: ana_hindcasts_AC_sst_ASO
+    # for all forecast start from Apr
+    FORECASTDIRS: BASEDIR/RUNPRE{1,2}???04??
+
+-  # this dash line is necessary for yaml parser, do not remove it.
+    plotScript: plot_anomaly_correlation.ncl
+    FIGFILENAME: ana_hindcasts_AC_sst_NDJ
+    # for all forecast start from Jul
+    FORECASTDIRS: BASEDIR/RUNPRE{1,2}???07??
+
+-  # this dash line is necessary for yaml parser, do not remove it.
+    plotScript: plot_anomaly_correlation.ncl
+    FIGFILENAME: ana_hindcasts_AC_sst_FMA
+    # for all forecast start from Oct
+    FORECASTDIRS: BASEDIR/RUNPRE{1,2}???10??
+
+-  # this dash line is necessary for yaml parser, do not remove it.
+    plotScript: mk_html_page.sh
+    FIGFILES: ana_hindcasts_AC_sst_FMA ana_hindcasts_AC_sst_MJJ ana_hindcasts_AC_sst_ASO ana_hindcasts_AC_sst_NDJ
+    COMMENT: 
+        From Becker etal 2014. 1 lead seasonal forecast correlation. 
+        This is a example for plot set description

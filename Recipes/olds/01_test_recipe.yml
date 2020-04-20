@@ -1,0 +1,66 @@
+# receipt for plots
+#
+Title: SST time series 
+Description: Mean SST time series and standard deviation in simulations.
+Scripts:
+# proc section
+-  # this dash line is necessary for yaml parser, do not remove it.
+    plotScript: proc_ncrcat_var_members.sh
+# COMPONENT: which component with this variable, atm/ocn/...etc
+    COMPONENT: ocn
+# VARIABLE: to be extract from output data
+    VARIABLE: sst
+# OUTPUTFILE: extract from output data 
+    OUTPUTPREFIX: sst_mem
+
+# plot section
+- 
+# plotScript: script to be run, necessary
+    plotScript: plot_mean_ts_ens.ncl
+# INPUTFILE: data source, from above OUTPUTPREFIX
+    INPUTFILES: sst_mem*
+# VARIABLE: variable name to be plot from INPUTFILE
+    VARIABLE: sst
+# COMPONENT: ocn need some more process, like external grid file.
+    COMPONENT: ocn
+# FIGFILENAME: output figure file name
+    FIGFILENAME: sst_ts
+# BEFORE_PLOT: if any thing you want it in plotScript
+    BEFORE_PLOT: |
+        ;; this is a multi-line comment
+        ;; use BEFORE_PLOT
+# OTHERS: other strings in scriptTemplate to replace
+    LAT: '-10:10'
+    LON: '110:180'
+
+-  # another plot 
+    plotScript: plot_mean_ts_ens.ncl
+    INPUTFILES: sst_mem*
+    VARIABLE: sst
+    COMPONENT: ocn
+    FIGFILENAME: sst_NAtl
+    BEFORE_PLOT: 
+    LAT: '40:80'
+    LON: '-60:30'
+    #FIGFORMAT: png 
+
+-  # another plot 
+    plotScript: plot_mean_ts_ens.ncl
+    INPUTFILES: sst_mem*
+    VARIABLE: sst
+    COMPONENT: ocn
+    FIGFILENAME: sst_troWNP
+    BEFORE_PLOT: 
+    LAT: '0:20'
+    LON: '120:180'
+    #FIGFORMAT: png 
+
+# make html section
+- 
+# script to convert ps to png, and output html 
+    plotScript: mk_html_page.sh
+    PSFILE: "*.ps"
+    COMMENT: |
+        This is the place to put figure specifics.
+        Defined the COMMENT string receipt.
+    FIGFILES: sst_ts sst_NAtl sst_troWNP
