@@ -1,0 +1,419 @@
+# plot data variance in mpiexm
+# mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
+
+Title: Ocean Heat Content annual variance ratio of control run
+Description: |
+    Inegrated Ocean Heat Content(OHC) 100m, 200m and 500m variance ratio.
+COMMENT: |
+    Inegrated Ocean Heat Content(OHC) 100m, 200m and 500m variance ratio.
+#Thumbnail: 
+COMPONENT:  mpiom
+GLOB: |
+    res@mpLimitMode = "LatLon"
+    res@mpMinLatF = -90.
+    res@mpMaxLatF = 90.
+    res@mpMinLonF = -330.
+    res@mpMaxLonF =   30.
+    res@pmTickMarkDisplayMode = "Always"
+    res@mpCenterLonF =   -150.
+NATL: |
+    res@mpLimitMode = "LatLon"
+    res@mpMinLatF = 20.
+    res@mpMaxLatF = 70.
+    res@mpMinLonF = -80.
+    res@mpMaxLonF =  10.
+    res@pmTickMarkDisplayMode = "Always"
+    res@mpCenterLatF = 50.
+    res@mpCenterLonF =  -35.
+    res@mpProjection = "LambertConformal"
+    res@mpGridAndLimbOn = True
+    res@gsnMaskLambertConformal = True
+    res@gsnRightString = "~F34~0~F~C"
+REGRES: GLOB
+PLOTRES: |
+    REGRES
+    res@cnLinesOn = False
+    res@cnFillOn = True
+    res@cnFillMode = "CellFill"
+    res@lbOrientation = "Vertical"
+    res@pmLabelBarWidthF = 0.1
+    res@pmLabelBarOrthogonalPosF   = 0.01
+    res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/203,204,254/),(/255,255,255/),(/255,255,255/),(/254,254,0/),(/255,118,33/),(/255,0,0/),(/255,0,222/)/)
+    res@cnFillColors   := res@cnFillColors/255. 
+    res@cnLevelSelectionMode = "ExplicitLevels"
+    ;res@cnLevels = (/.2,1,2,3,4,5/)
+    res@cnLevels = (/.2,.4,.6,.8,.9,1.,1.1,1.2,1.4,1.6/)
+    res@gsnRightString = "1"
+
+    lres@cnLineColor = "Red"
+    lres@cnLinesOn = True
+    lres@cnFillOn = False
+    lres@cnLevelSelectionMode = "ExplicitLevels"
+    lres@cnLevels := (/.2/)
+    lres@cnLineLabelsOn = False
+    lres@cnInfoLabelOn = False
+TSRES: |
+    res@trYMinF = -100.
+    res@trYMaxF =  100.
+TLAT: 50.,60.
+TLON: -40,-10
+TADD: 50~F34~0~F~N-60~F34~0~F~N,40~F34~0~F~W-10~F34~0~F~W
+    ## append coordinate to title of time series figures
+
+CASEDIR: /projects/NS9207K/pgchiu/CASE
+    ## CASE define later
+
+CTN: f08_1AGCM
+    ## proxy of CCASE 'control case'
+CCASE: CTN
+CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
+YBEC: 1101,1250
+CONTROLYEARBE: YBEC
+NYC: 150
+
+CAD: f08_5AGCMs_NASPG_sample
+CND: CTL2
+YBED: 1101,1250
+NYD: 150
+
+CAA: f08_5AGCMs_NASPG_average
+CNA: IE-average
+YBEA: 1101,1250
+NYA: 150 
+CAS: f09_5AGCMs_NASPG_sample
+CNS: IE-sample
+YBES: 1101,1250
+NYS: 150
+
+
+Scripts:
+# OHC 100m
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    VARIABLE: OHC-100
+    TITLE: "yearly OHC 100m variance ratio CNA/CTL (model year: IE=NYA, CTL=NYC)"
+    FIGFILENAME: OHC100_var_ratio_average
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAS
+    YEARBE: YBES
+    VARIABLE: OHC-100
+    TITLE: "yearly OHC 100m variance ratio CNS/CTL (model year: IE=NYS, CTL=NYC)"
+    FIGFILENAME: OHC100_var_ratio_sample
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    VARIABLE: OHC-100
+    TITLE: "yearly OHC 100m variance ratio CNA/CTL (model year: IE=NYA, CTL=NYC)"
+    FIGFILENAME: OHC100_var_ratio_average_natl
+    CACHEFILENAME: OHC100_var_ratio_average
+    REGRES: NATL
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAS
+    YEARBE: YBES
+    VARIABLE: OHC-100
+    TITLE: "yearly OHC 100m variance ratio CNS/CTL (model year: IE=NYS, CTL=NYC)"
+    FIGFILENAME: OHC100_var_ratio_sample_natl
+    CACHEFILENAME: OHC100_var_ratio_sample
+    REGRES: NATL
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: 12,13,14
+    VARIABLE: OHC-100
+    TITLE: "yearly OHC 100m variance ratio CNS/CTL DJF (model year: IE=NYS, CTL=NYC)"
+    FIGFILENAME: OHC100_var_ratio_sample_DJF
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: 12,13,14
+    VARIABLE: OHC-100
+    TITLE: "yearly OHC 100m variance ratio CNA/CTL DJF (model year: IE=NYA, CTL=NYC)"
+    FIGFILENAME: OHC100_var_ratio_average_DJF
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: 3,4,5
+    VARIABLE: OHC-100
+    TITLE: "yearly OHC 100m variance ratio CNS/CTL MAM (model year: IE=NYS, CTL=NYC)"
+    FIGFILENAME: OHC100_var_ratio_sample_MAM
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: 3,4,5
+    VARIABLE: OHC-100
+    TITLE: "yearly OHC 100m variance ratio CNA/CTL MAM (model year: IE=NYA, CTL=NYC)"
+    FIGFILENAME: OHC100_var_ratio_average_MAM
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: 6,7,8
+    VARIABLE: OHC-100
+    TITLE: "yearly OHC 100m variance ratio CNS/CTL JJA (model year: IE=NYS, CTL=NYC)"
+    FIGFILENAME: OHC100_var_ratio_sample_JJA
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: 6,7,8
+    VARIABLE: OHC-100
+    TITLE: "yearly OHC 100m variance ratio CNA/CTL JJA (model year: IE=NYA, CTL=NYC)"
+    FIGFILENAME: OHC100_var_ratio_average_JJA
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: 9,10,11
+    VARIABLE: OHC-100
+    TITLE: "yearly OHC 100m variance ratio CNS/CTL SON (model year: IE=NYS, CTL=NYC)"
+    FIGFILENAME: OHC100_var_ratio_sample_SON
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: 9,10,11
+    VARIABLE: OHC-100
+    TITLE: "yearly OHC 100m variance ratio CNA/CTL SON (model year: IE=NYA, CTL=NYC)"
+    FIGFILENAME: OHC100_var_ratio_average_SON
+
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAS
+    YEARBE: YBES
+    LATBE: TLAT
+    LONBE: TLON
+    PLOTRES: TSRES
+    VARIABLE: OHC-100
+    TITLE: OHC 100m ts CNS TADD
+    FIGFILENAME: OHC100_ts_sample
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    LATBE: TLAT
+    LONBE: TLON
+    PLOTRES: TSRES
+    VARIABLE: OHC-100
+    TITLE: OHC 100m ts CNA TADD
+    FIGFILENAME: OHC100_ts_average
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    LATBE: TLAT
+    LONBE: TLON
+    PLOTRES: TSRES
+    VARIABLE: OHC-100
+    TITLE: OHC 100m ts CTL TADD
+    FIGFILENAME: OHC100_ts_control
+
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: 12,13,14
+    LATBE: TLAT
+    LONBE: TLON
+    PLOTRES: TSRES
+    VARIABLE: OHC-100
+    TITLE: OHC 100m ts CNS DJF TADD
+    FIGFILENAME: OHC100_ts_sample_DJF
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: 12,13,14
+    LATBE: TLAT
+    LONBE: TLON
+    PLOTRES: TSRES
+    VARIABLE: OHC-100
+    TITLE: OHC 100m ts CNA DJF TADD
+    FIGFILENAME: OHC100_ts_average_DJF
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MONTHS: 12,13,14
+    LATBE: TLAT
+    LONBE: TLON
+    PLOTRES: TSRES
+    VARIABLE: OHC-100
+    TITLE: OHC 100m ts CTL DJF TADD
+    FIGFILENAME: OHC100_ts_control_DJF
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: 3,4,5
+    LATBE: TLAT
+    LONBE: TLON
+    PLOTRES: TSRES
+    VARIABLE: OHC-100
+    TITLE: OHC 100m ts CNS MAM TADD
+    FIGFILENAME: OHC100_ts_sample_MAM
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: 3,4,5
+    LATBE: TLAT
+    LONBE: TLON
+    PLOTRES: TSRES
+    VARIABLE: OHC-100
+    TITLE: OHC 100m ts CNA MAM TADD
+    FIGFILENAME: OHC100_ts_average_MAM
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MONTHS: 3,4,5
+    LATBE: TLAT
+    LONBE: TLON
+    PLOTRES: TSRES
+    VARIABLE: OHC-100
+    TITLE: OHC 100m ts CTL MAM TADD
+    FIGFILENAME: OHC100_ts_control_MAM
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: 6,7,8
+    LATBE: TLAT
+    LONBE: TLON
+    PLOTRES: TSRES
+    VARIABLE: OHC-100
+    TITLE: OHC 100m ts CNS JJA TADD
+    FIGFILENAME: OHC100_ts_sample_JJA
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: 6,7,8
+    LATBE: TLAT
+    LONBE: TLON
+    PLOTRES: TSRES
+    VARIABLE: OHC-100
+    TITLE: OHC 100m ts CNA JJA TADD
+    FIGFILENAME: OHC100_ts_average_JJA
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MONTHS: 6,7,8
+    LATBE: TLAT
+    LONBE: TLON
+    PLOTRES: TSRES
+    VARIABLE: OHC-100
+    TITLE: OHC 100m ts CTL JJA TADD
+    FIGFILENAME: OHC100_ts_control_JJA
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: 9,10,11
+    LATBE: TLAT
+    LONBE: TLON
+    PLOTRES: TSRES
+    VARIABLE: OHC-100
+    TITLE: OHC 100m ts CNS SON TADD
+    FIGFILENAME: OHC100_ts_sample_SON
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: 9,10,11
+    LATBE: TLAT
+    LONBE: TLON
+    PLOTRES: TSRES
+    VARIABLE: OHC-100
+    TITLE: OHC 100m ts CNA SON TADD
+    FIGFILENAME: OHC100_ts_average_SON
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MONTHS: 9,10,11
+    LATBE: TLAT
+    LONBE: TLON
+    PLOTRES: TSRES
+    VARIABLE: OHC-100
+    TITLE: OHC 100m ts CTL SON TADD
+    FIGFILENAME: OHC100_ts_control_SON
+
+# OHC 200m
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    VARIABLE: OHC-200
+    TITLE: "yearly OHC 200m variance ratio CNA/CTL (model year: IE=NYA, CTL=NYC)"
+    FIGFILENAME: OHC200_var_ratio_average
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAS
+    YEARBE: YBES
+    VARIABLE: OHC-200
+    TITLE: "yearly OHC 200m variance ratio CNS/CTL (model year: IE=NYS, CTL=NYC)"
+    FIGFILENAME: OHC200_var_ratio_sample
+# OHC 500m
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    VARIABLE: OHC-500
+    TITLE: "yearly OHC 500m variance ratio CNA/CTL (model year: IE=NYA, CTL=NYC)"
+    FIGFILENAME: OHC500_var_ratio_average
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAS
+    YEARBE: YBES
+    VARIABLE: OHC-500
+    TITLE: "yearly OHC 500m variance ratio CNS/CTL (model year: IE=NYS, CTL=NYC)"
+    FIGFILENAME: OHC500_var_ratio_sample
+
+-  
+    plotScript: mk_html_page.sh
+    FIGFILES:
+        OHC100_var_ratio_sample
+        OHC100_var_ratio_average
+        OHC100_var_ratio_sample_natl
+        OHC100_var_ratio_average_natl
+        OHC100_ts_sample
+        OHC100_ts_average
+        OHC100_ts_control
+        OHC200_var_ratio_sample
+        OHC200_var_ratio_average
+        OHC500_var_ratio_sample
+        OHC500_var_ratio_average
+        OHC100_var_ratio_sample_DJF
+        OHC100_var_ratio_average_DJF
+        OHC100_var_ratio_sample_MAM
+        OHC100_var_ratio_average_MAM
+        OHC100_var_ratio_sample_JJA
+        OHC100_var_ratio_average_JJA
+        OHC100_var_ratio_sample_SON
+        OHC100_var_ratio_average_SON
+        OHC100_ts_sample_DJF
+        OHC100_ts_average_DJF
+        OHC100_ts_control_DJF
+        OHC100_ts_sample_MAM
+        OHC100_ts_average_MAM
+        OHC100_ts_control_MAM
+        OHC100_ts_sample_JJA
+        OHC100_ts_average_JJA
+        OHC100_ts_control_JJA
+        OHC100_ts_sample_SON
+        OHC100_ts_average_SON
+        OHC100_ts_control_SON
+
+    COLUMN: figs CNS CNA Control 'tr' 'OHC100' 'tr' ANN 2 - 2 ANN 3 '(OHC200)' 2 '(OHC500)' 'tr' ANN 2 DJF 2 MAM 2 JJA 2 SON 2 'OHC100' 'tr' DJF 3 MAM 3 JJA 3 SON 3
+

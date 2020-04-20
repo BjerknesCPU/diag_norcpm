@@ -3,6 +3,7 @@
 ;; plot variance ratio in lat/lon of case/control
 ;;
 ;;DIAG_NORCPM; FIGFILENAME: fig
+;;DIAG_NORCPM; WRITEFIGFILELIST: write_table("figfilelist.txt","a",[/"FIGFILENAME"/],"%s") ;; for mk_html_page.sh
 ;;DIAG_NORCPM; CACHEFILENAME: FIGFILENAME
 ;;DIAG_NORCPM; PLOTRES: ;; PLOTRES
 ;;DIAG_NORCPM; TITLE: title
@@ -12,6 +13,7 @@
 load "CODEDIR/mpiexm/func_read_mpiexm.ncl"
 begin
     figfn = "FIGFILENAME"
+    WRITEFIGFILELIST
     cachefile = "CACHEFILENAME.nc"
     title = "TITLE"
     varname = "VARIABLE"

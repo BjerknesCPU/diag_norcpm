@@ -5,6 +5,7 @@
 ;;DIAG_NORCPM; TITLE: Prediction Correlation
 ;;DIAG_NORCPM; TITLELEFT: 
 ;;DIAG_NORCPM; TITLERIGHT: 
+;;DIAG_NORCPM; PLOTRES: ;; PLOTRES
 ;;DIAG_NORCPM; LEADMONTHS: 12
 ;;DIAG_NORCPM; READSAMEMONTH: True
     ;; check if read are same month(Jan ... etc)
@@ -21,6 +22,7 @@ load "CODEDIR/func_read_obs.ncl"
 load "CODEDIR/func_persistence_prediction_skill.ncl"
 load "CODEDIR/func_wallClockElapseTime.ncl" ;; original function does not support "CEST" timezone 
 load "$NCARG_ROOT/lib/ncarg/nclscripts/esmf/ESMF_regridding.ncl"
+load "CODEDIR/func_read_framework.ncl"
 begin
     ;; xy plot, forecast time(x) and correlation/RMSE(y)
     ;; member 01(ind 0) is assumed as true solution
@@ -43,8 +45,6 @@ begin
     obsdata = "OBSDATASET"
     obsvar = "OBSVARIABLE"
 
-    nmember = 9+1 ;; bad idea, try other way. 0 is for ensemble mean
-
     cachefile = "CORFIGFILENAME.nc"
     if(isfilepresent(cachefile))then
         f = addfile(cachefile,"r")
@@ -62,8 +62,16 @@ begin
         pprmse = new(plotmonths+1,"float")
         do m = 0, plotmonths  ;; for each lead month
             wcStrt     = systemfunc("date")
-            var1m = read_noresm_forecasts_ens_leadmonths(forecastdirs,component,varname,m,ocngridfile) 
-            wallClockElapseTime(wcStrt, "Read ens 1 month", 0)
+            moncachefn = cachefile+"_mon_"+sprinti("%3.3d",m)+".nc"
+            if(isfilepresent(moncachefn))then
+                f = addfile(moncachefn,"r")
+                var1m = f->var1m
+            else
+                var1m = read_noresm_forecasts_ens_latlon_leadmonths(forecastdirs,component,varname,m,latbe,lonbe,ocngridfile) 
+                f = addfile(moncachefn,"c")
+                f->var1m = var1m
+            end if
+            ;;wallClockElapseTime(wcStrt, "Read ens 1 month", 0)
                 ;; [forecast | 104] x [time | 1] x [y | 384] x [x | 320]
             if(.not.isvar("wgt"))then ;; run only once
                 ;; get weighting for area mean and desired region
@@ -95,7 +103,7 @@ begin
 
             ;; read obs data and get mean
             inittime = cd_calendar(var1m&forecast,-1)
-            varobsny1m = read_obs_months(obsdir,obsdata,obsvar,inittime/100,mod(inittime,100)+m) ;; t,y,x
+            varobsny1m = read_obs_framework_leadmonths(obsdir,obsdata,obsvar,inittime/100,mod(inittime,100),m,-1,latbe,lonbe) ;; t,y,x
             if(.not.isvar("obswgt"))then ;; run only once
                 obswgt = get_var_area_wgt_lat_lon_2d(varobsny1m,"wgt")
                 obslat2d = get_var_area_wgt_lat_lon_2d(varobsny1m,"lat")
@@ -114,62 +122,79 @@ begin
             end if
 
             ;; obsdata regional mean
-            obs_mean(:,m) = wgt_areaave2(varobsny1m,obswgt,0) ;; t
+            if(all(ismissing(varobsny1m)))then
+                obs_mean(:,m) = obs_mean@_FillValue
+            else
+                obs_mean(:,m) = wgt_areaave2(varobsny1m,obswgt,0) ;; t
+            end if
 
             delete(var1m)
             delete(varobsny1m)
         end do
 
+
         ;; remove climatology of model
-        ;; var_mean(inittimec),lead_month)
-        ;;;; get month of each element
-        dims = dimsizes(var_mean)
-        initta = cd_calendar(inittimec,0)
-        initmon= initta(:,1)
-        var_month = new(dims,"integer")
-        do j = 0,dims(0)-1
-        do i = 0,dims(1)-1
-            var_month(j,i) = toint(initmon(j)+i)
-        end do
-        end do
-        var_month = where(var_month.gt.12,var_month-12,var_month)
-        var_month = var_month -1 ;; for subscript
+            ;; var_mean(inittimec),lead_month)
+            ;;;; get month of each element
+            dims = dimsizes(var_mean)
+            initta = cd_calendar(inittimec,0)
+            initmon= initta(:,1)
+            var_month = new(dims,"integer")
+            do j = 0,dims(0)-1
+            do i = 0,dims(1)-1
+                var_month(j,i) = toint(initmon(j)+i)
+            end do
+            end do
+            var_month = where(var_month.gt.12,var_month-12,var_month)
+            var_month = var_month -1 ;; for subscript
+            ;;;; get climatology
+            clm12 = new(12,typeof(var_mean))
+            clm12  = 0
+            obsclm12 = clm12
+            nm12  = toint(clm12)
 
-        ;;;; get climatology
-        clm12 = new(12,typeof(var_mean))
-        clm12  = 0
-        obsclm12 = clm12
-        nm12  = toint(clm12)
+            do j = 0,dims(0)-1
+            do i = 0,dims(1)-1
+                mm = var_month(j,i) %12
+                clm12(mm) = clm12(mm) + var_mean(j,i)
+                if(.not.ismissing(obs_mean(j,i)))then
+                    obsclm12(mm) = obsclm12(mm) + obs_mean(j,i)
+                    nm12(mm)  = nm12(mm) +1
+                end if
+            end do
+            end do
+            clm12 = clm12/nm12
+            obsclm12 = obsclm12/nm12
 
-        do j = 0,dims(0)-1
-        do i = 0,dims(1)-1
-            clm12(var_month(j,i)) = clm12(var_month(j,i)) + var_mean(j,i)
-            obsclm12(var_month(j,i)) = obsclm12(var_month(j,i)) + obs_mean(j,i)
-            nm12(var_month(j,i))  = nm12(var_month(j,i)) +1
-        end do
-        end do
-        clm12 = clm12/nm12
-        obsclm12 = obsclm12/nm12
-
-        ;;;; remove climatology of var_mean and obs_mean
-        var_ano =  var_mean
-        obs_ano =  obs_mean
-        do j = 0,dims(0)-1
-        do i = 0,dims(1)-1
-            var_ano(j,i) = var_mean(j,i) - clm12(var_month(j,i))
-            obs_ano(j,i) = obs_mean(j,i) - obsclm12(var_month(j,i))
-        end do
-        end do
+            ;;;; remove climatology of var_mean and obs_mean
+            var_ano =  var_mean
+            obs_ano =  obs_mean
+            do j = 0,dims(0)-1
+            do i = 0,dims(1)-1
+                mm = var_month(j,i) %12
+                var_ano(j,i) = var_mean(j,i) - clm12(mm)
+                obs_ano(j,i) = obs_mean(j,i) - obsclm12(mm)
+            end do
+            end do
+            varts = var_ano
+            obsts = obs_ano
+            nt = plotmonths
 
 
-        do m = 0,plotmonths
+        do t = 0,nt-1
             ;; regrid obs data to model grid 
-            varcor(m) = escorc_n(obs_ano(:,m),var_ano(:,m),0,0) ;; ensemble ano correlation
-            varrmse(m) =sqrt(avg((var_ano(:,m)-obs_ano(:,m))^2))
+            ;; check missing in obsts
+            itmax = min(ind(ismissing(obsts(:,t)))) -1
+            itmax = where(ismissing(itmax),dims(0)-1,itmax)
+            if(itmax.le.3)then ;; few or no value
+                continue
+            end if
+            varcor(t) = escorc_n(obsts(:itmax,t),varts(:itmax,t),0,0) ;; ensemble ano correlation
+            varrmse(t) =sqrt(avg((varts(:itmax,t)-obsts(:itmax,t))^2))
 
             ;; persistence forecast
-            ppcor(m) = escorc(obs_ano(:,m),obs_ano(:,0))
-            pprmse(m) = sqrt(avg((obs_ano(:,m)-obs_ano(:,0))^2))
+            ppcor(t) = escorc(obsts(:itmax,t),obsts(:itmax,0))
+            pprmse(t) = sqrt(avg((obsts(:itmax,t)-obsts(:itmax,0))^2))
         end do
 
 
@@ -183,8 +208,8 @@ begin
         f->obswgt = obswgt
         f->obs_mean = obs_mean
         f->var_mean = var_mean
-        f->obs_ano = obs_ano
-        f->var_ano = var_ano
+        f->obsts = obsts
+        f->varts = varts
     end if
 
     res = True
@@ -206,10 +231,11 @@ begin
         
         res@xyLineColors = (/"black","red"/)
         res@xyDashPattern = 0
+
     nitems = 2
     legend_labels = (/"  Ens. mean","  Persistance"/)
     lgres = True
-        lgres@lgLineColors = (/"black","red"/)
+        lgres@lgLineColors = res@xyLineColors
         lgres@lgLineThicknessF = res@xyLineThicknessF
         lgres@lgItemType = "Lines"
         lgres@vpWidthF =  0.20
@@ -221,6 +247,8 @@ begin
     amres = True
         amres@amParallelPosF = -0.3
         amres@amOrthogonalPosF =  0.3
+
+    PLOTRES
 
     pp = (/varcor,ppcor/)
 

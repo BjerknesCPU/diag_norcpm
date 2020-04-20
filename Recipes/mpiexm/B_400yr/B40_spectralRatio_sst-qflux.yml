@@ -8,8 +8,8 @@ COMMENT: Daily SST and QFlux spectral ratio at subtropical/subploar gyre and reg
 Depends: 
     mpiexm/B_400yr/B30_spectral_sst.yml
     mpiexm/B_400yr/B32_spectral_qflux.yml
-REFFRAC: A30_spectral_sst
-REFDENO: A32_spectral_qflux
+REFFRAC: B30_spectral_sst
+REFDENO: B32_spectral_qflux
 VARFRAC: sst
 VARDENO: Q_FLUX_SFC
 VN: SST-QFlux
@@ -29,7 +29,7 @@ CND: CTL2
 
 CAA: f08_5AGCMs_NASPG_average
 CNA: IE-average
-CAS: f09_5AGCMs_NASPG_sample_notdone
+CAS: f09_5AGCMs_NASPG_sample
 CNS: IE-sample
 
 
@@ -42,8 +42,8 @@ Scripts:
     TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
     DATAFNFRAC: ../REFFRAC/CTN_VARFRAC_daily_spect_TAG.nc
     DATAFNDENO: ../REFDENO/CTN_VARDENO_daily_spect_TAG.nc
-    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise_TAG.nc
-    REDNOISEFILEDENO: ../REFDENO/CTL_noise_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTN_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTN_noise_TAG.nc
 -  
     plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
     TITLE: "VN spectral ratio CNA subtropical"
@@ -52,8 +52,8 @@ Scripts:
     TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
     DATAFNFRAC: ../REFFRAC/CAA_VARFRAC_daily_spect_TAG.nc
     DATAFNDENO: ../REFDENO/CAA_VARDENO_daily_spect_TAG.nc
-    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise_TAG.nc
-    REDNOISEFILEDENO: ../REFDENO/CTL_noise_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTN_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTN_noise_TAG.nc
 -  
     plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
     TITLE: "VN spectral ratio CNS subtropical"
@@ -62,8 +62,8 @@ Scripts:
     TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
     DATAFNFRAC: ../REFFRAC/CAS_VARFRAC_daily_spect_TAG.nc
     DATAFNDENO: ../REFDENO/CAS_VARDENO_daily_spect_TAG.nc
-    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise_TAG.nc
-    REDNOISEFILEDENO: ../REFDENO/CTL_noise_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTN_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTN_noise_TAG.nc
     
 -  
     plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
@@ -73,8 +73,8 @@ Scripts:
     TTAG: '50~F34~0~F~W-15~F34~0~F~W, 45~F34~0~F~N-57~F34~0~F~N'
     DATAFNFRAC: ../REFFRAC/CTN_VARFRAC_daily_spect_TAG.nc
     DATAFNDENO: ../REFDENO/CTN_VARDENO_daily_spect_TAG.nc
-    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise_TAG.nc
-    REDNOISEFILEDENO: ../REFDENO/CTL_noise_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTN_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTN_noise_TAG.nc
 -  
     plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
     TITLE: "VN spectral ratio CNA subpolar"
@@ -83,8 +83,8 @@ Scripts:
     TTAG: '50~F34~0~F~W-15~F34~0~F~W, 45~F34~0~F~N-57~F34~0~F~N'
     DATAFNFRAC: ../REFFRAC/CAA_VARFRAC_daily_spect_TAG.nc
     DATAFNDENO: ../REFDENO/CAA_VARDENO_daily_spect_TAG.nc
-    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise_TAG.nc
-    REDNOISEFILEDENO: ../REFDENO/CTL_noise_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTN_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTN_noise_TAG.nc
 -  
     plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
     TITLE: "VN spectral ratio CNS subpolar"
@@ -93,8 +93,8 @@ Scripts:
     TTAG: '50~F34~0~F~W-15~F34~0~F~W, 45~F34~0~F~N-57~F34~0~F~N'
     DATAFNFRAC: ../REFFRAC/CAS_VARFRAC_daily_spect_TAG.nc
     DATAFNDENO: ../REFDENO/CAS_VARDENO_daily_spect_TAG.nc
-    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise_TAG.nc
-    REDNOISEFILEDENO: ../REFDENO/CTL_noise_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTN_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTN_noise_TAG.nc
 
 -  
     plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
@@ -104,8 +104,8 @@ Scripts:
     TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
     DATAFNFRAC: ../REFFRAC/CTN_VARFRAC_daily_spect_TAG.nc
     DATAFNDENO: ../REFDENO/CTN_VARDENO_daily_spect_TAG.nc
-    REDNOISEFILEFRAC: ../REFFRAC/CTL_acr_noise_TAG.nc
-    REDNOISEFILEDENO: ../REFDENO/CTL_acr_noise_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTN_acr_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTN_acr_noise_TAG.nc
     REMOVEDAILYCLIMATE: True
 -  
     plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
@@ -115,8 +115,8 @@ Scripts:
     TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
     DATAFNFRAC: ../REFFRAC/CAA_VARFRAC_daily_spect_TAG.nc
     DATAFNDENO: ../REFDENO/CAA_VARDENO_daily_spect_TAG.nc
-    REDNOISEFILEFRAC: ../REFFRAC/CTL_acr_noise_TAG.nc
-    REDNOISEFILEDENO: ../REFDENO/CTL_acr_noise_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTN_acr_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTN_acr_noise_TAG.nc
     REMOVEDAILYCLIMATE: True
 -  
     plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
@@ -126,8 +126,8 @@ Scripts:
     TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
     DATAFNFRAC: ../REFFRAC/CAS_VARFRAC_daily_spect_TAG.nc
     DATAFNDENO: ../REFDENO/CAS_VARDENO_daily_spect_TAG.nc
-    REDNOISEFILEFRAC: ../REFFRAC/CTL_acr_noise_TAG.nc
-    REDNOISEFILEDENO: ../REFDENO/CTL_acr_noise_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTN_acr_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTN_acr_noise_TAG.nc
     REMOVEDAILYCLIMATE: True
     
 -  
@@ -138,8 +138,8 @@ Scripts:
     TTAG: '50~F34~0~F~W-15~F34~0~F~W, 45~F34~0~F~N-57~F34~0~F~N'
     DATAFNFRAC: ../REFFRAC/CTN_VARFRAC_daily_spect_TAG.nc
     DATAFNDENO: ../REFDENO/CTN_VARDENO_daily_spect_TAG.nc
-    REDNOISEFILEFRAC: ../REFFRAC/CTL_acr_noise_TAG.nc
-    REDNOISEFILEDENO: ../REFDENO/CTL_acr_noise_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTN_acr_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTN_acr_noise_TAG.nc
     REMOVEDAILYCLIMATE: True
 -  
     plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
@@ -149,8 +149,8 @@ Scripts:
     TTAG: '50~F34~0~F~W-15~F34~0~F~W, 45~F34~0~F~N-57~F34~0~F~N'
     DATAFNFRAC: ../REFFRAC/CAA_VARFRAC_daily_spect_TAG.nc
     DATAFNDENO: ../REFDENO/CAA_VARDENO_daily_spect_TAG.nc
-    REDNOISEFILEFRAC: ../REFFRAC/CTL_acr_noise_TAG.nc
-    REDNOISEFILEDENO: ../REFDENO/CTL_acr_noise_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTN_acr_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTN_acr_noise_TAG.nc
     REMOVEDAILYCLIMATE: True
 -  
     plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
@@ -160,8 +160,8 @@ Scripts:
     TTAG: '50~F34~0~F~W-15~F34~0~F~W, 45~F34~0~F~N-57~F34~0~F~N'
     DATAFNFRAC: ../REFFRAC/CAS_VARFRAC_daily_spect_TAG.nc
     DATAFNDENO: ../REFDENO/CAS_VARDENO_daily_spect_TAG.nc
-    REDNOISEFILEFRAC: ../REFFRAC/CTL_acr_noise_TAG.nc
-    REDNOISEFILEDENO: ../REFDENO/CTL_acr_noise_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTN_acr_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTN_acr_noise_TAG.nc
     REMOVEDAILYCLIMATE: True
 
 -  

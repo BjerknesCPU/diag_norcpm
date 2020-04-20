@@ -1,0 +1,711 @@
+Title: SST JFM indices regression to JFM SLP
+Description: |
+    SST indices included NAO, AMO, subpolar, subtropical gyre and NINO3.4 index.
+    SLP is JFM.
+COMMENT: |
+    SST indices included AMO, subpolar, subtropical gyre and NINO3.4 index.
+    1. NAO is defined as the difference between the monthly SLP anomalies averaged over the domains of (50&deg;W-10&deg;E, 25&deg;-55&deg;N) and (40&deg;W-20&deg;E, 55-85&deg;N).
+    2. AMO, defined as 10-year low-pass filtered area-averaged annual SST anomalies over the North Atlantic basin (0&deg;N-65&deg;N, 80&deg;W-0&deg;E). 
+    3. Mean JFM SST of wider subpolar grye region(wSubP),  60&deg;W-10&deg;W, 50&deg;N-60&deg;N
+    4. Mean JFM SST of southern subtropical grye region(sSubT), 70&deg;W-20&deg;W, 10&deg;N-30&deg;N
+    5. Mean DJF SST of NINO3.4 region, 170&deg;W-120&deg;W, 5&deg;S-5&deg;N
+    6. Mean JFM SST of wSubP, but 10-year low-pass filtered.
+    7. Mean JFM SST of sSubT, but 10-year low-pass filtered.
+
+#Thumbnail: 
+
+
+## plots setting
+FIGFILES: $(cat figfilelist.txt) # for mk_html_pages.sh
+#### NAO
+Plot_NAO:
+    plotScript: mpiexm/plot_mpiexm_NAO.ncl
+    TITLE: "NAO index NAME "
+    FIGFILENAME: CASE_slp_nmodNMOD_nao_DJF
+    MONTHS: 12,13,14
+    COMPONENT:  echam6
+    VARIABLE:  slp
+    PLOTRES: |
+        res@tiMainString = title
+        res@gsnLeftString = months_abbr(months)+ ", NYR years"
+        res@trYMinF = -3.
+        res@trYMaxF =  3.
+        res@vpHeightF = .3
+        res@tiYAxisString = "std. SLP dif."
+        res@gsnYRefLine = 0.
+        if(.not.isvar("x"))then
+            x = ispan(min(ybe),max(ybe),1)
+        end if
+        write_table(figfn+".txt","w",[/"year  value"/],"%s") ;; output time series text file for Noel
+        write_table(figfn+".txt","a",[/x+"  "+tsdif/],"%s") ;; output time series text file for Noel
+NAOts_forRegMap:
+    TSNETCDFFILE: CASE_slp_nmodNMOD_nao_DJF
+    TSVARNAME: tsdif
+    TSNA: NAO
+    MONTHS: 12,13,14
+    RANGE: |
+        res@cnLevelSelectionMode = "ExplicitLevels"
+        res@cnLevels = fspan(-.6,.6,13)
+    POSTPLOT: |  ## add box
+        latbeA = (/25.,55./)
+        lonbeA = (/-50.,10./)
+        latbeB = (/55.,85./)
+        lonbeB = (/-40.,20./)
+        boxxA = (/min(lonbeA),max(lonbeA),max(lonbeA),min(lonbeA),min(lonbeA)/)
+        boxyA = (/min(latbeA),min(latbeA),max(latbeA),max(latbeA),min(latbeA)/)
+        boxxB = (/min(lonbeB),max(lonbeB),max(lonbeB),min(lonbeB),min(lonbeB)/)
+        boxyB = (/min(latbeB),min(latbeB),max(latbeB),max(latbeB),min(latbeB)/)
+        lres = True
+            lres@gsLineThicknessF = 3.0
+        a = gsn_add_polyline(wks,plot,boxxA,boxyA,lres)
+        b = gsn_add_polyline(wks,plot,boxxB,boxyB,lres)
+
+#### AMO
+Plot_AMO:
+    plotScript: mpiexm/plot_mpiexm_ts.ncl
+    TITLE: "AMO index NAME "
+    FIGFILENAME: CASE_sst_amo_nmodNMOD_ANN
+    COMPONENT:  mpiom
+    VARIABLE: sst
+    LATBE: 0.,65.
+    LONBE: -80.,0.
+    MONTHS: 1,2,3,4,5,6,7,8,9,10,11,12
+    TSPOSTPROC: | 
+        ;; low pass 
+        wgt = filwgts_lanczos(21,0,1./10.,-999,1.) 
+        ts := wgt_runave(ts,wgt,0)
+        x = ispan(min(ybe),max(ybe),1)
+    PLOTRES: |
+        res@tiMainString = title
+        res@gsnLeftString = months_abbr(months)+ ", NYR years"
+        res@vpHeightF = .3
+        res@trYMinF = -0.4
+        res@trYMaxF =  0.4
+        res@tmXBFormat = "f3.0"
+        ts_mean = avg(ts)
+        ts := ts - ts_mean ;; remove mean
+        res@gsnRightString = "avg="+sprintf("%3.2f",ts_mean)+" K"
+        if(.not.isvar("x"))then
+            x = ispan(min(ybe),max(ybe),1)
+        end if
+        write_table(figfn+".txt","w",[/"year  value"/],"%s") ;; output time series text file for Noel
+        write_table(figfn+".txt","a",[/x+"  "+ts/],"%s") ;; output time series text file for Noel
+AMOts_forRegMap:
+    TSNETCDFFILE: CASE_sst_amo_nmodNMOD_ANN
+    TSVARNAME: ts
+    TSNA: AMO
+    MONTHS: 1,2,3
+    RANGE: |
+        res@cnLevelSelectionMode = "ExplicitLevels"
+        res@cnLevels = fspan(-600.,600.,13)
+    LATBE: 0.,65.
+    LONBE: -80.,0.
+    POSTPLOT: |  ## add box
+        latbe = (/LATBE/)
+        lonbe = (/LONBE/)
+        boxx = (/min(lonbe),max(lonbe),max(lonbe),min(lonbe),min(lonbe)/)
+        boxy = (/min(latbe),min(latbe),max(latbe),max(latbe),min(latbe)/)
+        lres = True
+            lres@gsLineThicknessF = 3.0
+        b = gsn_add_polyline(wks,plot,boxx,boxy,lres)
+
+#### subtropical mean SST
+Plot_sst_sSubT:
+    plotScript: mpiexm/plot_mpiexm_ts.ncl
+    TITLE: "sSubT SST NAME "
+    FIGFILENAME: CASE_sst_nmodNMOD_sSubT_JFM
+    COMPONENT:  mpiom
+    VARIABLE: sst
+    LATBE: 10.,30.
+    LONBE: -70.,-20.
+    MONTHS: 1,2,3
+    TSPOSTPROC: |
+        ;; low pass
+        ;;;wgt = filwgts_lanczos(21,0,1./10.,-999,1.)
+        ;;;ts := wgt_runave(ts,wgt,0)
+        x = ispan(min(ybe),max(ybe),1)
+    PLOTRES: |
+        res@tiMainString = title
+        res@gsnLeftString = months_abbr(months)+ ", NYR years"
+        res@vpHeightF = .3
+        res@trYMinF = -0.4
+        res@trYMaxF =  0.4
+        res@tmXBFormat = "f3.0"
+        ts_mean = avg(ts)
+        ts := ts - ts_mean ;; remove mean
+        res@gsnRightString = "avg="+sprintf("%3.2f",ts_mean)+" K"
+        if(.not.isvar("x"))then
+            x = ispan(min(ybe),max(ybe),1)
+        end if
+        write_table(figfn+".txt","w",[/"year  value"/],"%s") ;; output time series text file for Noel
+        write_table(figfn+".txt","a",[/x+"  "+ts/],"%s") ;; output time series text file for Noel
+sst_sSubTts_forRegMap:
+    TSNETCDFFILE: CASE_sst_nmodNMOD_sSubT_JFM
+    TSVARNAME: ts
+    TSNA: sSubT 
+    MONTHS: 1,2,3
+    RANGE: |
+        res@cnLevelSelectionMode = "ExplicitLevels"
+        res@cnLevels = fspan(-510.,510.,13)
+    LATBE: 10.,30.
+    LONBE: -70.,-20.
+    POSTPLOT: |  ## add box
+        latbe = (/LATBE/)
+        lonbe = (/LONBE/)
+        boxx = (/min(lonbe),max(lonbe),max(lonbe),min(lonbe),min(lonbe)/)
+        boxy = (/min(latbe),min(latbe),max(latbe),max(latbe),min(latbe)/)
+        lres = True
+            lres@gsLineThicknessF = 3.0
+        b = gsn_add_polyline(wks,plot,boxx,boxy,lres)
+Plot_sst_sSubT_10yrLPass:
+    plotScript: mpiexm/plot_mpiexm_ts.ncl
+    TITLE: "SSubT SST NAME "
+    FIGFILENAME: CASE_sst_nmodNMOD_sSubT_JFM_10yrLP
+    COMPONENT:  mpiom
+    VARIABLE: sst
+    LATBE: 10.,30.
+    LONBE: -70.,-20.
+    MONTHS: 1,2,3
+    TSPOSTPROC: |
+        ;; low pass
+        wgt = filwgts_lanczos(21,0,1./10.,-999,1.)
+        ts := wgt_runave(ts,wgt,0)
+        x = ispan(min(ybe),max(ybe),1)
+    PLOTRES: |
+        res@tiMainString = title
+        res@gsnLeftString = months_abbr(months)+ ", NYR years"
+        res@vpHeightF = .3
+        res@trYMinF = -0.4
+        res@trYMaxF =  0.4
+        res@tmXBFormat = "f3.0"
+        ts_mean = avg(ts)
+        ts := ts - ts_mean ;; remove mean
+        res@gsnRightString = "avg="+sprintf("%3.2f",ts_mean)+" K"
+        if(.not.isvar("x"))then
+            x = ispan(min(ybe),max(ybe),1)
+        end if
+        write_table(figfn+".txt","w",[/"year  value"/],"%s") ;; output time series text file for Noel
+        write_table(figfn+".txt","a",[/x+"  "+ts/],"%s") ;; output time series text file for Noel
+sst_sSubTts_10yrLPass_forRegMap:
+    TSNETCDFFILE: CASE_sst_nmodNMOD_sSubT_JFM_10yrLP
+    TSVARNAME: ts
+    TSNA: sSubT 
+    MONTHS: 1,2,3
+    RANGE: |
+        res@cnLevelSelectionMode = "ExplicitLevels"
+        res@cnLevels = fspan(-510.,510.,13)
+    LATBE: 10.,30.
+    LONBE: -70.,-20.
+    POSTPLOT: |  ## add box
+        latbe = (/LATBE/)
+        lonbe = (/LONBE/)
+        boxx = (/min(lonbe),max(lonbe),max(lonbe),min(lonbe),min(lonbe)/)
+        boxy = (/min(latbe),min(latbe),max(latbe),max(latbe),min(latbe)/)
+        lres = True
+            lres@gsLineThicknessF = 3.0
+        b = gsn_add_polyline(wks,plot,boxx,boxy,lres)
+
+#### subpolar mean SST
+Plot_sst_wSubP:
+    plotScript: mpiexm/plot_mpiexm_ts.ncl
+    TITLE: "wSubP SST NAME "
+    FIGFILENAME: CASE_sst_nmodNMOD_wSubP_JFM
+    COMPONENT:  mpiom
+    VARIABLE: sst
+    LATBE: 50.,60.
+    LONBE: -60.,-10.
+    MONTHS: 1,2,3
+    TSPOSTPROC: |
+        ;; low pass
+        ;;;wgt = filwgts_lanczos(21,0,1./10.,-999,1.)
+        ;;;ts := wgt_runave(ts,wgt,0)
+        x = ispan(min(ybe),max(ybe),1)
+    PLOTRES: |
+        res@tiMainString = title
+        res@gsnLeftString = months_abbr(months)+ ", NYR years"
+        res@vpHeightF = .3
+        res@trYMinF = -1.0
+        res@trYMaxF =  1.0
+        res@tmXBFormat = "f3.0"
+        ts_mean = avg(ts)
+        ts := ts - ts_mean ;; remove mean
+        res@gsnRightString = "avg="+sprintf("%3.2f",ts_mean)+" K"
+        if(.not.isvar("x"))then
+            x = ispan(min(ybe),max(ybe),1)
+        end if
+        write_table(figfn+".txt","w",[/"year  value"/],"%s") ;; output time series text file for Noel
+        write_table(figfn+".txt","a",[/x+"  "+ts/],"%s") ;; output time series text file for Noel
+sst_wSubPts_forRegMap:
+    TSNETCDFFILE: CASE_sst_nmodNMOD_wSubP_JFM
+    TSVARNAME: ts
+    TSNA: wSubP 
+    MONTHS: 1,2,3
+    RANGE: |
+        res@cnLevelSelectionMode = "ExplicitLevels"
+        res@cnLevels = fspan(-210.,210.,13)
+    LATBE: 50.,60.
+    LONBE: -60.,-10.
+    POSTPLOT: |  ## add box
+        latbe = (/LATBE/)
+        lonbe = (/LONBE/)
+        boxx = (/min(lonbe),max(lonbe),max(lonbe),min(lonbe),min(lonbe)/)
+        boxy = (/min(latbe),min(latbe),max(latbe),max(latbe),min(latbe)/)
+        lres = True
+            lres@gsLineThicknessF = 3.0
+        b = gsn_add_polyline(wks,plot,boxx,boxy,lres)
+Plot_sst_wSubP_10yrLPass:
+    plotScript: mpiexm/plot_mpiexm_ts.ncl
+    TITLE: "wSubP SST NAME "
+    FIGFILENAME: CASE_sst_nmodNMOD_wSubP_JFM_10yrLP
+    COMPONENT:  mpiom
+    VARIABLE: sst
+    LATBE: 50.,60.
+    LONBE: -60.,-10.
+    MONTHS: 1,2,3
+    TSPOSTPROC: |
+        ;; low pass
+        wgt = filwgts_lanczos(21,0,1./10.,-999,1.)
+        ts := wgt_runave(ts,wgt,0)
+        x = ispan(min(ybe),max(ybe),1)
+    PLOTRES: |
+        res@tiMainString = title
+        res@gsnLeftString = months_abbr(months)+ ", NYR years"
+        res@vpHeightF = .3
+        res@trYMinF = -1.0
+        res@trYMaxF =  1.0
+        res@tmXBFormat = "f3.0"
+        ts_mean = avg(ts)
+        ts := ts - ts_mean ;; remove mean
+        res@gsnRightString = "avg="+sprintf("%3.2f",ts_mean)+" K"
+        if(.not.isvar("x"))then
+            x = ispan(min(ybe),max(ybe),1)
+        end if
+        write_table(figfn+".txt","w",[/"year  value"/],"%s") ;; output time series text file for Noel
+        write_table(figfn+".txt","a",[/x+"  "+ts/],"%s") ;; output time series text file for Noel
+sst_wSubPts_10yrLPass_forRegMap:
+    TSNETCDFFILE: CASE_sst_nmodNMOD_wSubP_JFM_10yrLP
+    TSVARNAME: ts
+    TSNA: wSubP 
+    MONTHS: 1,2,3
+    RANGE: |
+        res@cnLevelSelectionMode = "ExplicitLevels"
+        res@cnLevels = fspan(-210.,210.,13)
+    LATBE: 50.,60.
+    LONBE: -60.,-10.
+    POSTPLOT: |  ## add box
+        latbe = (/LATBE/)
+        lonbe = (/LONBE/)
+        boxx = (/min(lonbe),max(lonbe),max(lonbe),min(lonbe),min(lonbe)/)
+        boxy = (/min(latbe),min(latbe),max(latbe),max(latbe),min(latbe)/)
+        lres = True
+            lres@gsLineThicknessF = 3.0
+        b = gsn_add_polyline(wks,plot,boxx,boxy,lres)
+
+#### NINO3.4 mean SST
+Plot_sst_nino34:
+    plotScript: mpiexm/plot_mpiexm_ts.ncl
+    TITLE: "NINO3.4 SST NAME "
+    FIGFILENAME: CASE_sst_nmodNMOD_nino34_DJF
+    COMPONENT:  mpiom
+    VARIABLE: sst
+    LATBE: -5.,5.
+    LONBE: -170.,-120.
+    MONTHS: 12,13,14
+    TSPOSTPROC: |
+        ;; low pass
+        ;;;wgt = filwgts_lanczos(21,0,1./10.,-999,1.)
+        ;;;ts := wgt_runave(ts,wgt,0)
+        x = ispan(min(ybe),max(ybe),1)
+    PLOTRES: |
+        res@tiMainString = title
+        res@gsnLeftString = months_abbr(months)+ ", NYR years"
+        res@vpHeightF = .3
+        res@trYMinF = -3.1
+        res@trYMaxF =  -res@trYMinF
+        res@tmXBFormat = "f3.0"
+        ts_mean = avg(ts)
+        ts := ts - ts_mean ;; remove mean
+        res@gsnRightString = "avg="+sprintf("%3.2f",ts_mean)+" K"
+        if(.not.isvar("x"))then
+            x = ispan(min(ybe),max(ybe),1)
+        end if
+        write_table(figfn+".txt","w",[/"year  value"/],"%s") ;; output time series text file for Noel
+        write_table(figfn+".txt","a",[/x+"  "+ts/],"%s") ;; output time series text file for Noel
+sst_nino34ts_forRegMap:
+    TSNETCDFFILE: CASE_sst_nmodNMOD_nino34_DJF
+    TSVARNAME: ts
+    TSNA: NINO3.4
+    MONTHS: 12,13,14
+    RANGE: |
+        res@cnLevelSelectionMode = "ExplicitLevels"
+        res@cnLevels = fspan(-210.,210.,13)
+    LATBE: -5.,5.
+    LONBE: -170.,-120.
+    POSTPLOT: |  ## add box
+        latbe = (/LATBE/)
+        lonbe = (/LONBE/)
+        boxx = (/min(lonbe),max(lonbe),max(lonbe),min(lonbe),min(lonbe)/)
+        boxy = (/min(latbe),min(latbe),max(latbe),max(latbe),min(latbe)/)
+        lres = True
+            lres@gsLineThicknessF = 3.0
+        b = gsn_add_polyline(wks,plot,boxx,boxy,lres)
+
+#### Regression to SLP
+Plot_SLPRegMap:
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    TITLE: "TSNA index reg. NAME (model year: NYR)"
+    FIGFILENAME: CASE_TSNA_nmodNMOD_slp_regmap
+    COMPONENT:  echam6
+    VARIABLE:  slp
+    PLOTRES: |
+        res@mpLimitMode = "LatLon"
+        res@mpMinLatF = -90.
+        res@mpMaxLatF = 90.
+        res@mpMinLonF = -330.
+        res@mpMaxLonF =   30.
+        res@pmTickMarkDisplayMode = "Always"
+        res@mpCenterLonF =   -150.
+        res@cnLinesOn = False
+        res@cnFillOn = True
+        res@lbOrientation = "Vertical"
+        res@pmLabelBarWidthF = 0.1
+        res@pmLabelBarOrthogonalPosF   = 0.01
+        res@gsnLeftString = months_abbr(months)
+        res@tiMainString = title
+        res@tiMainOffsetYF  = -.045
+        RANGE
+
+#### ANOVA map
+Plot_SLPANOVA:
+    plotScript: mpiexm/plot_mpiexm_anova.ncl
+    TITLE: "NAME SLP ANOVA (model year: NYR)"
+    FIGFILENAME: CASE_nmodNMOD_slp_anova_map
+    VARIABLE: slp
+    COMPONENT: echam6
+    PLOTRES: |
+        res@gsnLeftString = months_abbr(months)
+        res@tiMainString = title
+        res@tiMainOffsetYF  = -.045
+        res@mpLimitMode = "LatLon"
+        res@mpMinLatF = -90.
+        res@mpMaxLatF = 90.
+        res@mpMinLonF = -330.
+        res@mpMaxLonF =   30.
+        res@pmTickMarkDisplayMode = "Always"
+        res@mpCenterLonF =   -150.
+Plot_SLPANOVA_JFM:
+    plotScript: mpiexm/plot_mpiexm_anova.ncl
+    TITLE: "NAME SLP ANOVA (model year: NYR)"
+    FIGFILENAME: CASE_nmodNMOD_slp_JFM_anova_map
+    VARIABLE: slp
+    COMPONENT: echam6
+    MONTHS: 1,2,3
+    PLOTRES: |
+        res@gsnLeftString = months_abbr(months)
+        res@tiMainString = title
+        res@tiMainOffsetYF  = -.045
+        res@mpLimitMode = "LatLon"
+        res@mpMinLatF = -90.
+        res@mpMaxLatF = 90.
+        res@mpMinLonF = -330.
+        res@mpMaxLonF =   30.
+        res@pmTickMarkDisplayMode = "Always"
+        res@mpCenterLonF =   -150.
+
+## case common setting    
+CASEDIR: /projects/NS9207K/pgchiu/CASE
+    ## CASE define later
+YEARBE: 1101,1250
+NYR: 150
+
+## case setting
+Case_CTL:
+    CASE: f08_1AGCM
+    NAME: CTL
+    NMOD: 0
+Case_CTL2:
+    CASE: f08_5AGCMs_NASPG_sample
+    NAME: CTL2
+    MODELN: 1
+    NMOD: 0
+Case_AVG:
+    CASE: f08_5AGCMs_NASPG_average
+    NAME: IEave
+    MODELN: 1
+    NMOD: 1
+Case_AVG5:
+    CASE: f08_5AGCMs_NASPG_average
+    NAME: IEave5
+    MODELN: (/1,2,3,4,5/)
+    NMOD: 5
+Case_SAM:
+    CASE: f09_5AGCMs_NASPG_sample
+    NAME: IEsam
+    MODELN: 1
+    NMOD: 1
+Case_SAM5:
+    CASE: f09_5AGCMs_NASPG_sample
+    NAME: IEsam5
+    MODELN: (/1,2,3,4,5/)
+    NMOD: 5
+Case_GlobalAVG5:
+    CASE: f09_5AGCMs_Global_average
+    NAME: IEGave5
+    MODELN: (/1,2,3,4,5/)
+    NMOD: 5
+Case_GlobalAVG:
+    CASE: f09_5AGCMs_Global_average
+    NAME: IEGave
+    MODELN: 1
+    NMOD: 1
+
+
+Scripts:
+-  # Remove figfilelist.txt which is for mk_html_page.sh at bottom
+    plotScript: mk_runcode.sh
+    RUNTHESECODES: |
+        rm -f figfilelist.txt
+## NAO index
+- varPack: Plot_NAO, Case_CTL
+- varPack: Plot_NAO, Case_SAM
+- varPack: Plot_NAO, Case_AVG 
+- varPack: Plot_NAO, Case_GlobalAVG 
+- varPack: Plot_NAO, Case_CTL2
+- varPack: Plot_NAO, Case_SAM5
+- varPack: Plot_NAO, Case_AVG5
+- varPack: Plot_NAO, Case_GlobalAVG5
+- varPack: Plot_SLPRegMap, NAOts_forRegMap, Case_CTL
+- varPack: Plot_SLPRegMap, NAOts_forRegMap, Case_SAM
+- varPack: Plot_SLPRegMap, NAOts_forRegMap, Case_AVG
+- varPack: Plot_SLPRegMap, NAOts_forRegMap, Case_GlobalAVG
+- varPack: Plot_SLPRegMap, NAOts_forRegMap, Case_CTL2
+- varPack: Plot_SLPRegMap, NAOts_forRegMap, Case_SAM5
+- varPack: Plot_SLPRegMap, NAOts_forRegMap, Case_AVG5
+- varPack: Plot_SLPRegMap, NAOts_forRegMap, Case_GlobalAVG5
+
+## AMO index
+- varPack: Plot_AMO, Case_CTL
+- varPack: Plot_AMO, Case_SAM
+- varPack: Plot_AMO, Case_AVG 
+- varPack: Plot_AMO, Case_GlobalAVG 
+- varPack: Plot_AMO, Case_CTL2
+- varPack: Plot_AMO, Case_SAM5
+- varPack: Plot_AMO, Case_AVG5
+- varPack: Plot_AMO, Case_GlobalAVG5
+- varPack: Plot_SLPRegMap, AMOts_forRegMap, Case_CTL
+- varPack: Plot_SLPRegMap, AMOts_forRegMap, Case_SAM
+- varPack: Plot_SLPRegMap, AMOts_forRegMap, Case_AVG
+- varPack: Plot_SLPRegMap, AMOts_forRegMap, Case_GlobalAVG
+- varPack: Plot_SLPRegMap, AMOts_forRegMap, Case_CTL2
+- varPack: Plot_SLPRegMap, AMOts_forRegMap, Case_SAM5
+- varPack: Plot_SLPRegMap, AMOts_forRegMap, Case_AVG5
+- varPack: Plot_SLPRegMap, AMOts_forRegMap, Case_GlobalAVG5
+
+## sst_sSubT index
+- varPack: Plot_sst_sSubT, Case_CTL
+- varPack: Plot_sst_sSubT, Case_SAM
+- varPack: Plot_sst_sSubT, Case_AVG 
+- varPack: Plot_sst_sSubT, Case_GlobalAVG 
+- varPack: Plot_sst_sSubT, Case_CTL2
+- varPack: Plot_sst_sSubT, Case_SAM5
+- varPack: Plot_sst_sSubT, Case_AVG5
+- varPack: Plot_sst_sSubT, Case_GlobalAVG5
+- varPack: Plot_SLPRegMap, sst_sSubTts_forRegMap, Case_CTL
+- varPack: Plot_SLPRegMap, sst_sSubTts_forRegMap, Case_SAM
+- varPack: Plot_SLPRegMap, sst_sSubTts_forRegMap, Case_AVG
+- varPack: Plot_SLPRegMap, sst_sSubTts_forRegMap, Case_GlobalAVG
+- varPack: Plot_SLPRegMap, sst_sSubTts_forRegMap, Case_CTL2
+- varPack: Plot_SLPRegMap, sst_sSubTts_forRegMap, Case_SAM5
+- varPack: Plot_SLPRegMap, sst_sSubTts_forRegMap, Case_AVG5
+- varPack: Plot_SLPRegMap, sst_sSubTts_forRegMap, Case_GlobalAVG5
+
+## sst_wSubP index
+- varPack: Plot_sst_wSubP, Case_CTL
+- varPack: Plot_sst_wSubP, Case_SAM
+- varPack: Plot_sst_wSubP, Case_AVG 
+- varPack: Plot_sst_wSubP, Case_GlobalAVG 
+- varPack: Plot_sst_wSubP, Case_CTL2
+- varPack: Plot_sst_wSubP, Case_SAM5
+- varPack: Plot_sst_wSubP, Case_AVG5
+- varPack: Plot_sst_wSubP, Case_GlobalAVG5
+- varPack: Plot_SLPRegMap, sst_wSubPts_forRegMap, Case_CTL
+- varPack: Plot_SLPRegMap, sst_wSubPts_forRegMap, Case_SAM
+- varPack: Plot_SLPRegMap, sst_wSubPts_forRegMap, Case_AVG
+- varPack: Plot_SLPRegMap, sst_wSubPts_forRegMap, Case_GlobalAVG
+- varPack: Plot_SLPRegMap, sst_wSubPts_forRegMap, Case_CTL2
+- varPack: Plot_SLPRegMap, sst_wSubPts_forRegMap, Case_SAM5
+- varPack: Plot_SLPRegMap, sst_wSubPts_forRegMap, Case_AVG5
+- varPack: Plot_SLPRegMap, sst_wSubPts_forRegMap, Case_GlobalAVG5
+
+## sst_nino34 index
+- varPack: Plot_sst_nino34, Case_CTL
+- varPack: Plot_sst_nino34, Case_SAM
+- varPack: Plot_sst_nino34, Case_AVG 
+- varPack: Plot_sst_nino34, Case_GlobalAVG 
+- varPack: Plot_sst_nino34, Case_CTL2
+- varPack: Plot_sst_nino34, Case_SAM5
+- varPack: Plot_sst_nino34, Case_AVG5
+- varPack: Plot_sst_nino34, Case_GlobalAVG5
+- varPack: Plot_SLPRegMap, sst_nino34ts_forRegMap, Case_CTL
+- varPack: Plot_SLPRegMap, sst_nino34ts_forRegMap, Case_SAM
+- varPack: Plot_SLPRegMap, sst_nino34ts_forRegMap, Case_AVG
+- varPack: Plot_SLPRegMap, sst_nino34ts_forRegMap, Case_GlobalAVG
+- varPack: Plot_SLPRegMap, sst_nino34ts_forRegMap, Case_CTL2
+- varPack: Plot_SLPRegMap, sst_nino34ts_forRegMap, Case_SAM5
+- varPack: Plot_SLPRegMap, sst_nino34ts_forRegMap, Case_AVG5
+- varPack: Plot_SLPRegMap, sst_nino34ts_forRegMap, Case_GlobalAVG5
+
+## sst_sSubT index with 10 year low-pass filter
+- varPack: Plot_sst_sSubT_10yrLPass, Case_CTL
+- varPack: Plot_sst_sSubT_10yrLPass, Case_SAM
+- varPack: Plot_sst_sSubT_10yrLPass, Case_AVG 
+- varPack: Plot_sst_sSubT_10yrLPass, Case_GlobalAVG 
+- varPack: Plot_sst_sSubT_10yrLPass, Case_CTL2
+- varPack: Plot_sst_sSubT_10yrLPass, Case_SAM5
+- varPack: Plot_sst_sSubT_10yrLPass, Case_AVG5
+- varPack: Plot_sst_sSubT_10yrLPass, Case_GlobalAVG5
+- varPack: Plot_SLPRegMap, sst_sSubTts_10yrLPass_forRegMap, Case_CTL
+- varPack: Plot_SLPRegMap, sst_sSubTts_10yrLPass_forRegMap, Case_SAM
+- varPack: Plot_SLPRegMap, sst_sSubTts_10yrLPass_forRegMap, Case_AVG
+- varPack: Plot_SLPRegMap, sst_sSubTts_10yrLPass_forRegMap, Case_GlobalAVG
+- varPack: Plot_SLPRegMap, sst_sSubTts_10yrLPass_forRegMap, Case_CTL2
+- varPack: Plot_SLPRegMap, sst_sSubTts_10yrLPass_forRegMap, Case_SAM5
+- varPack: Plot_SLPRegMap, sst_sSubTts_10yrLPass_forRegMap, Case_AVG5
+- varPack: Plot_SLPRegMap, sst_sSubTts_10yrLPass_forRegMap, Case_GlobalAVG5
+
+## sst_wSubP index
+- varPack: Plot_sst_wSubP_10yrLPass, Case_CTL
+- varPack: Plot_sst_wSubP_10yrLPass, Case_SAM
+- varPack: Plot_sst_wSubP_10yrLPass, Case_AVG 
+- varPack: Plot_sst_wSubP_10yrLPass, Case_GlobalAVG 
+- varPack: Plot_sst_wSubP_10yrLPass, Case_CTL2
+- varPack: Plot_sst_wSubP_10yrLPass, Case_SAM5
+- varPack: Plot_sst_wSubP_10yrLPass, Case_AVG5
+- varPack: Plot_sst_wSubP_10yrLPass, Case_GlobalAVG5
+- varPack: Plot_SLPRegMap, sst_wSubPts_10yrLPass_forRegMap, Case_CTL
+- varPack: Plot_SLPRegMap, sst_wSubPts_10yrLPass_forRegMap, Case_SAM
+- varPack: Plot_SLPRegMap, sst_wSubPts_10yrLPass_forRegMap, Case_AVG
+- varPack: Plot_SLPRegMap, sst_wSubPts_10yrLPass_forRegMap, Case_GlobalAVG
+- varPack: Plot_SLPRegMap, sst_wSubPts_10yrLPass_forRegMap, Case_CTL2
+- varPack: Plot_SLPRegMap, sst_wSubPts_10yrLPass_forRegMap, Case_SAM5
+- varPack: Plot_SLPRegMap, sst_wSubPts_10yrLPass_forRegMap, Case_AVG5
+- varPack: Plot_SLPRegMap, sst_wSubPts_10yrLPass_forRegMap, Case_GlobalAVG5
+
+## slp ANOVA
+- varPack: Plot_SLPANOVA, Case_SAM5
+- varPack: Plot_SLPANOVA, Case_AVG5
+- varPack: Plot_SLPANOVA, Case_GlobalAVG5
+    ##    -   # anova difference
+    ##        plotScript: plot_ncdif_map.ncl
+    ##        TITLE: ANOVA IEsam5 - IEave5
+    ##        FIGFILENAME: dif_slp_anova
+    ##        NCFILEA: f09_5AGCMs_NASPG_sample_nmod5_slp_anova_map.nc
+    ##        NCFILEB: f08_5AGCMs_NASPG_average_nmod5_slp_anova_map.nc
+    ##        VARIABLEA: anova
+    ##        VARIABLEB: anova
+    ##        PLOTRES: |
+    ##            res@mpLimitMode = "LatLon"
+    ##            res@mpMinLatF = -90.
+    ##            res@mpMaxLatF = 90.
+    ##            res@mpMinLonF = -330.
+    ##            res@mpMaxLonF =   30.
+    ##            res@pmTickMarkDisplayMode = "Always"
+    ##            res@mpCenterLonF =   -150.
+    ##            res@cnLevelSelectionMode = "ExplicitLevels"
+    ##            res@cnLevels = fspan(-.15,.15,13)
+- varPack: Plot_SLPANOVA_JFM, Case_SAM5
+- varPack: Plot_SLPANOVA_JFM, Case_AVG5
+- varPack: Plot_SLPANOVA_JFM, Case_GlobalAVG5
+    ##    -   # JFM anova difference 
+    ##        plotScript: plot_ncdif_map.ncl
+    ##        TITLE: ANOVA JFM IEsam5 - IEave5 
+    ##        FIGFILENAME: dif_slp_JFM_anova
+    ##        NCFILEA: f09_5AGCMs_NASPG_sample_nmod5_slp_JFM_anova_map.nc
+    ##        NCFILEB: f08_5AGCMs_NASPG_average_nmod5_slp_JFM_anova_map.nc
+    ##        VARIABLEA: anova
+    ##        VARIABLEB: anova
+    ##        PLOTRES: |
+    ##            res@mpLimitMode = "LatLon"
+    ##            res@mpMinLatF = -90.
+    ##            res@mpMaxLatF = 90.
+    ##            res@mpMinLonF = -330.
+    ##            res@mpMaxLonF =   30.
+    ##            res@pmTickMarkDisplayMode = "Always"
+    ##            res@mpCenterLonF =   -150.
+    ##            res@cnLevelSelectionMode = "ExplicitLevels"
+    ##            res@cnLevels = fspan(-.15,.15,13)
+
+
+-  
+    plotScript: mk_html_page.sh
+    COLUMN: >
+        'CTL' 'IEsam(1st AGCM)' 'IEavg(1st AGCM)' 'IEGavg(1st AGCM)' 'CTL2' tr
+         '<hr>' '<hr>' '<hr>' '<hr>' '<hr>' tr
+        '1. <hr>' '&nbsp; <hr>' '&nbsp; <hr>' '&nbsp; <hr>' tr
+        'NAO index DJF' tr 
+        5
+        'Ensemble ->' 3
+        'NAO index DJF SLP regression map' tr 
+        5
+        'Ensemble ->' 3
+
+         '<hr>' '<hr>' '<hr>' '<hr>' '<hr>' tr
+        '2. <hr>' '&nbsp; <hr>' '&nbsp; <hr>' '&nbsp; <hr>' tr
+        'AMO index' tr 
+        5 
+        'Ensemble ->' 3
+        'AMO index SLP regression map' tr 
+        5
+        'Ensemble ->' 3
+        
+         '<hr>' '<hr>' '<hr>' '<hr>' '<hr>' tr
+        '3. <hr>' '&nbsp; <hr>' '&nbsp; <hr>' '&nbsp; <hr>' tr
+        'Mean southern subtropical gyre JFM SST' tr 
+        5 
+        'Ensemble ->' 3
+        'Mean southern subtropical gyre JFM SST to SLP regression map' tr 
+        5 
+        'Ensemble ->' 3
+
+         '<hr>' '<hr>' '<hr>' '<hr>' '<hr>' tr
+        '4. <hr>' '&nbsp; <hr>' '&nbsp; <hr>' '&nbsp; <hr>' tr
+        'Mean wider subpolar gyre JFM SST' tr 
+        5 
+        'Ensemble ->' 3
+        'Mean wider subpolar gyre JFM SST to SLP regression map' tr 
+        5
+        'Ensemble ->' 3
+
+         '<hr>' '<hr>' '<hr>' '<hr>' '<hr>' tr
+        '5. <hr>' '&nbsp; <hr>' '&nbsp; <hr>' '&nbsp; <hr>' tr
+        'Mean NINO3.4 DJF SST' tr 
+        5 
+        'Ensemble ->' 3
+        'Mean NINO3.4 DJF SST to SLP regression map' tr 
+        5
+        'Ensemble ->' 3
+
+         '<hr>' '<hr>' '<hr>' '<hr>' '<hr>' tr
+        '6. <hr>' '&nbsp; <hr>' '&nbsp; <hr>' '&nbsp; <hr>' tr
+        'Mean subtropical gyre JFM SST with 10 year low-pass filter' tr 
+        5 
+        'Ensemble ->' 3
+        'Mean subtropical gyre JFM filtered SST to SLP regression map' tr 
+        5 
+        'Ensemble ->' 3
+
+         '<hr>' '<hr>' '<hr>' '<hr>' '<hr>' tr
+        '7. <hr>' '&nbsp; <hr>' '&nbsp; <hr>' '&nbsp; <hr>' tr
+        'Mean subpolar gyre JFM SST with 10 year low-pass filter' tr 
+        5 
+        'Ensemble ->' 3
+        'Mean subpolar gyre JFM filtered SST to SLP regression map' tr 
+        5
+        'Ensemble ->' 3
+
+         '<hr>' '<hr>' '<hr>' '<hr>' '<hr>' tr
+        'SLP ANOVA map along 5 AGCMs' tr 
+        '5 AGCMs ->' 3
+        '5 AGCMs JFM ->' 3
+
+         '<hr>' '<hr>' '<hr>' '<hr>' '<hr>' tr

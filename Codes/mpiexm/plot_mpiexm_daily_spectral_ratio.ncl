@@ -21,6 +21,7 @@
 load "CODEDIR/mpiexm/func_read_mpiexm.ncl"
 begin
     figfn = "FIGFILENAME"
+write_table("figfilelist.txt","a",[/figfn/],"%s") ;; for mk_html_page.sh
     title = "TITLE"
     outputfn = "OUTPUTFILENAME.nc" ;; output data only
 

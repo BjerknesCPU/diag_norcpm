@@ -10,6 +10,7 @@
 load "CODEDIR/mpiexm/func_read_mpiexm.ncl"
 begin
     figfn = "FIGFILENAME"
+write_table("figfilelist.txt","a",[/figfn/],"%s") ;; for mk_html_page.sh
     cachefile = figfn+".nc"
     title = "TITLE"
     varname = "VARIABLE"

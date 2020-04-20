@@ -26,6 +26,8 @@ if os.path.exists(plotCaseYML) and ReadENV: # read plotCaseYML instead of enviro
             outputDir           = plotSettings.get('outputDir')
             diag_norcpm_Root    = plotSettings.get('diag_norcpm_Root')
             DefaultYML          = plotSettings.get('DefaultYML')
+            dryrun              = plotSettings.get('Dryrun') or dryrun
+            maxprocess          = plotSettings.get('Maxprocess')
             ReadENV = False
         except yaml.YAMLError as exc:
             print(exc)
@@ -38,6 +40,7 @@ else:
     diag_norcpm_Root    = os.environ.get('diag_norcpm_Root')
     DefaultYML          = os.environ.get('defaultRecipe')
 
+    
     ymltext = ''
     ymltext += 'plotCase: '+plotCase+'\n'
     ymltext += 'BASEDIR: '+BASEDIR+'\n'
@@ -46,9 +49,15 @@ else:
     ymltext += 'outputDir: '+outputDir+'\n'
     ymltext += 'diag_norcpm_Root: '+diag_norcpm_Root+'\n'
     ymltext += 'DefaultYML: '+DefaultYML+'\n'
+    if not os.path.exists(outputDir): os.makedirs(outputDir)
     with open(outputDir+'/'+plotCaseYML,'w') as j:
         j.write(ymltext)
 
+if dryrun in [False,"False",'no','NO','No']: dryrun = False
+if maxprocess:
+    maxprocess = int(maxprocess)
+else:
+    maxprocess = 1
 # default directories and setting, begin -------------------------------------------------
 RecipeDir      = diag_norcpm_Root+'/Recipes/'
 CodeDir         = diag_norcpm_Root+'/Codes/'
@@ -92,7 +101,8 @@ if not plotRecipes:
     sys.exit()
 # list Recipes, end -----------------------------------------
 
-#### makefile to rerun the recipes
+#### makefile and runall.sh for rerun the recipes
+os.chdir(outputDir)
 updateTxt  = 'cd .. \n'
 updateTxt += diag_norcpm_Root+'/diag_norcpm.sh '+BASEDIR+'\n'
 open('update.sh','w').write(updateTxt)
@@ -104,13 +114,12 @@ upload:
 	cd ../ ; ~/exec/public {Dirname} ; cd -
 all: replot upload
 '''
-with open('Makefile','w') as f:
-    f.write(makefileTxt)
+if not os.path.isfile('Makefile'):
+    with open('Makefile','w') as f:
+        f.write(makefileTxt)
 
 # Step 1 - parse recipes, begin ------------------------------------------------
 print('plot recipes: '+','.join(plotRecipes))
-## before process
-if not os.path.exists(outputDir): os.makedirs(outputDir)
 ## parse recipes
 def parseRecipes(i):
     ''' i is the filename, it may be contain path, './', or just filename
@@ -238,13 +247,12 @@ for recipe in Recipes:
         ## unpack varPack, which is an array, used to apply variable set in recipe
         if script.get('varPack'):
             vp = script.get('varPack')
-            if type(vp) == type('str'):  # only one varPack
-                for i in recipe.get(vp):
-                    if i.isupper(): scriptDict.update({i:script.get(i)})
-            else: ## if it is an array
-                for j in vp:
-                    for i in recipe.get(j):
-                        if i.isupper(): scriptDict.update({i:script.get(i)})
+            if type(vp) == type('str'):  # not an array
+                vp = [ a.strip() for a in vp.split(',') ]
+            for j in vp:
+                for i in recipe.get(j):
+                    script.update({i:recipe[j].get(i)})
+
         for i in  script.keys():
             if i.isupper(): scriptDict.update({i:script.get(i)})
         
@@ -369,7 +377,7 @@ while StillWaiting:
             RunDone.append(p.name)
         else:
             InQueue.append(p.name)
-    ## update Waiting
+    ## update Waiting.txt
     Waiting = [ i for i in Waiting if not i in RunningNames ]
     if Waiting: StillWaiting = True
     with open('Waiting.txt','w') as wf:
@@ -398,7 +406,7 @@ for p in Running:
 
 ### make index.html for all directories
 os.chdir(outputDir)
-#### grab index.html and thumbnail in subdirectories
+#### get subdirs info
 recipeInfo = dict()
 subdirs = [ i for i in os.listdir('.') if os.path.isdir(i)]
 subdirs.sort()
@@ -406,6 +414,7 @@ for i in subdirs:
     thumbnail = ''
     description = ''
     showinindex = 'True'
+    tags = ['misc']
     # try index.html
     if isbs4: # if bs4 present and there is index.html in subdir, not done yet
         indexfile =  [ j for j in os.listdir(i) if re.match(".*index..*",j) ] [0]
@@ -421,59 +430,119 @@ for i in subdirs:
             if readme.get('Description'): description = readme.get('Description')
             if readme.get('Thumbnail'): thumbnail = readme.get('Thumbnail')
             if readme.get('ShowInIndex'): showinindex = readme.get('ShowInIndex')
+            if showinindex in [False,"False",'no','NO','No']: showinindex = False
+            if readme.get('Tags'): tags = readme.get('Tags')
+            if type(tags) == type('str'): tags = [ tag.strip() for tag in readme.get("Tags").split(',') ]
     except:
         ## no README or not plot directory
-        continue
+        pass
+        #continue
 
     # if none of above
     if not thumbnail: 
         thumbnail = [ j for j in os.listdir(i) if re.match(".*thumb.png",j) ]
+        thumbnail.sort()
         if thumbnail: 
             thumbnail = thumbnail[0]
         else:
-            print("no thumbnail in "+i)
-            #print([ j for j in os.listdir(i) ])
+            if showinindex: print("no thumbnail in "+i)
             thumbnail = ''
     if not description:
         description = i
     if not title:
         title = i
     # store it
-    recipeInfo.update({i:{'title': title, 'thumb': thumbnail, 'desc': description, 'showinindex': showinindex}})
+    recipeInfo.update({i:{
+        'title': title 
+        , 'thumb': thumbnail
+        , 'desc': description
+        , 'showinindex': showinindex
+        , 'tags': tags
+        }})
 
-print("All Recieps compelete, making index page...")
-#### html header
-html = ''
-html += '<!DOCTYPE html> \n'
-html += '<html> \n'
-html += '<body> \n'
+#### grab index.html and thumbnail in subdirectories
+def mk_index_entry(Arecipe_info):
+    entry_html = ''
+    dirs = Arecipe_info.keys()
+    sorted(dirs)
+    for i in dirs:
+        r = Arecipe_info[i]
+        if r['showinindex'] in [False,"False",'no','NO','No']: continue
+        entry_html += "<span style='display:inline-block'>"
+        entry_html += '<a href="'+i+'/index.html">'
+        entry_html += '<h4>'+r['title']+'</h4>'
+        if r.get('thumb'): entry_html += ''+'<img  ALIGN="left" src="'+i+'/'+r['thumb']+'">'
+        entry_html += '</a>\n'
+        entry_html += '<pre>'+r['desc']+'</pre>'
+        entry_html += '</br> \n'
+        entry_html += '</span>\n'
+        entry_html += '</br> \n'
+        entry_html += '<hr> \n'
+    return entry_html
 
-#### title
-html += '<h3>diag_norcpm:</h3><h1>'+plotCase+'</h1>\n'
-html += '<hr>\n'
-#### recipe items
-dirs = recipeInfo.keys()
-sorted(dirs)
-for i in dirs:
-    r = recipeInfo[i]
-    if r['showinindex'] in [False,"False",'no','NO','No']: continue
-    html += "<span style='display:inline-block'>"
-    html += '<a href="'+i+'">'
-    html += '<h4>'+r['title']+'</h4>'
-    if r.get('thumb'): html += ''+'<img  ALIGN="left" src="'+i+'/'+r['thumb']+'">'
-    html += '</a>\n'
-    html += '<pre>'+r['desc']+'</pre>'
-    html += '</br> \n'
-    html += '</span>\n'
-    html += '</br> \n'
-    html += '<hr> \n'
+def mk_index():
+    print("All Recieps compelete, making index page...")
+    #### html header
+    html = ''
+    html += '<!DOCTYPE html> \n'
+    html += '<html> \n'
+    html += '<body> \n'
 
-#### html footer
-html += '<p align="right"><small>contact: pgchiu (Ping-Gin.Chiu_at_uib.no)</small></p> \n'
-html += '</body> \n'
-html += '</html> \n'
+    #### title
+    html += '<h3>diag_norcpm:</h3><h1>'+plotCase+'</h1>\n'
+    html += '<hr>\n'
+    #### recipe items
+    entries = mk_index_entry(recipeInfo)
+    html += entries
 
-#### write index html
-open("index.html",'w').write(html)
+    #### html footer
+    html += '<p align="right"><small>contact: pgchiu (Ping-Gin.Chiu_at_uib.no)</small></p> \n'
+    html += '</body> \n'
+    html += '</html> \n'
+
+    #### write index html
+    open("index.html",'w').write(html)
+
+mk_index()
+
+if False: ## debug  for tags
+    for i in recipeInfo.keys():
+        print(i+' '+str(recipeInfo[i].get('tags')))
+
+def mk_tag_index(Arecipe_info):
+    alltags = list()
+    for i in Arecipe_info.keys():
+        tags = Arecipe_info[i].get('tags')
+        for j in tags:
+            if j not in alltags : alltags.append(j)
+
+    for tag in alltags:
+        indName = "index_"+tag+".html"
+        ## filter items needed
+        needitems = dict()
+        for i in Arecipe_info.keys():
+            if tag in Arecipe_info[i].get('tags'): needitems.update({i:Arecipe_info[i]})
+        #### html header
+        html = ''
+        html += '<!DOCTYPE html> \n'
+        html += '<html> \n'
+        html += '<body> \n'
+
+        #### title
+        html += '<h3>diag_norcpm:</h3><h1>'+plotCase+' ('+tag+')</h1>\n'
+        html += '<hr>\n'
+        #### recipe items
+        entries = mk_index_entry(needitems)
+        html += entries
+
+        #### html footer
+        html += '<p align="right"><small>contact: pgchiu (Ping-Gin.Chiu_at_uib.no)</small></p> \n'
+        html += '</body> \n'
+        html += '</html> \n'
+
+        #### write index html
+        open(indName,'w').write(html)
+
+mk_tag_index(recipeInfo)
 
 print("Index page done")

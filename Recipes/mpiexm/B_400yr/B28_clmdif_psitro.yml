@@ -92,7 +92,7 @@ CAA: f08_5AGCMs_NASPG_average
 CNA: IE-average
 YBEA: 1101,1500
 NYA: 400 
-CAS: f09_5AGCMs_NASPG_sample_notdon
+CAS: f09_5AGCMs_NASPG_sample
 CNS: IE-sample
 YBES: 1101,1500
 NYS: 400
@@ -121,7 +121,7 @@ Scripts:
     CASE: CAA
     YEARBE: YBEA
     TITLE: "VN dif. CNA - CTL (model year: IE=NYA, CTL=NYC)"
-    FIGFILENAME: dif_VARI_average
+    FIGFILENAME: dif_VARI_CAA
     PLOTRES: DIFRES
     REGRES: GLOB
 -  
@@ -129,7 +129,7 @@ Scripts:
     CASE: CAS
     YEARBE: YBES
     TITLE: "VN dif. CNS - CTL (model year: IE=NYS, CTL=NYC)"
-    FIGFILENAME: dif_VARI_sample
+    FIGFILENAME: dif_VARI_CAS
     PLOTRES: DIFRES
     REGRES: GLOB
 
@@ -157,7 +157,7 @@ Scripts:
     YEARBE: YBEA
     MONTHS: "12,13,14"
     TITLE: "DJF VN dif. CNA - CTL (model year: IE=NYA, CTL=NYC)"
-    FIGFILENAME: dif_VARI_average_DJF
+    FIGFILENAME: dif_VARI_CAA_DJF
     PLOTRES: DIFRES
     REGRES: GLOB
 -  
@@ -166,7 +166,7 @@ Scripts:
     YEARBE: YBES
     MONTHS: "12,13,14"
     TITLE: "DJF VN dif. CNS - CTL (model year: IE=NYS, CTL=NYC)"
-    FIGFILENAME: dif_VARI_sample_DJF
+    FIGFILENAME: dif_VARI_CAS_DJF
     PLOTRES: DIFRES
     REGRES: GLOB
 -  # MAM
@@ -193,7 +193,7 @@ Scripts:
     YEARBE: YBEA
     MONTHS: "3,4,5"
     TITLE: "MAM VN dif. CNA - CTL (model year: IE=NYA, CTL=NYC)"
-    FIGFILENAME: dif_VARI_average_MAM
+    FIGFILENAME: dif_VARI_CAA_MAM
     PLOTRES: DIFRES
     REGRES: GLOB
 -  
@@ -202,7 +202,7 @@ Scripts:
     YEARBE: YBES
     MONTHS: "3,4,5"
     TITLE: "MAM VN dif. CNS - CTL (model year: IE=NYS, CTL=NYC)"
-    FIGFILENAME: dif_VARI_sample_MAM
+    FIGFILENAME: dif_VARI_CAS_MAM
     PLOTRES: DIFRES
     REGRES: GLOB
 -  # JJA
@@ -229,7 +229,7 @@ Scripts:
     YEARBE: YBEA
     MONTHS: "6,7,8"
     TITLE: "JJA VN dif. CNA - CTL (model year: IE=NYA, CTL=NYC)"
-    FIGFILENAME: dif_VARI_average_JJA
+    FIGFILENAME: dif_VARI_CAA_JJA
     PLOTRES: DIFRES
     REGRES: GLOB
 -  
@@ -238,7 +238,7 @@ Scripts:
     YEARBE: YBES
     MONTHS: "6,7,8"
     TITLE: "JJA VN dif. CNS - CTL (model year: IE=NYS, CTL=NYC)"
-    FIGFILENAME: dif_VARI_sample_JJA
+    FIGFILENAME: dif_VARI_CAS_JJA
     PLOTRES: DIFRES
     REGRES: GLOB
 -  # SON
@@ -265,7 +265,7 @@ Scripts:
     YEARBE: YBEA
     MONTHS: "9,10,11"
     TITLE: "SON VN dif. CNA - CTL (model year: IE=NYA, CTL=NYC)"
-    FIGFILENAME: dif_VARI_average_SON
+    FIGFILENAME: dif_VARI_CAA_SON
     PLOTRES: DIFRES
     REGRES: GLOB
 -  
@@ -274,7 +274,7 @@ Scripts:
     YEARBE: YBES
     MONTHS: "9,10,11"
     TITLE: "SON VN dif. CNS - CTL (model year: IE=NYS, CTL=NYC)"
-    FIGFILENAME: dif_VARI_sample_SON
+    FIGFILENAME: dif_VARI_CAS_SON
     PLOTRES: DIFRES
     REGRES: GLOB
 
@@ -303,8 +303,8 @@ Scripts:
     CASE: CAA
     YEARBE: YBEA
     TITLE: "VN dif. CNA - CTL (model year: IE=NYA, CTL=NYC)"
-    FIGFILENAME: dif_VARI_average_natl
-    CACHEFILENAME: dif_VARI_average
+    FIGFILENAME: dif_VARI_CAA_natl
+    CACHEFILENAME: dif_VARI_CAA
     PLOTRES: DIFRES
     REGRES: NATL
 -  
@@ -312,8 +312,8 @@ Scripts:
     CASE: CAS
     YEARBE: YBES
     TITLE: "VN dif. CNS - CTL (model year: IE=NYS, CTL=NYC)"
-    FIGFILENAME: dif_VARI_sample_natl
-    CACHEFILENAME: dif_VARI_sample
+    FIGFILENAME: dif_VARI_CAS_natl
+    CACHEFILENAME: dif_VARI_CAS
     PLOTRES: DIFRES
     REGRES: NATL
 
@@ -343,8 +343,8 @@ Scripts:
     YEARBE: YBEA
     MONTHS: "12,13,14"
     TITLE: "DJF VN dif. CNA - CTL (model year: IE=NYA, CTL=NYC)"
-    FIGFILENAME: dif_VARI_average_DJF_natl
-    CACHEFILENAME: dif_VARI_average_DJF
+    FIGFILENAME: dif_VARI_CAA_DJF_natl
+    CACHEFILENAME: dif_VARI_CAA_DJF
     PLOTRES: DIFRES
     REGRES: NATL
 -  
@@ -353,8 +353,8 @@ Scripts:
     YEARBE: YBES
     MONTHS: "12,13,14"
     TITLE: "DJF VN dif. CNS - CTL (model year: IE=NYS, CTL=NYC)"
-    FIGFILENAME: dif_VARI_sample_DJF_natl
-    CACHEFILENAME: dif_VARI_sample_DJF
+    FIGFILENAME: dif_VARI_CAS_DJF_natl
+    CACHEFILENAME: dif_VARI_CAS_DJF
     PLOTRES: DIFRES
     REGRES: NATL
 -  # MAM
@@ -383,8 +383,8 @@ Scripts:
     YEARBE: YBEA
     MONTHS: "3,4,5"
     TITLE: "MAM VN dif. CNA - CTL (model year: IE=NYA, CTL=NYC)"
-    FIGFILENAME: dif_VARI_average_MAM_natl
-    CACHEFILENAME: dif_VARI_average_MAM
+    FIGFILENAME: dif_VARI_CAA_MAM_natl
+    CACHEFILENAME: dif_VARI_CAA_MAM
     PLOTRES: DIFRES
     REGRES: NATL
 -  
@@ -393,8 +393,8 @@ Scripts:
     YEARBE: YBES
     MONTHS: "3,4,5"
     TITLE: "MAM VN dif. CNS - CTL (model year: IE=NYS, CTL=NYC)"
-    FIGFILENAME: dif_VARI_sample_MAM_natl
-    CACHEFILENAME: dif_VARI_sample_MAM
+    FIGFILENAME: dif_VARI_CAS_MAM_natl
+    CACHEFILENAME: dif_VARI_CAS_MAM
     PLOTRES: DIFRES
     REGRES: NATL
 -  # JJA
@@ -423,8 +423,8 @@ Scripts:
     YEARBE: YBEA
     MONTHS: "6,7,8"
     TITLE: "JJA VN dif. CNA - CTL (model year: IE=NYA, CTL=NYC)"
-    FIGFILENAME: dif_VARI_average_JJA_natl
-    CACHEFILENAME: dif_VARI_average_JJA
+    FIGFILENAME: dif_VARI_CAA_JJA_natl
+    CACHEFILENAME: dif_VARI_CAA_JJA
     PLOTRES: DIFRES
     REGRES: NATL
 -  
@@ -433,8 +433,8 @@ Scripts:
     YEARBE: YBES
     MONTHS: "6,7,8"
     TITLE: "JJA VN dif. CNS - CTL (model year: IE=NYS, CTL=NYC)"
-    FIGFILENAME: dif_VARI_sample_JJA_natl
-    CACHEFILENAME: dif_VARI_sample_JJA
+    FIGFILENAME: dif_VARI_CAS_JJA_natl
+    CACHEFILENAME: dif_VARI_CAS_JJA
     PLOTRES: DIFRES
     REGRES: NATL
 -  # SON
@@ -463,8 +463,8 @@ Scripts:
     YEARBE: YBEA
     MONTHS: "9,10,11"
     TITLE: "SON VN dif. CNA - CTL (model year: IE=NYA, CTL=NYC)"
-    FIGFILENAME: dif_VARI_average_SON_natl
-    CACHEFILENAME: dif_VARI_average_SON
+    FIGFILENAME: dif_VARI_CAA_SON_natl
+    CACHEFILENAME: dif_VARI_CAA_SON
     PLOTRES: DIFRES
     REGRES: NATL
 -  
@@ -473,8 +473,8 @@ Scripts:
     YEARBE: YBES
     MONTHS: "9,10,11"
     TITLE: "SON VN dif. CNS - CTL (model year: IE=NYS, CTL=NYC)"
-    FIGFILENAME: dif_VARI_sample_SON_natl
-    CACHEFILENAME: dif_VARI_sample_SON
+    FIGFILENAME: dif_VARI_CAS_SON_natl
+    CACHEFILENAME: dif_VARI_CAS_SON
     PLOTRES: DIFRES
     REGRES: NATL
 
@@ -483,43 +483,43 @@ Scripts:
     FIGFILES: 
         cli_VARI_CTN
         dif_VARI_CAD
-        dif_VARI_sample
-        dif_VARI_average
+        dif_VARI_CAS
+        dif_VARI_CAA
         cli_VARI_CTN_DJF
         dif_VARI_CAD_DJF
-        dif_VARI_sample_DJF
-        dif_VARI_average_DJF
+        dif_VARI_CAS_DJF
+        dif_VARI_CAA_DJF
         cli_VARI_CTN_MAM
         dif_VARI_CAD_MAM
-        dif_VARI_sample_MAM
-        dif_VARI_average_MAM
+        dif_VARI_CAS_MAM
+        dif_VARI_CAA_MAM
         cli_VARI_CTN_JJA
         dif_VARI_CAD_JJA
-        dif_VARI_sample_JJA
-        dif_VARI_average_JJA
+        dif_VARI_CAS_JJA
+        dif_VARI_CAA_JJA
         cli_VARI_CTN_SON
         dif_VARI_CAD_SON
-        dif_VARI_sample_SON
-        dif_VARI_average_SON
+        dif_VARI_CAS_SON
+        dif_VARI_CAA_SON
         
         cli_VARI_CTN_natl
         dif_VARI_CAD_natl
-        dif_VARI_sample_natl
-        dif_VARI_average_natl
+        dif_VARI_CAS_natl
+        dif_VARI_CAA_natl
         cli_VARI_CTN_DJF_natl
         dif_VARI_CAD_DJF_natl
-        dif_VARI_sample_DJF_natl
-        dif_VARI_average_DJF_natl
+        dif_VARI_CAS_DJF_natl
+        dif_VARI_CAA_DJF_natl
         cli_VARI_CTN_MAM_natl
         dif_VARI_CAD_MAM_natl
-        dif_VARI_sample_MAM_natl
-        dif_VARI_average_MAM_natl
+        dif_VARI_CAS_MAM_natl
+        dif_VARI_CAA_MAM_natl
         cli_VARI_CTN_JJA_natl
         dif_VARI_CAD_JJA_natl
-        dif_VARI_sample_JJA_natl
-        dif_VARI_average_JJA_natl
+        dif_VARI_CAS_JJA_natl
+        dif_VARI_CAA_JJA_natl
         cli_VARI_CTN_SON_natl
         dif_VARI_CAD_SON_natl
-        dif_VARI_sample_SON_natl
-        dif_VARI_average_SON_natl
+        dif_VARI_CAS_SON_natl
+        dif_VARI_CAA_SON_natl
     COLUMN: figures CTL CTL2 CNS CNA 'tr' ANN 4 DJF 4 MAM 4 JJA 4 SON 4 ANN 4 DJF 4 MAM 4 JJA 4 SON 4

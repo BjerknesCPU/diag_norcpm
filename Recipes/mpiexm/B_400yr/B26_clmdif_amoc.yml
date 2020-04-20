@@ -12,7 +12,7 @@ MONTHS: 0
 VARI: atlantic_moc
 VARIABLE: VARI
 VN: AMOC
-REGRES:  |
+RGRES:  |
     ;; Coordinates
     res@trYReverse = True
     res@gsnYAxisIrregular2Linear = True ; converts irreg depth to linear 
@@ -20,7 +20,7 @@ REGRES:  |
     res@trYMaxF = 5000.
     res@trYMinF =    0.
 DIFRES:  | ## for dif plot
-    REGRES
+    RGRES
     res@cnLinesOn = False
     res@cnFillOn = True
     res@cnFillMode = "CellFill"
@@ -33,7 +33,7 @@ DIFRES:  | ## for dif plot
     vardif = vardif* 1.e-9
     vardif@units = "Sv"
 CTLRES:  |
-    REGRES
+    RGRES
     res@cnLinesOn = False
     res@cnFillOn = True
     res@cnFillMode = "CellFill"
@@ -67,7 +67,7 @@ CAA: f08_5AGCMs_NASPG_average
 CNA: IE-average
 YBEA: 1101,1500
 NYA: 400 
-CAS: f09_5AGCMs_NASPG_sample_notdon
+CAS: f09_5AGCMs_NASPG_sample
 CNS: IE-sample
 YBES: 1101,1500
 NYS: 400
@@ -81,6 +81,14 @@ Scripts:
     YEARBE: YBEC
     TITLE: "VN mean CTL (model year: NYC)"
     FIGFILENAME: cli_VARI_CTN
+    PLOTRES: CTLRES
+-  
+    plotScript: mpiexm/plot_mpiexm_climatology_ZL.ncl
+    CASE: CAD
+    MODELN: 0
+    YEARBE: YBED
+    TITLE: "VN mean CND (model year: NYD)"
+    FIGFILENAME: cli_VARI_CAD
     PLOTRES: CTLRES
 -  
     plotScript: mpiexm/plot_mpiexm_climatology_ZL.ncl
@@ -100,17 +108,24 @@ Scripts:
     PLOTRES: CTLRES
 -  
     plotScript: mpiexm/plot_mpiexm_difference_ZL.ncl
+    CASE: CAD
+    YEARBE: YBED
+    TITLE: "VN dif. CND-CTL (model year: IE=NYD, CTL=NYC)"
+    FIGFILENAME: dif_VARI_CAD
+    PLOTRES: DIFRES
+-  
+    plotScript: mpiexm/plot_mpiexm_difference_ZL.ncl
     CASE: CAA
     YEARBE: YBEA
     TITLE: "VN dif. CNA-CTL (model year: IE=NYA, CTL=NYC)"
-    FIGFILENAME: dif_VARI_average
+    FIGFILENAME: dif_VARI_CAA
     PLOTRES: DIFRES
 -  
     plotScript: mpiexm/plot_mpiexm_difference_ZL.ncl
     CASE: CAS
     YEARBE: YBES
     TITLE: "VN dif. CNS-CTL (model year: IE=NYS, CTL=NYC)"
-    FIGFILENAME: dif_VARI_sample
+    FIGFILENAME: dif_VARI_CAS
     PLOTRES: DIFRES
 
 
@@ -118,10 +133,12 @@ Scripts:
     plotScript: mk_html_page.sh
     FIGFILES: 
         cli_VARI_CTN
+        cli_VARI_CAD
         cli_VARI_sample
         cli_VARI_average
-        dif_VARI_sample
-        dif_VARI_average
+        dif_VARI_CAD
+        dif_VARI_CAS
+        dif_VARI_CAA
         
-    COLUMN: figures CTL CNS CNA 'tr' Cli. 3 Diff - 2
+    COLUMN: figures CTL CND CNS CNA 'tr' Cli. 4 Diff - 3
 

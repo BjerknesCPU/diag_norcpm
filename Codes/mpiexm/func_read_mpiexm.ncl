@@ -149,13 +149,18 @@ begin
     if (nm .eq. 12 .and. all(months .eq. ispan(1,12,1)))then
         return "ANN"
     end if
+    ;; only one month
+    if (nm .eq. 1 )then
+        return sprinti("mon%2.2d",months)
+    end if
 
     ;; is continous
     dm = months(1:) - months(:nm-2)
     if (all(dm.eq.1))then
         abbrs = (/"D","J","F","M","A","M","J","J","A","S","O","N","D","J","F","M"/)
-        abbr = str_join(abbrs(months),"")
-        abbr = str_sub_str(abbr," ","")
+        ;abbr = str_join(abbrs(months),"")
+        ;abbr = str_sub_str(abbr," ","")
+        abbr = str_concat(abbrs(months))
         return abbr
     end if
 
@@ -168,7 +173,7 @@ begin
 end
 
 undef("cachefn")
-function cachefn(case, casedir,component,varname,years,months,modeln[1])
+function cachefn(case, casedir,component,varname,years,months,modeln[1],tag)
 begin
     ;; assemble cache file name with variables to read
     ;; case_component_varname_min(years)-max(years)_months(abbr)_modeln.nc
@@ -181,7 +186,7 @@ begin
         print("cachefn(): years is not continuous, need to modify cachefn()")
         exit
     end if
-    fn = case+"_"+component+"_"+varname+"_"+min(years)+"-"+max(years)+"_"+months_abbr(months)+"_"+modeln+".nc"
+    fn = case+"_"+component+"_"+sprinti("%2.2d",modeln)+"_"+varname+"_"+min(years)+"-"+max(years)+"_"+months_abbr(months)+"_"+tag+".nc"
 
     fn = cachedir+"/"+fn
     return fn
@@ -313,6 +318,9 @@ undef("assign_ocn_grid")
 procedure assign_ocn_grid(var,gf:file)
 begin
     ;;print("assign_ocn_grid(): ")
+    if (isatt(var,"lat2d"))then ;; lat is already exist
+        return
+    end if
     if (isatt(var,"coordinates"))then ;; assign lat/lon to ocn variables
         coords = var@coordinates
         if(coords .eq. "plon plat")then ;; p cell
@@ -426,10 +434,10 @@ begin
     if(.not.isvar("wgt"))then
         print("mask_with_latbe_lonbe(): no wgt defined...")
         print(dims)
-        print(lon2d(0,0)+" "+lon2d(0,1))
-        print(lon2d(0,254)+" "+lon2d(0,255))
-        print(lat2d(0,0)+" "+lat2d(0,1))
-        print(lat2d(0,254)+" "+lat2d(0,255))
+        ;print(lon2d(0,0)+" "+lon2d(0,1))
+        ;print(lon2d(0,254)+" "+lon2d(0,255))
+        ;print(lat2d(0,0)+" "+lat2d(0,1))
+        ;print(lat2d(0,254)+" "+lat2d(0,255))
         exit
     end if
     wgt = where(vmask,wgt,0)
@@ -462,6 +470,7 @@ begin
         f = addfile("wgt.nc","c")
         f->wgt = wgt
     end if
+    copy_VarCoords_2(var,varts)
     return varts
 end
 
@@ -908,7 +917,7 @@ begin
 
         if(isfilepresent(ofn))then
             f = addfile(ofn,"r")
-            if(getfilevardims(f,"time").eq.1)then
+            if(getfilevardimsizes(f,"time").eq.1)then
                 print("cache file wrong, remove it. "+ofn)
                 system("rm -f "+ofn)
             end if
@@ -923,7 +932,7 @@ begin
                 system("ln -sf "+fn+" "+tmpdatadir+"/")
             end do
             end do
-            cmd = "cdo  -fldmean -sellonlatbox,"+lonlatbox+" -select,name="+varname+" '"+tmpdatadir+"/*' "+ofn
+            cmd = "cdo  -fldmean -sellonlatbox,"+lonlatbox+" -select,name="+varname+" '"+tmpdatadir+"/*' tmp_"+ofn+" && mv tmp_"+ofn+" "+ofn
             print(""+cmd)
             system("rm -f "+ofn)
             system(cmd)
@@ -934,6 +943,7 @@ begin
         return remove_right_size_1_dim(varall)
     end if
 
+    print("read_mpiexm_filevar_mean_daily_ts_seasonaly(): read data with ncl")
     ;; others read with ncl
     do y = 0, dimsizes(years)-1
     do m = 0, dimsizes(months)-1
@@ -993,8 +1003,12 @@ begin
         nmodel = dimsizes(modeln)
         var = read_mpiexm_var_mean_daily_ts_seasonaly(case, casedir,component,varname,years,imonths,latbe,lonbe,modeln(0))
         var = var/nmodel
+        ;printVarSummary(var)
         do i = 1, nmodel-1
-            var = var + (read_mpiexm_var_mean_daily_ts_seasonaly(case, casedir,component,varname,years,imonths,latbe,lonbe,modeln(i))/nmodel)
+            var1 = (read_mpiexm_var_mean_daily_ts_seasonaly(case, casedir,component,varname,years,imonths,latbe,lonbe,modeln(i))/nmodel)
+            ;print(case+" "+modeln(i)+" "+varname+" "+years)
+            ;printVarSummary(var1)
+            var = var + var1 
         end do
         return var
     end if
@@ -1348,7 +1362,7 @@ begin
     return varall
 end
 
-function read_mpiexm_season_YZLL(case, casedir,component,varname,years,imonths,modeln)
+function read_mpiexm_season_YZLL(case, casedir,component,varname,years,imonths,modeln[1])
 begin
     ;; frontend of read_mpiexm_12m(), read yearly average
     ;; output var in year,(lev,),y,x
@@ -1360,7 +1374,7 @@ begin
     end if
 
     ;; check cache
-    cache = cachefn(case, casedir,component,varname,years,months,modeln)
+    cache = cachefn(case, casedir,component,varname,years,months,modeln,"season_YZLL")
     if(isfilepresent(cache))then
         f = addfile(cache,"r")
         var = f->$varname$
@@ -1435,15 +1449,70 @@ begin
     m1@modeln = modeln
     return m1
 end 
+function read_mpiexm_season_MYZLL(case, casedir,component,varname,years,imonths,modeln)
+begin
+    ;; frontend of read_mpiexm_season_YZLL(), read multiple models
+    nmodel = dimsizes(modeln)
+    if(nmodel.eq.1)then
+        return read_mpiexm_season_YZLL(case, casedir,component,varname,years,imonths,modeln)
+    end if
+
+    m1 = read_mpiexm_season_YZLL(case, casedir,component,varname,years,imonths,modeln(0))
+    mall = new(array_append_record(nmodel,dimsizes(m1),0),typeof(m1))
+    mall(0,:,:,:,:) = m1
+    delete(m1)
+    do i = 1, nmodel-1
+        mall(i,:,:,:,:) = read_mpiexm_season_YZLL(case, casedir,component,varname,years,imonths,modeln(i))
+    end do
+    mall!0 = "modeln"
+    mall&modeln = modeln
+    return mall
+end 
 
 function read_mpiexm_season_ts(case, casedir,component,varname,years,months,latbe,lonbe,modeln)
 begin
     ;; return time yearly(seasonal) series 
-    a = read_mpiexm_season_YZLL(case, casedir,component,varname,years,months,modeln)
-    b = mean_with_latbe_lonbe(a,latbe,lonbe)
-    b!0 = a!0
-    b&$b!0$ = a&$a!0$
-    return remove_right_size_1_dim(b)
+    ;; only 1 modeln
+    nmod = dimsizes(modeln)
+    if(nmod .eq. 1)then
+        a = read_mpiexm_season_YZLL(case, casedir,component,varname,years,months,modeln)
+        b = mean_with_latbe_lonbe(a,latbe,lonbe)
+        b!0 = a!0
+        b&$b!0$ = a&$a!0$
+        return remove_right_size_1_dim(b)
+    else
+        a = read_mpiexm_season_YZLL(case, casedir,component,varname,years,months,modeln(0))
+        b = mean_with_latbe_lonbe(a,latbe,lonbe)
+        c = remove_right_size_1_dim(b)
+        tsall = new(array_append_record(nmod,dimsizes(c),0),typeof(b))
+        tsall!0 = "member"
+        tsall&member = modeln
+        tsall!1 = a!0
+        tsall&$tsall!1$ = a&$a!0$
+        tsall(0,:) = c
+        delete(c)
+        do i = 1, nmod-1
+            delete(a)
+            delete(b)
+            a = read_mpiexm_season_YZLL(case, casedir,component,varname,years,months,modeln(0))
+            b = mean_with_latbe_lonbe(a,latbe,lonbe)
+            
+            tsall(i,:) = remove_right_size_1_dim(b)
+        end do
+        return  tsall
+
+    end if
+end
+function read_mpiexm_ens_season_ts(case, casedir,component,varname,years,months,latbe,lonbe,modeln)
+begin
+    ;; ensemble
+    allts = read_mpiexm_season_ts(case, casedir,component,varname,years,months,latbe,lonbe,modeln)
+    if(dimsizes(modeln).eq.1)then
+        return allts
+    else
+        ts = dim_avg_n_Wrap(allts,0)
+        return ts
+    end if
 end
 
 function read_mpiexm_season_mean_ZLL(case, casedir,component,varname,years,imonths,modeln)
@@ -1458,7 +1527,7 @@ begin
     end if
 
     ;; check cache
-    cache = cachefn(case, casedir,component,varname,years,months,modeln)
+    cache = cachefn(case, casedir,component,varname,years,months,modeln,"season_ZLL")
     if(isfilepresent(cache))then
         f = addfile(cache,"r")
         var = f->$varname$

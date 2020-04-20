@@ -6,12 +6,16 @@
 ;;DIAG_NORCPM; SIGMETHOD: True
     ;; True: https://pro.arcgis.com/en/pro-app/tool-reference/spatial-statistics/what-is-a-z-score-what-is-a-p-value.htm
     ;; False: student t test
-    
 ;;DIAG_NORCPM; SIGLEVEL: 99
-;;DIAG_NORCPM; OBSPROXY: 1
+;;DIAG_NORCPM; OBSPROXY: 0
     ;; use 1 member (>0) or obs(=0) as true solution
 ;;DIAG_NORCPM; OBSDIR: /cluster/projects/nn9039k/NorCPM/Obs
     ;; this OBSDIR is set for fram
+;;DIAG_NORCPM; OBSVARNAME: OBSVN
+    ;; compatibility to previous code
+
+;;DIAG_NORCPM; LEADSEASON: 0
+;;DIAG_NORCPM; LEADMONTHS: 0
 
 load "CODEDIR/func_read_all_members.ncl"
 load "CODEDIR/func_read_obs.ncl"
@@ -35,12 +39,17 @@ begin
     component="COMPONENT"
     ocngridfile="OCNGRIDFILE"
     lead_season = LEADSEASON
+    if(lead_season.ne.0)then
+        lead_months = (/1,2,3/) + ((lead_season-1)*3)
+    else
+        lead_months = (/LEADMONTHS/)
+    end if
     figfilename = "FIGFILENAME"
     siglevel = SIGLEVEL
     proxyObs = OBSPROXY -1  ;; < 0 means real obs, 0 is the first member
     obsdir = "OBSDIR"
     obsdataset = "OBSDATASET"
-    obsvn = "OBSVN"
+    obsvn = "OBSVARNAME"
 
     ;; read variable in member dirs, output as (forecast,member,time,y,x)
     ;;      the time here is depend on lead_season and first simulation month
@@ -55,7 +64,7 @@ begin
         AChom2 = f->AChom2 
         p = f->p
     else
-        var = read_noresm_forecasts_members_leadseason(dirs,component,vn,lead_season,ocngridfile)
+        var = read_noresm_forecasts_members_latlon_leadmonths(dirs,component,vn,lead_months,(/-90,90/),(/0,360/),ocngridfile)
         dims = dimsizes(var)
         ndim = dimsizes(dims)
         if(ndim.gt.5)then
@@ -139,9 +148,9 @@ begin
             AChet = varSeaAno(0,0,:,:)  ;; create array, use real obs data
             AChet = 0.
             obsvarSea = varSeaAno(:,0,:,:)*0 ;;  create array
+            obsvarSea = obsvarSea@_FillValue
 
             inittimes = cd_calendar(varSeaAno&forecast,-1)
-            leadmonths = (/1,2,3/)+((lead_season-1)*3)
             nt = dimsizes(inittimes)
             opt = True ;; for esmf regrid
                 opt@DstGridLat = get_latlon2d(varSeaAno,"lat2d")
@@ -152,11 +161,22 @@ begin
             do t = 0, nt-1
                 ;; multi-year 1season
                 if(vn.eq."sst")then
-                    var1 = dim_avg_n_Wrap(read_obs_leadmonths(obsdir,obsdataset,obsvn,inittimes(t)/100,mod(inittimes(t),100),leadmonths),0)
+                    inityear = inittimes(t)/100
+                    initmonth = mod(inittimes(t),100)
+                    obsvar = read_obs_framework_leadmonths(obsdir,obsdataset,obsvn,inityear,initmonth,lead_months,-1,(/-90,90/),(/0,360/))
+                    if(all(ismissing(obsvar)))then
+                        continue
+                    else
+                        var1 = dim_avg_n_Wrap(obsvar,0)
+                    end if
+                    delete(obsvar)
                 else
-                    var1 = dim_avg_n_Wrap(read_obs_framework_leadmonths(obsdir,obsdataset,obsvn,inittimes(t)/100,mod(inittimes(t),100),leadmonths,0,(/-90.,90/),(/0.,360./)),0) ;; 
+                    var1 = dim_avg_n_Wrap(read_obs_framework_leadmonths(obsdir,obsdataset,obsvn,inittimes(t)/100,mod(inittimes(t),100),lead_months,0,(/-90.,90/),(/0.,360./)),0) ;; 
                 end if
-
+                if(all(ismissing(var1)))then
+                    obsvarSea(t,:,:) = obsvarSea@_FillValue
+                    continue
+                end if
                     opt@SrcGridMask = where(ismissing(var1),0,1)
                 ;; regrid to model grid
                 system("rm -f source_grid_file.nc destination_grid_file.nc weights_file.nc")
@@ -215,6 +235,11 @@ begin
         f = addfile(cache,"c")
         f->AChom2 = AChom2
         f->p = p
+        if(isvar("obsvarSea"))then
+            f->obsvarSea = obsvarSea
+            f->obsvarSeaClm = obsvarSeaClm
+            f->obsvarSeaAno = obsvarSeaAno 
+        end if
 
     end if
     ;; define color table with paper figure 8

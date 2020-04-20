@@ -40,7 +40,7 @@ CNA: IE-average
 YBEA: 1101,1500
 NYA: 400 
 MODNA: (/1,2,3,4,5/)
-CAS: f09_5AGCMs_NASPG_sample_notdone
+CAS: f09_5AGCMs_NASPG_sample
 CNS: IE-sample
 YBES: 1101,1500
 NYS: 400
@@ -407,4 +407,4 @@ Scripts:
         'Subtropical gyre (medium) <br> (57.5DEGW-32.5DEGW, 25DEGN-35DEGN)' 3
         'Annual cycle removed and JJA only' 'tr' 
         'Subtropical gyre <br> (70DEGW-20DEGW, 20DEGN-40DEGN)' 3 
-    DEG: '&#deg;'
+    DEG: '&deg;'

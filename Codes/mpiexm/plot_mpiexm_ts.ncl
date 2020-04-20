@@ -2,11 +2,13 @@
 ;; plot area mean time series of mpiexm
 
 ;;DIAG_NORCPM; FIGFILENAME: fig
+;;DIAG_NORCPM; WRITEFIGFILELIST: write_table("figfilelist.txt","a",[/"FIGFILENAME"/],"%s") ;; for mk_html_page.sh
 ;;DIAG_NORCPM; CACHEFILENAME: FIGFILENAME
 ;;DIAG_NORCPM; PLOTRES: ;; PLOTRES is not defined
-;;DIAG_NORCPM; TSMAINPROC: ts = read_mpiexm_season_ts(case,casedir,component,varname,years,months,latbe,lonbe,modeln)
+;;DIAG_NORCPM; TSMAINPROC: ts = read_mpiexm_ens_season_ts(case,casedir,component,varname,years,months,latbe,lonbe,modeln)
     ;; reading time series 
 ;;DIAG_NORCPM; TSPOSTPROC: ;; TSPOSTPROC is not defined
+;;DIAG_NORCPM; XMAINPROC: ;; XMAINPROC is not defined
 ;;DIAG_NORCPM; TITLE: title
 ;;DIAG_NORCPM; MONTHS: 0
     ;; 0, means all months
@@ -19,6 +21,7 @@
 load "CODEDIR/mpiexm/func_read_mpiexm.ncl"
 begin
     figfn = "FIGFILENAME"
+    WRITEFIGFILELIST
     cachefile = "CACHEFILENAME"+".nc"
     title = "TITLE"
     varname = "VARIABLE"
@@ -55,6 +58,7 @@ begin
         f->ts = ts
     end if
 
+    XMAINPROC
 
     wks = gsn_open_wks("ps",figfn)
 

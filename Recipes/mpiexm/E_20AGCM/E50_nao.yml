@@ -1,0 +1,273 @@
+Title: NAO index and regression maps
+Description: |
+    NAO index, follow Wang et al. 2017 (doi:10.1038/s41598-017-00353-y),
+    is defined as the difference between the monthly mean sea level pressure (SLP) anomalies averaged over the domains of 
+    (50&deg;W-10&deg;E, 25&deg;-55&deg;N) and (40&deg;W-20&deg;E, 55-85&deg;N).
+    Those region are the empirical positions of the Azores Subtropical High and the Icelandic Subpolar Low.
+COMMENT: |
+    NAO index, follow Wang et al. 2017 (doi:10.1038/s41598-017-00353-y),
+    is defined as the difference between the monthly mean sea level pressure (SLP) anomalies averaged over the domains of 
+    (50&deg;W-10&deg;E, 25&deg;-55&deg;N) and (40&deg;W-20&deg;E, 55-85&deg;N).
+    Those region are the empirical positions of the Azores Subtropical High and the Icelandic Subpolar Low.
+#Thumbnail: maxML_var_ratio_average_case_thumb.png
+COMPONENT:  echam6
+MONTHS: 12,13,14
+VN: slp
+VARIABLE:  VN
+PLOTRES: |
+    res@trYMinF = -3.
+    res@trYMaxF =  3.
+    res@vpHeightF = .3
+    res@tiYAxisString = "std. SLP dif."
+    res@gsnYRefLine = 0.
+REGRES: |
+    res@mpLimitMode = "LatLon"
+    res@mpMinLatF = -90.
+    res@mpMaxLatF = 90.
+    res@mpMinLonF = -330.
+    res@mpMaxLonF =   30.
+    res@pmTickMarkDisplayMode = "Always"
+    res@mpCenterLonF =   -150.
+    res@cnLinesOn = False
+    res@cnFillOn = True
+    res@lbOrientation = "Vertical"
+    res@pmLabelBarWidthF = 0.1
+    res@pmLabelBarOrthogonalPosF   = 0.01
+    res@cnLevelSelectionMode = "ExplicitLevels"
+    res@cnLevels = fspan(-1.2,1.2,13)
+RERRES: |
+    res@mpLimitMode = "LatLon"
+    res@mpMinLatF = 20.
+    res@mpMaxLatF = 70.
+    res@mpMinLonF = -80.
+    res@mpMaxLonF =  10.
+    res@pmTickMarkDisplayMode = "Always"
+    res@mpCenterLatF = 50.
+    res@mpCenterLonF =  -35.
+    res@mpProjection = "LambertConformal"
+    res@mpGridAndLimbOn = True
+    res@gsnMaskLambertConformal = True
+    res@cnLinesOn = False
+    res@cnFillOn = True
+    res@lbOrientation = "Vertical"
+    res@pmLabelBarWidthF = 0.1
+    res@pmLabelBarOrthogonalPosF   = 0.01
+    res@cnLevelSelectionMode = "ExplicitLevels"
+    res@cnLevels = fspan(-1.2,1.2,13)
+
+    
+CASEDIR: /projects/NS9207K/pgchiu/CASE
+    ## CASE define later
+
+CTN: f08_1AGCM
+    ## proxy of CCASE 'control case'
+CCASE: CTN
+CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
+YBEC: 1101,1150
+CONTROLYEARBE: YBEC
+NYC: 50
+
+CAA: f08_5AGCMs_NASPG_average
+CNA: IE-average
+YBEA: 1101,1150
+NYA: 50 
+CAS: f08_5AGCMs_NASPG_sample
+CNS: IE-average20
+YBES: 1101,1150
+NYS: 50
+
+
+Scripts:
+-  
+    plotScript: mpiexm/plot_mpiexm_NAO.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    TITLE: "NAO index CTL (model year: NYC)"
+    FIGFILENAME: CTN_VN_dif
+    OUTPUTREDNOISE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_NAO.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MODELN: (/1,2,3,4,5/)
+    TITLE: "NAO index CNA(model year: NYA)"
+    FIGFILENAME: CAA_VN_dif_5AGCM
+-  
+    plotScript: mpiexm/plot_mpiexm_NAO.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MODELN: 1
+    TITLE: "NAO index CNA(model year: NYA)"
+    FIGFILENAME: CAA_VN_dif_1AGCM
+-  
+    plotScript: mpiexm/plot_mpiexm_NAO.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MODELN: 1
+    TITLE: "NAO index CNS(model year: NYS)"
+    FIGFILENAME: CAS_VN_dif
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    TITLE: "NAO index reg. CTL (model year: NYC)"
+    FIGFILENAME: CASE_VN_regmap
+    TSNETCDFFILE: CASE_VN_dif
+    TSVARNAME: tsdif
+    PLOTRES:  REGRES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MODELN: (/1,2,3,4,5/)
+    TITLE: "NAO index reg. CNA (model year: NYA)"
+    FIGFILENAME: CASE_VN_regmap_5AGCM
+    TSNETCDFFILE: CASE_VN_dif_5AGCM
+    TSVARNAME: tsdif
+    PLOTRES:  REGRES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MODELN: 1
+    TITLE: "NAO index reg. CNA (model year: NYA)"
+    FIGFILENAME: CASE_VN_regmap_1AGCM
+    TSNETCDFFILE: CASE_VN_dif
+    TSVARNAME: tsdif
+    PLOTRES:  REGRES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MODELN: 1
+    TITLE: "NAO index reg. CNS (model year: NYS)"
+    FIGFILENAME: CASE_VN_regmap
+    TSNETCDFFILE: CASE_VN_dif
+    TSVARNAME: tsdif
+    PLOTRES:  REGRES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    TITLE: "NAO index reg. CTL (model year: NYC)"
+    FIGFILENAME: CASE_VN_regmap_natl
+    CACHEFILENAME: CASE_VN_regmap
+    TSNETCDFFILE: CASE_VN_dif
+    TSVARNAME: tsdif
+    PLOTRES:  RERRES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MODELN: (/1,2,3,4,5/)
+    TITLE: "NAO index reg. CNA (model year: NYA)"
+    FIGFILENAME: CASE_VN_regmap_natl_5AGCM
+    CACHEFILENAME: CASE_VN_regmap_5AGCM
+    TSNETCDFFILE: CASE_VN_dif_5AGCM
+    TSVARNAME: tsdif
+    PLOTRES:  RERRES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MODELN: 1
+    TITLE: "NAO index reg. CNA (model year: NYA)"
+    FIGFILENAME: CASE_VN_regmap_natl_1AGCM
+    CACHEFILENAME: CASE_VN_regmap_1AGCM
+    TSNETCDFFILE: CASE_VN_dif_1AGCM
+    TSVARNAME: tsdif
+    PLOTRES:  RERRES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MODELN: 1
+    TITLE: "NAO index reg. CNS (model year: NYS)"
+    FIGFILENAME: CASE_VN_regmap_natl
+    CACHEFILENAME: CASE_VN_regmap
+    TSNETCDFFILE: CASE_VN_dif_1AGCM
+    TSVARNAME: tsdif
+    PLOTRES:  RERRES
+
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    TITLE: "NAO index A reg. CTL (model year: NYC)"
+    FIGFILENAME: CASE_VN_regmap_A
+    TSNETCDFFILE: CASE_VN_dif
+    TSVARNAME: tsSeaA
+    PLOTRES:  REGRES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MODELN: (/1,2,3,4,5/)
+    TITLE: "NAO index A reg. CNA (model year: NYA)"
+    FIGFILENAME: CASE_VN_regmap_A_5AGCM
+    TSNETCDFFILE: CASE_VN_dif_5AGCM
+    TSVARNAME: tsSeaA
+    PLOTRES:  REGRES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MODELN: 1
+    TITLE: "NAO index A reg. CNS (model year: NYS)"
+    FIGFILENAME: CASE_VN_regmap_A
+    TSNETCDFFILE: CASE_VN_dif
+    TSVARNAME: tsSeaA
+    PLOTRES:  REGRES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    TITLE: "NAO index B reg. CTL (model year: NYC)"
+    FIGFILENAME: CASE_VN_regmap_B
+    TSNETCDFFILE: CASE_VN_dif
+    TSVARNAME: tsSeaB
+    PLOTRES:  REGRES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MODELN: (/1,2,3,4,5/)
+    TITLE: "NAO index B reg. CNA (model year: NYA)"
+    FIGFILENAME: CASE_VN_regmap_B_5AGCM
+    TSNETCDFFILE: CASE_VN_dif_5AGCM
+    TSVARNAME: tsSeaB
+    PLOTRES:  REGRES
+-  
+    plotScript: mpiexm/plot_mpiexm_regmap.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MODELN: 1
+    TITLE: "NAO index B reg. CNS (model year: NYS)"
+    FIGFILENAME: CASE_VN_regmap_B
+    TSNETCDFFILE: CASE_VN_dif
+    TSVARNAME: tsSeaB
+    PLOTRES:  REGRES
+-  
+    plotScript: mk_html_page.sh
+    FIGFILES: 
+        CTN_VN_dif
+        CAA_VN_dif_5AGCM
+        CAS_VN_dif
+        CAA_VN_dif_1AGCM
+        CTN_VN_regmap
+        CAA_VN_regmap_5AGCM
+        CAS_VN_regmap
+        CAA_VN_regmap_1AGCM
+        CTN_VN_regmap_natl
+        CAA_VN_regmap_natl_5AGCM
+        CAS_VN_regmap_natl
+        CAA_VN_regmap_natl_1AGCM
+        CTN_VN_regmap_A
+        CAA_VN_regmap_A_5AGCM
+        CAS_VN_regmap_A
+        CTN_VN_regmap_B
+        CAA_VN_regmap_B_5AGCM
+        CAS_VN_regmap_B
+
+    COLUMN: "'NAO index DJF' '</tr><tr>' 'Control' 'CNA(5AGCM avg)' 'CNS(1st AGCM)' '</tr><tr>' 3 '-' 'CNA(1st AGCM)' '-'  '</tr><tr>' '-' 1 'NAO index DJF regression map' '</tr><tr>' 'Control' 'CNA(5AGCM avg)' 'CNS(1st AGCM)' '</tr><tr>' 3 '-' 'CNA(1st AGCM)' '-'  '</tr><tr>' '-' 1 'Control' 'CNA(5AGCM avg)' 'CNS(1st AGCM)' '</tr><tr>' 3 '-' 'CNA(1st AGCM)' '-'  '</tr><tr>' '-' 1 'DJF SLP (50W-10E, 25-55N) regression map' '</tr><tr>' 3 'DJF SLP (40W-20E, 55-85N) regression map' '</tr><tr>' 3 "
+

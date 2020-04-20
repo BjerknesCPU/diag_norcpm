@@ -56,7 +56,7 @@ TSRES: |
     res@trYMinF = -100.
     res@trYMaxF =  100.
 TLAT: 50.,60.
-TLON: -40.,10.
+TLON: -40.,-10.
 TADD: 50~F34~0~F~N-60~F34~0~F~N,40~F34~0~F~W-10~F34~0~F~W
     ## append coordinate to title of time series figures
 
@@ -80,7 +80,7 @@ CAA: f08_5AGCMs_NASPG_average
 CNA: IE-average
 YBEA: 1101,1500
 NYA: 400 
-CAS: f09_5AGCMs_NASPG_sample_notdone
+CAS: f09_5AGCMs_NASPG_sample
 CNS: IE-sample
 YBES: 1101,1500
 NYS: 400

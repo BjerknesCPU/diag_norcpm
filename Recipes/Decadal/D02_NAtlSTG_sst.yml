@@ -1,0 +1,271 @@
+# plot for seasonal hindcasts
+
+Title: North Atlantic subtropical gyre SST time series
+Description: 
+    North Atlantic subtropical gyre SST time series compare with HadISST.
+COMMENT: |
+    North Atlantic subtropical gyre SST time series compare with HadISST.
+Tags: sst, timeSeries
+COMPONENT:  ocn
+VARIABLE:  sst
+VN: SST
+OBSDATASET: SST/HADISST
+OBSVARNAME: sst
+LATBE: 20.,40.
+LONBE: -70.,-20.
+MAXLAT: 40.
+MINLAT: 20.
+MINLON: -70.
+MAXLON: -20.
+REG: stg
+YEARBE: 1960,2018
+FORECASTDIRS: BASEDIR/RUNPRE{1,2}???10??
+PLOTRES: |
+    res@trXMinF = 1960
+    res@trXMaxF = 2030
+    res@trYMaxF = 25.
+    res@trYMinF = 20.
+
+RankHisto: 
+    plotScript: plot_rank_histogram.ncl
+    TITLE: VN REG rank histo. yLYR
+    TITLELEFT: REG
+    FIGFILENAME: VARIABLE_REG_rank_histo_leadyearLYR
+    PLOTRES: |
+        res@trYMaxF = .3
+AnoCor:
+    plotScript: plot_anomaly_correlation.ncl
+    TITLE: VN AnoCor LeadYear LYR
+    FIGFILENAME: anocor_VARIABLE_leadyearLYR
+LeadYear001:
+    LYR: 001
+    LEADMONTHS: 3,4,5,6,7,8,9,10,11,12,13,14
+        ## simulation start from Oct. year0
+        ## year 1 Jan => leadmonth 3
+LeadYear002:
+    LYR: 002
+    LEADMONTHS: 15,16,17,18,19,20,21,22,23,24,25,26
+LeadYear003:
+    LYR: 003
+    LEADMONTHS: 27,28,29,30,31,32,33,34,35,36,37,38
+LeadYear004:
+    LYR: 004
+    LEADMONTHS: 39,40,41,42,43,44,45,46,47,48,49,50
+LeadYear005:
+    LYR: 005
+    LEADMONTHS: 51,52,53,54,55,56,57,58,59,60,61,62
+LeadYear006:
+    LYR: 006
+    LEADMONTHS: 63,64,65,66,67,68,69,70,71,72,73,74
+
+Scripts:
+-   ## plot region box on map
+    plotScript: plot_box_on_map.ncl
+    FIGFILENAME: REG_box
+    ADDBOXLATBE: LATBE
+    ADDBOXLONBE: LONBE
+    PLOTRES:
+-   ## make cache files for plot_mean_ts.ncl
+    plotScript: mk_runcode.sh
+    FORECASTDIRS: BASEDIR/RUNPRE{1,2}???10??
+    FIGFILENAME: ts_VARIABLE_REG
+    MONTHS: 1,2,3,4,5,6,7,8,9,10,11,12
+    RUNTHESECODES: |
+        a='1'
+        while [ ! -z "${a}" ] ; do
+        a=$(ncl -Q << EOF
+        load "/nird/home/pgchiu/scratch/diag_norcpm/Codes//func_read_all_members.ncl"
+        begin
+        forecastdirs=systemfunc("ls -d FORECASTDIRS|sort")
+        varname = "VARIABLE"
+        ocngridfile = "OCNGRIDFILE"
+        component = "COMPONENT"
+        title = "TITLE"
+        cacheprefix = "FIGFILENAME"
+        yearbe = (/YEARBE/)
+        years = ispan(min(yearbe),max(yearbe),1)
+        months = (/MONTHS/)
+        if(any(months.eq.0))then
+            months := ispan(1,12,1)
+        end if
+        latbe = (/LATBE/)
+        lonbe = (/LONBE/)
+
+        nfcast = dimsizes(forecastdirs)
+        do i = 0, nfcast -1
+        forecache = cacheprefix+"_f"+sprinti("%2.2d",i)+".nc"
+        if(isfilepresent(forecache))then
+        continue
+        end if
+        print("make cache:"+forecache)
+        wcS = toint(systemfunc("date +%s"))
+        ts = read_norcpm_forecast_members_var_ts_season_latbe_lonbe_yearly(forecastdirs(i),component,varname,months,latbe,lonbe,ocngridfile) ;; yearly ts
+        f = addfile(forecache,"c")
+        f->ts = ts
+        wcE = toint(systemfunc("date +%s"))
+        print( "make cache in "+(wcE-wcS)+" seconds.")
+        exit
+        end do
+        end
+        EOF
+        )
+        echo $a
+        if [ ! -z $(echo $a | grep -v 'make cache') ] ; then
+        exit
+        fi
+        done
+-   ## time series of annual
+    plotScript: Decadal/plot_mean_ts_ens.ncl
+    TITLE: REG HadISST and forecasts
+    FIGFILENAME: ts_VARIABLE_REG
+-   ## make cache files for plot_mean_ts.ncl
+    plotScript: mk_runcode.sh
+    FIGFILENAME: ts_VARIABLE_REG_DJF
+    MONTHS: 12,13,14
+    RUNTHESECODES: |
+        a='1'
+        while [ ! -z "${a}" ] ; do
+        a=$(ncl -Q << EOF
+        load "/nird/home/pgchiu/scratch/diag_norcpm/Codes//func_read_all_members.ncl"
+        begin
+        forecastdirs=systemfunc("ls -d FORECASTDIRS|sort")
+        varname = "VARIABLE"
+        ocngridfile = "OCNGRIDFILE"
+        component = "COMPONENT"
+        title = "TITLE"
+        cacheprefix = "FIGFILENAME"
+        yearbe = (/YEARBE/)
+        years = ispan(min(yearbe),max(yearbe),1)
+        months = (/MONTHS/)
+        if(any(months.eq.0))then
+            months := ispan(1,12,1)
+        end if
+        latbe = (/LATBE/)
+        lonbe = (/LONBE/)
+
+        nfcast = dimsizes(forecastdirs)
+        do i = 0, nfcast -1
+        forecache = cacheprefix+"_f"+sprinti("%2.2d",i)+".nc"
+        if(isfilepresent(forecache))then
+        continue
+        end if
+        print("make cache:"+forecache)
+        wcS = toint(systemfunc("date +%s"))
+        ts = read_norcpm_forecast_members_var_ts_season_latbe_lonbe_yearly(forecastdirs(i),component,varname,months,latbe,lonbe,ocngridfile) ;; yearly ts
+        f = addfile(forecache,"c")
+        f->ts = ts
+        wcE = toint(systemfunc("date +%s"))
+        print( "make cache in "+(wcE-wcS)+" seconds.")
+        exit
+        end do
+        end
+        EOF
+        )
+        echo $a
+        if [ ! -z $(echo $a | grep -v 'make cache') ] ; then
+        exit
+        fi
+        done
+-   ## time series of DJF
+    plotScript: Decadal/plot_mean_ts_ens.ncl
+    TITLE: REG DJF HadISST and forecasts
+    FIGFILENAME: ts_VARIABLE_REG_DJF
+    MONTHS: 12,13,14
+-   ## make cache files for plot_forecast_correlation.ncl
+    plotScript: mk_runcode.sh
+    FIGFILENAME: ts_VARIABLE_REG_DJF
+    LEADMONTHS: 119
+    RUNTHESECODES: |
+        a='1'
+        while [ ! -z "${a}" ] ; do
+        a=$(ncl -Q << EOF
+        load "/nird/home/pgchiu/scratch/diag_norcpm/Codes//func_read_all_members.ncl"
+        begin
+        forecastdirs=systemfunc("ls -d FORECASTDIRS|sort")
+        varname = "VARIABLE"
+        ocngridfile = "OCNGRIDFILE"
+        component = "COMPONENT"
+        cacheprefix = "fig_cor_forecast_REG.nc"
+        plotmonths = LEADMONTHS
+        latbe = (/LATBE/)
+        lonbe = (/LONBE/)
+
+        do m = 0, plotmonths
+        moncachefn = cacheprefix+"_mon_"+sprinti("%3.3d",m)+".nc"
+        if(isfilepresent(moncachefn))then
+        continue
+        end if
+        print("make cache:"+moncachefn)
+        wcS = toint(systemfunc("date +%s"))
+        var1m = read_noresm_forecasts_ens_latlon_leadmonths(forecastdirs,component,varname,m,latbe,lonbe,ocngridfile)
+        f = addfile(moncachefn,"c")
+        f->var1m = var1m
+        wcE = toint(systemfunc("date +%s"))
+        print( "make cache in "+(wcE-wcS)+" seconds.")
+        exit
+        end do
+        end
+        EOF
+        )
+        echo $a
+        if [ ! -z "$(echo $a | grep -v 'make cache')" ] ; then
+        exit
+        fi
+        done
+-   ## forecast correction
+    plotScript: plot_forecast_correlation.ncl
+    CORTITLE: REG forecast correlation
+    RMSETITLE: REG forecast RMSE
+    CORFIGFILENAME: fig_cor_forecast_REG
+    RMSEFIGFILENAME: fig_rmse_forecast_REG
+    PLOTRES: |
+        ;; plotres
+        res@tmXBMode = "Manual"
+        res@tmXBTickSpacingF = 12
+        res@vpHeightF = .3
+        res@xyLineColors = (/"red","black"/)
+        lgres@lgLineColors = res@xyLineColors
+        amres@amParallelPosF = .3
+        amres@amOrthogonalPosF = -.35
+    LEADMONTHS: 119
+
+-  # historgram lead year 001
+    varPack: RankHisto, LeadYear001
+-  # historgram lead year 002
+    varPack: RankHisto, LeadYear002
+-  # historgram lead year 003
+    varPack: RankHisto, LeadYear003
+-  # historgram lead year 004
+    varPack: RankHisto, LeadYear004
+-  # historgram lead year 005
+    varPack: RankHisto, LeadYear005
+-  # historgram lead year 006
+    varPack: RankHisto, LeadYear006
+
+
+-  # mk html pages with figure filename
+    plotScript: mk_html_page.sh
+    FIGFILES: 
+        REG_box
+
+        ts_sst_REG
+        ts_sst_REG_DJF
+
+        fig_cor_forecast_REG
+        fig_rmse_forecast_REG
+
+        sst_REG_rank_histo_leadyear001
+        sst_REG_rank_histo_leadyear002
+        sst_REG_rank_histo_leadyear003
+        sst_REG_rank_histo_leadyear004
+        sst_REG_rank_histo_leadyear005
+        sst_REG_rank_histo_leadyear006
+    COLUMN: >
+        'Region' tr
+        1
+        'Time series' tr
+        2 
+        'Correlation and RMSE' tr
+        2 
+        'Rank histogram' tr
+        3 3 

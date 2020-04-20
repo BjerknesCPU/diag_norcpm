@@ -145,6 +145,7 @@ procedure add_lc_labels(wks,map,minlat,maxlat,minlon,maxlon)
 end
 
 figfn = "FIGFILENAME"
+write_table("figfilelist.txt","a",[/figfn/],"%s") ;; for mk_html_page.sh
 title = "TITLE"
 
 gridfn="GRIDNCFN"

@@ -8,7 +8,7 @@ Depends:
     16_AnoCor_ohc_obs.yml
     21_rank_histogram_obs.yml
     22_rank_histogram_ano_obs.yml
-    #13_nino34_predic_skill.yml
+    13_nino34_predic_skill.yml
 ShowInIndex: False
     ## will not show in index page
 

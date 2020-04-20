@@ -1,0 +1,276 @@
+Title: Atlantic Multi-decadal Oscillation (AMO) index
+Description:  |
+    Atlantic Multi-decadal Oscillation (AMO) index.
+    Detrend process following Trenberth's approach.
+    Index = anomaly(SST_time_sereis(0-60N,80W-0) - SST_time_series(global))
+    See https://climatedataguide.ucar.edu/climate-data/atlantic-multi-decadal-oscillation-amo
+COMMENT: |
+    Atlantic Multi-decadal Oscillation (AMO) index.
+    Detrend process following Trenberth's approach.
+    Index = anomaly(SST_time_sereis(0-60N,80W-0) - SST_time_series(global))
+    See https://climatedataguide.ucar.edu/climate-data/atlantic-multi-decadal-oscillation-amo
+Tags: amo, timeSeries
+COMPONENT:  ocn
+VARIABLE:  sst
+VN: SST
+OBSDATASET: SST/HADISST
+OBSVARNAME: sst
+LATBE: 0.,60.
+LONBE: -80.,0.
+YEARBE: 1870,2018
+FORECASTDIRS: BASEDIR/RUNPRE{1,2}???10??
+PLOTRES: |
+    res@trXMinF = 1870
+    res@trXMaxF = 2030
+    res@trYMaxF = .8
+    res@trYMinF = -.8
+    res@gsnYRefLine = 0.
+
+
+Scripts:
+-   ## plot region box on map
+    plotScript: plot_box_on_map.ncl
+    FIGFILENAME: amo_box
+    ADDBOXLATBE: LATBE
+    ADDBOXLONBE: LONBE
+-   ## make forecast cache files for plot_mean_ts.ncl
+    plotScript: mk_runcode.sh
+    FIGFILENAME: ts_amo
+    MONTHS: 1,2,3,4,5,6,7,8,9,10,11,12
+    RUNTHESECODES: |
+        a='1'
+        while [ ! -z "${a}" ] ; do
+        a=$(ncl -Q << EOF
+        load "CODEDIR/func_read_all_members.ncl"
+        begin
+        forecastdirs=systemfunc("ls -d FORECASTDIRS|sort")
+        varname = "VARIABLE"
+        ocngridfile = "OCNGRIDFILE"
+        component = "COMPONENT"
+        cacheprefix = "FIGFILENAME"
+        yearbe = (/YEARBE/)
+        years = ispan(min(yearbe),max(yearbe),1)
+        months = (/MONTHS/)
+        if(any(months.eq.0))then
+            months := ispan(1,12,1)
+        end if
+        latbe = (/LATBE/)
+        lonbe = (/LONBE/)
+
+        nfcast = dimsizes(forecastdirs)
+        do i = 0, nfcast -1
+        forecache = cacheprefix+"_f"+sprinti("%2.2d",i)+".nc"
+        if(isfilepresent(forecache))then
+        continue
+        end if
+        print("make cache:"+forecache)
+        wcS = toint(systemfunc("date +%s"))
+        var = read_norcpm_forecast_members_var_season_latbe_lonbe_yearly(forecastdirs(i),component,varname,months,(/-90,90/),(/0,360/),ocngridfile) ;; monthly xy
+        var = where(var.lt.0,var@_FillValue,var)
+        ts = mean_with_latbe_lonbe(var,latbe,lonbe)
+        globalts = mean_with_latbe_lonbe(var,(/-90,90/),(/0.,360./))
+        ts = ts-globalts
+        ts = dim_rmvmean_n_Wrap(ts,1)
+        delete(var)
+        delete(globalts)
+
+        f = addfile(forecache,"c")
+        f->ts = ts
+        wcE = toint(systemfunc("date +%s"))
+        print( "make cache in "+(wcE-wcS)+" seconds.")
+        print("CONTINUE")
+        exit ;; make 1 cache per run, avoid memory issue
+        end do
+        end
+        EOF
+        )
+        echo $a
+        if [ -z  "$(echo $a | grep 'CONTINUE')" ] ; then
+        exit
+        fi
+        done
+-   ## make obs cache files for plot_mean_ts.ncl
+    plotScript: mk_runcode.sh
+    FIGFILENAME: ts_amo
+    MONTHS: 1,2,3,4,5,6,7,8,9,10,11,12
+    RUNTHESECODES: |
+        ncl -Q << EOF
+        load "CODEDIR/func_read_framework.ncl" ;; prototype reading function for obs data
+        load "CODEDIR/func_read_all_members.ncl" ;; for mean_with_latbe_lonbe()
+        begin
+        varname = "OBSVARNAME"
+        cacheprefix = "FIGFILENAME"
+        yearbe = (/YEARBE/)
+        years = ispan(min(yearbe),max(yearbe),1)
+        months = (/MONTHS/)
+        if(any(months.eq.0))then
+            months := ispan(1,12,1)
+        end if
+        latbe = (/LATBE/)
+        lonbe = (/LONBE/)
+        obsdir = "OBSDIR"
+        obsdataset = "OBSDATASET"
+        obsvn = "OBSVARNAME"
+
+        obscache = cacheprefix+"_obs.nc"
+        if(isfilepresent(obscache))then ;; skip if file present
+            exit
+        end if
+        print("make cache:"+obscache)
+        var = read_obs_framework_season(obsdir,obsdataset,obsvn,years,months,-1,(/-90,90/),(/0,360/))
+        var = where(var.lt.0,var@_FillValue,var) ;; remove values below 0 in sst
+        ts = mean_with_latbe_lonbe(var,latbe,lonbe)
+        globalts = mean_with_latbe_lonbe(var,(/-90,90/),(/0.,360./))
+        ts = ts-globalts
+        ts = ts-avg(ts)
+        delete(var)
+        delete(globalts)
+        f = addfile(obscache,"c")
+        f->obsts = ts
+        exit ;; make only one cache per run, avoid memory issue
+        end
+        EOF
+-   ## plot time series 
+    plotScript: Decadal/plot_mean_ts_ens.ncl
+    TITLE: AMO of HadISST and forecasts
+    FIGFILENAME: ts_amo
+    READCACHEONLY: True
+-   ## plot time series 
+    plotScript: Decadal/plot_mean_ts_ens.ncl
+    TITLE: AMO of HadISST and forecasts
+    FIGFILENAME: ts_amo_recent
+    CACHEFILENAME: ts_amo
+    READCACHEONLY: True
+    PLOTRES: |
+        res@trXMinF = 1960
+        res@trXMaxF = 2030
+        res@trYMaxF = .8
+        res@trYMinF = -.8
+        res@gsnYRefLine = 0.
+
+-   ## make forecast cache files for plot_mean_ts.ncl without anomaly
+    plotScript: mk_runcode.sh
+    FIGFILENAME: ts_amo_noano
+    MONTHS: 1,2,3,4,5,6,7,8,9,10,11,12
+    RUNTHESECODES: |
+        a='1'
+        while [ ! -z "${a}" ] ; do
+        a=$(ncl -Q << EOF
+        load "CODEDIR/func_read_all_members.ncl"
+        begin
+        forecastdirs=systemfunc("ls -d FORECASTDIRS|sort")
+        varname = "VARIABLE"
+        ocngridfile = "OCNGRIDFILE"
+        component = "COMPONENT"
+        cacheprefix = "FIGFILENAME"
+        yearbe = (/YEARBE/)
+        years = ispan(min(yearbe),max(yearbe),1)
+        months = (/MONTHS/)
+        if(any(months.eq.0))then
+            months := ispan(1,12,1)
+        end if
+        latbe = (/LATBE/)
+        lonbe = (/LONBE/)
+
+        nfcast = dimsizes(forecastdirs)
+        do i = 0, nfcast -1
+        forecache = cacheprefix+"_f"+sprinti("%2.2d",i)+".nc"
+        if(isfilepresent(forecache))then
+        continue
+        end if
+        print("make cache:"+forecache)
+        wcS = toint(systemfunc("date +%s"))
+        var = read_norcpm_forecast_members_var_season_latbe_lonbe_yearly(forecastdirs(i),component,varname,months,(/-90,90/),(/0,360/),ocngridfile) ;; monthly xy
+        var = where(var.lt.0,var@_FillValue,var)
+        ts = mean_with_latbe_lonbe(var,latbe,lonbe)
+        globalts = mean_with_latbe_lonbe(var,(/-90,90/),(/0.,360./))
+        ts = ts-globalts
+        delete(var)
+        delete(globalts)
+
+        f = addfile(forecache,"c")
+        f->ts = ts
+        wcE = toint(systemfunc("date +%s"))
+        print( "make cache in "+(wcE-wcS)+" seconds.")
+        print("CONTINUE")
+        exit ;; make 1 cache per run, avoid memory issue
+        end do
+        end
+        EOF
+        )
+        echo $a
+        if [ -z  "$(echo $a | grep 'CONTINUE')" ] ; then
+        exit
+        fi
+        done
+-   ## make obs cache files for plot_mean_ts.ncl without anomaly
+    plotScript: mk_runcode.sh
+    FIGFILENAME: ts_amo_noano
+    MONTHS: 1,2,3,4,5,6,7,8,9,10,11,12
+    RUNTHESECODES: |
+        ncl -Q << EOF
+        load "CODEDIR/func_read_framework.ncl" ;; prototype reading function for obs data
+        load "CODEDIR/func_read_all_members.ncl" ;; for mean_with_latbe_lonbe()
+        begin
+        varname = "OBSVARNAME"
+        cacheprefix = "FIGFILENAME"
+        yearbe = (/YEARBE/)
+        years = ispan(min(yearbe),max(yearbe),1)
+        months = (/MONTHS/)
+        if(any(months.eq.0))then
+            months := ispan(1,12,1)
+        end if
+        latbe = (/LATBE/)
+        lonbe = (/LONBE/)
+        obsdir = "OBSDIR"
+        obsdataset = "OBSDATASET"
+        obsvn = "OBSVARNAME"
+
+        obscache = cacheprefix+"_obs.nc"
+        if(isfilepresent(obscache))then ;; skip if file present
+            exit
+        end if
+        print("make cache:"+obscache)
+        var = read_obs_framework_season(obsdir,obsdataset,obsvn,years,months,-1,(/-90,90/),(/0,360/))
+        var = where(var.lt.0,var@_FillValue,var) ;; remove values below 0 in sst
+        ts = mean_with_latbe_lonbe(var,latbe,lonbe)
+        globalts = mean_with_latbe_lonbe(var,(/-90,90/),(/0.,360./))
+        ts = ts-globalts
+        delete(var)
+        delete(globalts)
+        f = addfile(obscache,"c")
+        f->obsts = ts
+        exit ;; make only one cache per run, avoid memory issue
+        end
+        EOF
+-   ## plot time series without anomaly
+    plotScript: Decadal/plot_mean_ts_ens.ncl
+    TITLE: AMO of HadISST and forecasts
+    FIGFILENAME: ts_amo_noano
+    READCACHEONLY: True
+    PLOTRES: |
+        res@trXMinF = 1870
+        res@trXMaxF = 2030
+        res@trYMaxF = 2.1 
+        res@trYMinF = .5
+-   ## plot time series 
+    plotScript: Decadal/plot_mean_ts_ens.ncl
+    TITLE: AMO of HadISST and forecasts
+    FIGFILENAME: ts_amo_noano_recent
+    CACHEFILENAME: ts_amo_noano
+    READCACHEONLY: True
+    PLOTRES: |
+        res@trXMinF = 1960
+        res@trXMaxF = 2030
+        res@trYMaxF = 2.1
+        res@trYMinF = .5
+
+-  # mk html pages with figure filename
+    plotScript: mk_html_page.sh
+    FIGFILES: 
+        amo_box
+        ts_amo
+        ts_amo_recent
+        ts_amo_noano
+        ts_amo_noano_recent
+    COLUMN: 1 2 2

@@ -8,6 +8,7 @@
 load "/nird/home/pgchiu/scratch/diag_norcpm/Codes//mpiexm/func_read_mpiexm.ncl"
 begin
     figfn = "FIGFILENAME"
+write_table("figfilelist.txt","a",[/figfn/],"%s") ;; for mk_html_page.sh
     outfn = "OUTPUTFILENAME.nc"
     title = "TITLE"
     latbe = (/0.,65./)

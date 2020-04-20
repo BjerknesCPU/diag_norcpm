@@ -56,8 +56,8 @@ PLOTRES: |
 TSRES: |
     res@trYMinF = -100.
     res@trYMaxF =  100.
-TLAT: TLAT
-TLON: TLON
+TLAT: 50,60
+TLON: -40,-10
 TADD: 50~F34~0~F~N-60~F34~0~F~N,40~F34~0~F~W-10~F34~0~F~W
     ## append coordinate to title of time series figures
 
@@ -81,7 +81,7 @@ CAA: f08_5AGCMs_NASPG_average
 CNA: IE-average
 YBEA: 1101,1500
 NYA: 400 
-CAS: f09_5AGCMs_NASPG_sample_notdone
+CAS: f09_5AGCMs_NASPG_sample
 CNS: IE-sample
 YBES: 1101,1500
 NYS: 400
@@ -353,5 +353,5 @@ Scripts:
         maxML_ts_average_SON
         maxML_ts_control_SON
 
-    COLUMN: figs CNS CNA Control 'tr' ANN 2 2 ANN 3 DJF 2 MAM 2 JJA 2 SON 2 DJF 3 MAM 3 JJA 3 SON 3
+    COLUMN: figs CNS CNA Control 'tr' ANN 2 - 2 ANN 3 DJF 2 MAM 2 JJA 2 SON 2 DJF 3 MAM 3 JJA 3 SON 3
 

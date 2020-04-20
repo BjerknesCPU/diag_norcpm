@@ -407,4 +407,4 @@ Scripts:
         'Subtropical gyre (medium) <br> (57.5DEGW-32.5DEGW, 25DEGN-35DEGN)' 3
         'Annual cycle removed and JJA only' 'tr' 
         'Subtropical gyre <br> (70DEGW-20DEGW, 20DEGN-40DEGN)' 3 
-    DEG: '&#deg;'
+    DEG: '&deg;'

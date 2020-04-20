@@ -3,6 +3,7 @@
 load "func_read_mpiexm.ncl"
 
 figfn = "fig"
+write_table("figfilelist.txt","a",[/figfn/],"%s") ;; for mk_html_page.sh
 latbe = (/0.,80./)
 lonbe = (/-60.,-10./)
 ;lonbe = (/0.,360./)

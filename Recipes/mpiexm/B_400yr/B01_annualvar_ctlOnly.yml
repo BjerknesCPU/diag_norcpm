@@ -5,13 +5,13 @@ Title: SST Annual variance ratio. Control run self comparison.
 Description: |
     SST annual variiance ratio. 
     Control run self comparison.
-    (1101-1250)/(1101-1450) and (1251-1400)/(1101-1450)
-    model year are 150/350
+    (1101-1300)/(1101-1500) and (1301-1500)/(1101-1500)
+    model year are 200/400
 COMMENT: |
     SST annual variiance ratio. 
     Control run self comparison.
-    (1101-1250)/(1101-1450) and (1251-1400)/(1101-1450)
-    model year are 150/350
+    (1101-1300)/(1101-1500) and (1301-1500)/(1101-1500)
+    model year are 200/400
 COMPONENT:  mpiom
 VARIABLE:  sst
 PLOTRES: |
@@ -48,18 +48,18 @@ CTN: f08_1AGCM
     ## proxy of CCASE 'control case'
 CCASE: CTN
 CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
-YBEC: 1101,1450
+YBEC: 1101,1500
 CONTROLYEARBE: YBEC
 NYC: 350
 
 CAA: f08_1AGCM
-CNA: 1251-1400
-YBEA: 1251,1400
+CNA: 1301-1500
+YBEA: 1301,1500
 NYA: 400
 
 CAS: f08_1AGCM
-CNS: 1101-1250
-YBES: 1101,1500
+CNS: 1101-1300
+YBES: 1101,1300
 NYS: 400 
 
 Scripts:

@@ -12,7 +12,12 @@
     ;; read cahce if present
 ;;DIAG_NORCPM; CACHEFILENAME: FIGFILENAME
     ;; cache file name, read if presnet, make if not
+;;DIAG_NORCPM; LEADMONTHS: -1
+;;DIAG_NORCPM; LEADSEASON: -1
+    ;; need one of these
 ;;DIAG_NORCPM; REG: global
+;;DIAG_NORCPM; LATBE: LATB,LATE
+;;DIAG_NORCPM; LONBE: LONB,LONE
 ;;DIAG_NORCPM; LATB: -90.
 ;;DIAG_NORCPM; LATE:  90.
 ;;DIAG_NORCPM; LONB:   0.
@@ -23,6 +28,9 @@
 ;;DIAG_NORCPM; ANOMALYANALYSIS: False
     ;; get sort bins by anomaly, not total field
     ;; the anomaly used here does not cover all available data years
+;;DIAG_NORCPM; OBSVARNAME: OBSVN 
+    ;; for compatibility
+;;DIAG_NORCPM; OBSPROXY: -1
 
 load "CODEDIR/func_read_all_members.ncl"
 load "CODEDIR/func_read_obs.ncl"
@@ -42,17 +50,22 @@ begin
     vn="VARIABLE"
     component="COMPONENT"
     ocngridfile="OCNGRIDFILE"
-    lead_season = LEADSEASON
-    leadmonths = (/1,2,3/)+((lead_season-1)*3)
+    slseason = False
+    leadmonths = (/LEADMONTHS/)
+    if(any(leadmonths.lt.0))then
+        lead_season = LEADSEASON
+        leadmonths := (/1,2,3/)+((lead_season-1)*3)
+        slseason = True
+    end if
     figfilename = "FIGFILENAME"
     obsdir = "OBSDIR"
     region = "REG"
-    latbe = (/LATB,LATE/)
-    lonbe = (/LONB,LONE/)
+    latbe = (/LATBE/)
+    lonbe = (/LONBE/)
     titleright = "TITLERIGHT"
     titleleft = "TITLELEFT"
     obsdataset = "OBSDATASET" 
-    obsvn = "OBSVN"
+    obsvn = "OBSVARNAME"
     anoanalysis = ANOMALYANALYSIS
 
     debug = DEBUG
@@ -74,7 +87,7 @@ begin
         readMM = rank_freq@readMM
     else
         ;; read model monthly data, should be (forecast,member,month,y,x)
-        var = read_noresm_forecasts_members_leadseason(dirs,component,vn,lead_season,ocngridfile)
+        var = read_noresm_forecasts_members_latlon_leadmonths(dirs,component,vn,leadmonths,latbe,lonbe,ocngridfile)
         dims = dimsizes(var)
         ndim = dimsizes(dims)
 
@@ -138,7 +151,7 @@ begin
                 initmonth = toint(inita(t,1))
                 ;; multi-year 1season
                 ;var1 = dim_avg_n_Wrap(read_obs_leadmonths(obsdir,obsdataset,obsvn,inityear,initmonth,leadmonths),0)
-                var1 = dim_avg_n_Wrap(read_obs_framework_leadmonths(obsdir,obsdataset,obsvn,inityear,initmonth,leadmonths,-1,(/-90.,90./),(/0.,360./)),0)
+                var1 = dim_avg_n_Wrap(read_obs_framework_leadmonths(obsdir,obsdataset,obsvn,inityear,initmonth,leadmonths,-1,latbe,lonbe),0)
                 if(obsvn.eq."sst")then ;; remove too small data
                     var1 = where(var1.lt.0.,var1@_FillValue,var1)
                 end if
@@ -202,7 +215,11 @@ begin
         res@gsnLeftString = "TITLELEFT"
         res@gsnRightString = "TITLERIGHT"
         res@gsnLeftString = where(res@gsnLeftString.eq."",region,res@gsnLeftString)
-        res@gsnRightString = where(res@gsnRightString.eq."", "leadseason="+lead_season+", "+readMMs,res@gsnRightString)
+        if(slseason)then
+            res@gsnRightString = where(res@gsnRightString.eq."", "leadseason="+lead_season+", "+readMMs,res@gsnRightString)
+        else 
+            res@gsnRightString = where(res@gsnRightString.eq."", readMMs,res@gsnRightString)
+        end if
 
 
     PLOTRES

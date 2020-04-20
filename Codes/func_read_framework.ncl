@@ -22,8 +22,228 @@ begin
     end if
 end
 
+undef("expand_years_months")
+function expand_years_months(years[*],months[*])
+begin
+    ;; expand years and months
+    ;; ex. years = (/1999,2000,2001,2002/)
+    ;;     months = (/6,7,8/)
+    ;; return (/(/1999,1999,1999,2000,2000,2000,2001,2001,2001,2002,2002,2002/)
+    ;;         ,(/  6,   7,   8,   6,   7,   8,   6,   7,   8,   6,   7,   8 /)/)
+    ny = dimsizes(years)
+    nm = dimsizes(months)
+    ;; expand year and month
+    ym = new((/ny*nm,2/),"integer")
+
+    n = 0
+    do y = 0,ny-1
+    do m = 0,nm-1
+        ym(n,0) = years(y)
+        ym(n,1) = months(m)
+        n = n+1
+    end do
+    end do
+
+    return ym
+end
+undef("align_years_months")
+procedure align_years_months(year[*],month[*])
+begin
+    ;; turn month=13 to year+1 month=1
+    ;; year and month dimension must same 
+    iyear = year
+    imonth = month
+
+    do i = 0, 200
+        if(any(month.gt.12))then
+            year = where(month.gt.12,year+1,year)
+            month = where(month.gt.12,month-12,month)
+            continue
+        end if
+        if(any(month.lt.1))then
+            year = where(month.lt.1,year+1,year)
+            month = where(month.lt.1,month-12,month)
+            continue
+        end if
+        break
+    end do
+    if(i.ge.200)then
+        print("align_years_months(): year/month="+iyear+"/"+imonth+" -> "+year+"/"+month )
+        print("align_years_months(): something wrong, check me in func_read_all_members.ncl")
+    end if
+    return
+end
+undef("put_val_to_left_dim")
+procedure put_val_to_left_dim(large,small,n)
+begin
+    dims = dimsizes(small)
+    ndim = dimsizes(dims)
+    if(ndim .eq.2)then
+        large(n,:,:) = small
+    end if
+    if(ndim .eq.3)then
+        large(n,:,:,:) = small
+    end if
+    if(ndim .eq.4)then
+        large(n,:,:,:,:) = small
+    end if
+    if(ndim .eq.5)then
+        large(n,:,:,:,:,:) = small
+    end if
+    return large
+end
+undef("add_1_dim_left")
+function add_1_dim_left(x,n)
+begin
+    dims = dimsizes(x)
+    ndim = dimsizes(dims)
+    newx = new(array_append_record(n,dims,0),typeof(x))
+    put_val_to_left_dim(newx,x,0)
+    return newx
+end
+
+
+undef("mask_with_latbe_lonbe")
+function mask_with_latbe_lonbe(ilat2d,ilon2d,latbe,lonbe)
+begin
+    ;; return a logical mask inside latbe and lonbe
+    ;;    dims follow lat2d and lon2d
+
+    ;; check lat2d and lon2d
+    latdims = dimsizes(ilat2d)
+    londims = dimsizes(ilon2d)
+    ;; check them should be same, TBD
+
+    if(dimsizes(latdims).eq.1)then ;; incase 1d lat/lon
+        lat2d = conform_dims((/latdims,londims/),ilat2d,0)
+        lon2d = conform_dims((/latdims,londims/),ilon2d,1)
+    end if
+    if(dimsizes(latdims).eq.2)then ;; really 2d lat/lon
+        lat2d = ilat2d
+        lon2d = ilon2d
+    end if
+
+    ;;      if longitude is -180 to +180, middle 0deg
+    if(any(lonbe.lt.0))then
+        lonmid0 = True
+    else ;; if longitude is 0    to  360
+        lonmid0 = False
+    end if
+    
+    if(max(lon2d).gt.200 .eq. lonmid0)then
+        if(lonmid0)then
+            lon2d = where(lon2d.gt.180,lon2d-360.,lon2d)
+        else
+            lon2d = where(lon2d.lt.0,lon2d+360.,lon2d)
+        end if
+    end if
+
+    vmask =             lat2d.ge.min(latbe) .and. lat2d.le.max(latbe)
+    vmask = vmask .and. lon2d.ge.min(lonbe) .and. lon2d.le.max(lonbe)
+    vmask@lat2d = lat2d
+    vmask@lon2d = lon2d
+
+    if(dimsizes(latdims).eq.1)then ;; incase 1d lat/lon
+        wgt = where(vmask,cos(lat2d/180*get_pi("double")),0)
+        vmask@wgt = wgt
+    end if
+
+    return vmask
+end
+undef("wgt_with_latbe_lonbe")
+function wgt_with_latbe_lonbe(var,ilat2d,ilon2d,latbe,lonbe)
+begin
+    ;; get mask
+    vmask = mask_with_latbe_lonbe(ilat2d,ilon2d,latbe,lonbe)
+
+    ;; if area2d is in var
+    if(isatt(var,"area2d"))then
+        wgt = var@area2d
+        wgt = where(vmask,wgt,0)
+        wgt = wgt/sum(wgt)
+        return wgt
+    end if
+    ;; if 1d lat
+    if(isatt(vmask,"wgt"))then
+        wgt = vmask@wgt
+        return wgt
+    end if
+
+    ;; read area.nc, bad idea but should work, need modify
+    g_areafile = "~/scratch/diag_norcpm/Data/mpiexm_areas.nc"  ;; bad idea
+    dims = dimsizes(lat2d)
+    if(all(dims.eq.(/96,192/)))then  ;; for atm, need modify
+        af = addfile(g_areafile,"r")
+        vn = "al01.srf"
+        area = f->$vn$
+        wgt = wgt / sum(wgt)
+    end if
+    if(all(dims.eq.(/220,256/)))then  ;; for ocn, need modify
+        af = addfile(g_areafile,"r")
+        vn = "oces.srf"
+        area = af->$vn$
+        ;; there are 2 lon line overlap overlap in data
+        adims = dimsizes(area)
+        adims(1) = adims(1)+2
+        wgt = new(adims,typeof(area))
+        wgt = 0.
+        wgt(:,:adims(1)-3) = area
+        wgt(:,adims(1)-2:) = area(:,:1)
+        wgt = wgt / max(wgt)
+    end if
+    if(.not.isvar("wgt"))then
+        print(dims)
+        print("mask_with_latbe_lonbe(): no wgt defined...")
+        print("see mask_with_latbe_lonbe() in func_read_framework.ncl")
+        ;print(lon2d(0,0)+" "+lon2d(0,1))
+        ;print(lon2d(0,254)+" "+lon2d(0,255))
+        ;print(lat2d(0,0)+" "+lat2d(0,1))
+        ;print(lat2d(0,254)+" "+lat2d(0,255))
+        exit
+    end if
+
+
+    wgt = where(vmask,wgt,0)
+    return wgt
+end
+undef("mean_with_latbe_lonbe")
+function mean_with_latbe_lonbe(var,latbe[2],lonbe[2])
+begin
+    ;; average rightmost 2 dims with latbe and lonbe
+    ;; var should be large than 2 dims
+    ;; var should have coordinates or lat2d/lon2d attitdue
+    dims = dimsizes(var)
+    ndim = dimsizes(dims)
+    if(isatt(var,"lat2d"))then
+        lat2d = var@lat2d
+        lon2d = var@lon2d
+    else
+        latname = var!(ndim-2)
+        lonname = var!(ndim-1)
+        lat2d =  var&$latname$;; not really lat2d, but compilable with mask_with_latbe_lonbe()
+        lon2d =  var&$lonname$;; not really lon2d, but compilable with mask_with_latbe_lonbe()
+    end if
+    wgt = wgt_with_latbe_lonbe(var,lat2d,lon2d,latbe,lonbe)
+    varts = wgt_areaave2(var,wgt,0) ;; 0 means use non-missing value only
+    if(False)then ;; debug
+        system("rm -f wgt.nc")
+        f = addfile("wgt.nc","c")
+        f->wgt = wgt
+    end if
+
+    if (ndim.eq.3)then
+        copy_VarCoords(var(:,0,0),varts)
+    end if
+    if (ndim.eq.4)then
+        copy_VarCoords(var(:,:,0,0),varts)
+    end if
+    if (ndim.eq.5)then
+        copy_VarCoords(var(:,:,:,0,0),varts)
+    end if
+    return varts
+end
 undef("read_file_with_ranges")
-function read_file_with_ranges(fn,varname,indtime[*],levs[*],ybe[2],xbe[2],opt)
+function read_file_with_ranges(fn,varname,iindtime[*],levs[*],ybe[2],xbe[2],opt)
 begin
     ;; fn: file name(s)
     ;; varname: variable to read in file f
@@ -32,7 +252,7 @@ begin
     ;; ybe, xbe: ybe, xbe if fixed/gaussian grid
     ;;          get min square area if use lat2d/lon2d
     ;; opt: optional argument, ex. gridfile.nc for ocn data
-    
+    indtime = iindtime 
     if(isfile(fn))then
         f = fn
         MultiFile = False
@@ -88,6 +308,16 @@ begin
         COORD0time = True
     end if
 
+    ;; missing time
+    imissingT = ind(ismissing(indtime))
+    if(any(ismissing(imissingT)))then
+        misTime = False
+    else
+        ;;;; fill with 0
+        indtime(imissingT) = 0
+        misTime = True
+    end if
+
     ;; read var, need to add file list function
     if(COORDed .and. COORD0time        .and. ndim.eq.3)then ;; assume time is the first
         if(MultiFile)then
@@ -95,6 +325,10 @@ begin
             var = f[:]->$varname$(indtime,latB:latE,lonB:lonE)
         else
             var = f->$varname$(indtime,latB:latE,lonB:lonE)
+        end if
+        ;; fill _FillValue at missing time
+        if(misTime)then
+            var(imissingT,:,:) = var@_FillValue
         end if
 
         reorder_dim_var(var)
@@ -127,12 +361,34 @@ begin
             f := addfiles(fn,"r")
             if(any(levs.eq.-1))then
                 var = f[:]->$varname$(indtime,:,latB:latE,lonB:lonE)
+                ;; fill _FillValue at missing time
+                if(misTime)then
+                    var(imissingT,:,:,:) = var@_FillValue
+                end if
             else
                 var = f[:]->$varname$(indtime,{levs},latB:latE,lonB:lonE)
+                ;; fill _FillValue at missing time
+                if(misTime)then
+                    if(dimsizes(levs).eq.1)then
+                        var(imissingT,:,:) = var@_FillValue
+                    else
+                        var(imissingT,:,:,:) = var@_FillValue
+                    end if
+                end if
             end if
         else
             var = f->$varname$(indtime,{levs},latB:latE,lonB:lonE)
+            ;; fill _FillValue at missing time
+            if(misTime)then
+                if(dimsizes(levs).eq.1)then
+                    var(imissingT,:,:) = var@_FillValue
+                else
+                    var(imissingT,:,:,:) = var@_FillValue
+                end if
+            end if
         end if
+
+
         reorder_dim_var(var)
         if(typeof(var).eq."short")then
             return short2flt(var)
@@ -203,6 +459,9 @@ begin
         else
             var = f->$varname$(indtime,bs:bn,bw:be)
         end if
+        if(misTime)then
+            var(imissingT,:,:) = var@_FillValue
+        end if
         reorder_dim_var(var)
         if(typeof(var).eq."short")then
             return short2flt(var)
@@ -215,14 +474,34 @@ begin
             f = addfiles(fn,"r")
             if(any(levs.eq.-1))then
                 var = f[:]->$varname$(indtime,:,bs:bn,bw:be)
+                if(misTime)then
+                    var(imissingT,:,:,:) = var@_FillValue
+                end if
             else
                 var = f[:]->$varname$(indtime,{levs},bs:bn,bw:be)
+                if(misTime)then
+                    if(dimsizes(levs).eq.1)then
+                        var(imissingT,:,:) = var@_FillValue
+                    else
+                        var(imissingT,:,:,:) = var@_FillValue
+                    end if
+                end if
             end if
         else
             if(any(levs.eq.-1))then
                 var = f->$varname$(indtime,:,bs:bn,bw:be)
+                if(misTime)then
+                    var(imissingT,:,:,:) = var@_FillValue
+                end if
             else
                 var = f->$varname$(indtime,{levs},bs:bn,bw:be)
+                if(misTime)then
+                    if(dimsizes(levs).eq.1)then
+                        var(imissingT,:,:) = var@_FillValue
+                    else
+                        var(imissingT,:,:,:) = var@_FillValue
+                    end if
+                end if
             end if
         end if
         reorder_dim_var(var)
@@ -279,12 +558,14 @@ begin
     print("read_data_profile_02(): yearly file not done yet")
     exit
 end
-function read_data_profile_03(dataroot, dataset, varname, years, months, lev, latbe, lonbe, opt)
+function read_data_profile_03(dataroot, dataset, varname, iyears, imonths, lev, latbe, lonbe, opt)
 begin
     ;; profile 03: one file for all time data, fix lat/lon variable
     ;;      ex. PREC/GPCP
     ;; need filename attribute in opt
 
+    years = iyears
+    months = imonths
     ;; data file name
     if(opt .and. isatt(opt,"datafilename"))then
         filename = opt@datafilename
@@ -292,12 +573,8 @@ begin
         print("read_data_profile_03() need opt@datafilename to read file.")
         exit
     end if
-    if(dimsizes(years).ne.dimsizes(months))then
-        print("read_data_profile_03(): dimsizes of years and months must be same.")
-        print("                        years:  "+str_join(dimsizes(years),","))
-        print("                        months: "+str_join(dimsizes(months),","))
-        exit
-    end if
+
+    align_years_months(years,months)
 
     ;; assume data in time,[lev,],lat,lon
 
@@ -317,8 +594,7 @@ begin
     indtime := indtime(1:)
     if(any(ismissing(indtime)))then
         print("read_data_profile_03(): time missing in data file: "+dataroot+"/"+filename)
-        print(needt(ind(ismissing(indtime))))
-        exit
+        print(" FillValue, YYYYMM: "+needt(ind(ismissing(indtime))))
     end if
     
     ;; read file
@@ -345,6 +621,23 @@ begin
     ;; varname: variable name to read
     ;; years, months: 1d array with same dimension, data time to read
     ;; latbe, lonbe: range to read, assume small to large, west to east
+    ny = dimsizes(years)
+    nm = dimsizes(months)
+    if(ny.ne.nm)then
+        print("read_obs_framework_months(): dims of years and months must be same")
+        exit
+    end if
+
+    ;;if(str_match_bool_ic(dataroot,"obsdata/gridded") .and. str_match_bool_ic(dataset,"SST/HADISST"))then
+    if(str_match_bool_ic(dataset,"SST/HADISST"))then ;; read HadISST from my download
+        ;;/nird/home/pgchiu/NS9039K/shared/obsdata/gridded/SST/HadISST_sst_187001-201910.nc
+        ;; one file with all data
+        opt = True
+            opt@datafilename = "SST/HadISST_sst_187001-201910.nc"
+        data = read_data_profile_03("~/NS9039K/shared/obsdata/gridded", dataset, varname, years, months, lev, latbe, lonbe, opt)
+        data = where(data.lt.-2,data@_FillValue,data)
+        return data
+    end if
 
     if(dataroot.eq."~/NS9560K/shared/Obs" .and. str_match_bool_ic(dataset,"GPCP"))then
         ;; one file with all data
@@ -414,6 +707,7 @@ begin
     exit
     return False
 end
+
 function read_obs_framework_leadmonths(dataroot, dataset, varname, inityears[*], initmonths[*], leadmonths[*], lev, latbe[2],lonbe[2])
 begin
     ;; produce read time with lead months
@@ -427,14 +721,48 @@ begin
         t = it*lnt+l
         years(t) = inityears(it)
         months(t) = initmonths(it) + leadmonths(l)
-        years(t) = where(months(t).gt.12,years(t)+1,years(t))
-        months(t) = where(months(t).gt.12,months(t)-12,months(t))
     end do
     end do
 
     return read_obs_framework_months(dataroot, dataset, varname, years, months, lev, latbe, lonbe)
 end
+function read_obs_framework_season(dataroot, dataset, varname, years[*], months[*], lev, latbe[2],lonbe[2])
+begin
+    ;;; read and return yearly seasonal data
+    ;;; frontend of read_obs_framework_months()
+    ym2 = expand_years_months(years,months)
+    ny = dimsizes(years)
+    nm = dimsizes(months)
+    varmon = read_obs_framework_months(dataroot, dataset, varname, ym2(:,0), ym2(:,1), lev, latbe,lonbe)
+    dims = dimsizes(varmon)
+    ndim = dimsizes(dims)
+    ;; create array
+    if(ndim.eq.3)then ;; t,y,x
+        varall = varmon(:ny-1,:,:) 
+    end if
+    if(ndim.eq.4)then ;; t,z,y,x
+        varall = varmon(:ny-1,:,:,:)
+    end if
+    do y = 0,ny-1
+        if(ndim.eq.3)then ;; t,y,x
+            varall(y,:,:) = dim_avg_n_Wrap(varmon(y*nm:(y+1)*nm-1,:,:),0)
+        end if
+        if(ndim.eq.4)then ;; t,z,y,x
+            varall(y,:,:,:) = dim_avg_n_Wrap(varmon(y*nm:(y+1)*nm-1,:,:,:),0)
+        end if
+    end do
 
+    varall!0 = "year"
+    varall&year = years
+    varall@months = months
+    return varall
+end 
+
+function read_obs_framework_season_ts(dataroot, dataset, varname, years[*], months[*], lev, latbe[2],lonbe[2])
+begin
+    var = read_obs_framework_season(dataroot, dataset, varname, years, months, lev, latbe,lonbe)
+    return mean_with_latbe_lonbe(var,latbe,lonbe)
+end
 
 ;; tests
     ;;    dataroot = "~/NS9560K/shared/Obs" ;;/PRECIP/GPCP.precip.mon.mean.nc"
@@ -517,3 +845,22 @@ end
     ;;    system("rm -f tmp.nc")
     ;;    f = addfile("tmp.nc","c")
     ;;    f->a = a
+;;
+    ;;    dataroot = "~/NS9039K/shared/obsdata/gridded" 
+    ;;    dataset = "SST/HADISST"
+    ;;    varname = "sst"
+    ;;    years = (/2018,2019,2020/)
+    ;;    months = years
+    ;;    months = 1
+    ;;    lev = -1
+    ;;    latbe = (/-90.,90./)
+    ;;    lonbe = (/0.,360./)
+    ;;    a = read_obs_framework_months(dataroot, dataset, varname, years, months, lev, latbe, lonbe)
+    ;;    b = dim_avg_n_Wrap(a,0)
+    ;;    printVarSummary(a)
+    ;;    printMinMax(a,0)
+    ;;    system("rm -f tmp.nc")
+    ;;    f = addfile("tmp.nc","c")
+    ;;    f->a = a
+    ;;    f->b = b
+

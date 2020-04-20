@@ -32,9 +32,9 @@ NATL: |
 
 CLA: fspan(0.,12000,25)
 DLA: fspan(-200.,200.,21)
-CLB: fspan(0.,20000,25)
+CLB: fspan(0.,21000,25)
 DLB: fspan(-400.,400.,21)
-CLC: fspan(0.,40000,25)
+CLC: fspan(0.,42000,25)
 DLC: fspan(-1000.,1000.,21)
 CLD: fspan(0.,60000,25)
 DLD: fspan(-1000.,1000.,21)
@@ -78,7 +78,7 @@ CAA: f08_5AGCMs_NASPG_average
 CNA: IE-average
 YBEA: 1101,1500
 NYA: 400 
-CAS: f09_5AGCMs_NASPG_sample_notdon
+CAS: f09_5AGCMs_NASPG_sample
 CNS: IE-sample
 YBES: 1101,1500
 NYS: 400
@@ -94,6 +94,16 @@ Scripts:
     FIGFILENAME: cli_OHC-100_CTN
     PLOTRES: CTLRES
     LEVS: CLA
+    REGRES: GLOB
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAD
+    YEARBE: YBED
+    VARIABLE: OHC-100
+    TITLE: "OHC-100 dif. CND - CTL (model year: IE=NYD, CTL=NYC)"
+    FIGFILENAME: dif_OHC-100_CAD
+    PLOTRES: DIFRES
+    LEVS: DLA
     REGRES: GLOB
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
@@ -128,6 +138,16 @@ Scripts:
     REGRES: GLOB
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAD
+    YEARBE: YBED
+    VARIABLE: OHC-200
+    TITLE: "OHC-200 dif. CND - CTL (model year: IE=NYD, CTL=NYC)"
+    FIGFILENAME: dif_OHC-200_CAD
+    PLOTRES: DIFRES
+    LEVS: DLA
+    REGRES: GLOB
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
     CASE: CAA
     YEARBE: YBEA
     VARIABLE: OHC-200
@@ -156,6 +176,16 @@ Scripts:
     FIGFILENAME: cli_OHC-500_CTN
     PLOTRES: CTLRES
     LEVS: CLC
+    REGRES: GLOB
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAD
+    YEARBE: YBED
+    VARIABLE: OHC-500
+    TITLE: "OHC-500 dif. CND - CTL (model year: IE=NYD, CTL=NYC)"
+    FIGFILENAME: dif_OHC-500_CAD
+    PLOTRES: DIFRES
+    LEVS: DLA
     REGRES: GLOB
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
@@ -190,6 +220,16 @@ Scripts:
     REGRES: GLOB
 -  
     plotScript: mpiexm/plot_mpiexm_difference.ncl
+    CASE: CAD
+    YEARBE: YBED
+    VARIABLE: OHC-1000
+    TITLE: "OHC-1000 dif. CND - CTL (model year: IE=NYD, CTL=NYC)"
+    FIGFILENAME: dif_OHC-1000_CAD
+    PLOTRES: DIFRES
+    LEVS: DLA
+    REGRES: GLOB
+-  
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
     CASE: CAA
     YEARBE: YBEA
     VARIABLE: OHC-1000
@@ -214,16 +254,20 @@ Scripts:
     plotScript: mk_html_page.sh
     FIGFILES: 
         cli_OHC-100_CTN
+        dif_OHC-100_CAD
         dif_OHC-100_sample
         dif_OHC-100_average
         cli_OHC-200_CTN
+        dif_OHC-200_CAD
         dif_OHC-200_sample
         dif_OHC-200_average
         cli_OHC-500_CTN
+        dif_OHC-500_CAD
         dif_OHC-500_sample
         dif_OHC-500_average
         cli_OHC-1000_CTN
+        dif_OHC-1000_CAD
         dif_OHC-1000_sample
         dif_OHC-1000_average
-    COLUMN: CTL CNS CNA 'tr' 'OHC 100m' 'tr' 3 'OHC 200m' 'tr' 3 'OHC 500m' 'tr' 3 'OHC 1000m' 'tr' 3 
+    COLUMN: CTL CND CNS CNA 'tr' 'OHC 100m' 'tr' 4 'OHC 200m' 'tr' 4 'OHC 500m' 'tr' 4 'OHC 1000m' 'tr' 4 
 

@@ -74,6 +74,7 @@ def gen_proc_plot(template:str,recipe):
             else:
                 afterstr = j
                 for i in keys:
+                    ## need to rewrite for keep indent in template
                     afterstr = re.sub(i,keysinscript[i],afterstr)
                 out += afterstr+'\n'
     return out
