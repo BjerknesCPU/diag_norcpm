@@ -1,0 +1,17 @@
+# Topic page, use to collect exists recipes
+#   sould put to top of the index page.
+#
+Title: Anomaly correlation set
+Description: description of anomaly correlation
+Depends: 17_AnoCor_sst_alllead.yml 18_AnoCor_prec.yml 19_AnoCor_sst_obs.yml
+
+Scripts:
+-  # test for figures from other directory
+    plotScript: mk_html_page.sh
+    FIGFILES: ../17_AnoCor_sst_alllead/ana_hindcasts_AC_sst_lead1_FMA ../17_AnoCor_sst_alllead/ana_hindcasts_AC_sst_lead2_FMA ../17_AnoCor_sst_alllead/ana_hindcasts_AC_sst_lead3_FMA ../17_AnoCor_sst_alllead/ana_hindcasts_AC_sst_lead4_FMA ../17_AnoCor_sst_alllead/ana_hindcasts_AC_sst_lead1_MJJ ../17_AnoCor_sst_alllead/ana_hindcasts_AC_sst_lead2_MJJ ../17_AnoCor_sst_alllead/ana_hindcasts_AC_sst_lead3_MJJ ../17_AnoCor_sst_alllead/ana_hindcasts_AC_sst_lead4_MJJ ../17_AnoCor_sst_alllead/ana_hindcasts_AC_sst_lead1_ASO ../17_AnoCor_sst_alllead/ana_hindcasts_AC_sst_lead2_ASO ../17_AnoCor_sst_alllead/ana_hindcasts_AC_sst_lead3_ASO ../17_AnoCor_sst_alllead/ana_hindcasts_AC_sst_lead4_ASO ../17_AnoCor_sst_alllead/ana_hindcasts_AC_sst_lead1_NDJ ../17_AnoCor_sst_alllead/ana_hindcasts_AC_sst_lead2_NDJ ../17_AnoCor_sst_alllead/ana_hindcasts_AC_sst_lead3_NDJ ../17_AnoCor_sst_alllead/ana_hindcasts_AC_sst_lead4_NDJ 
+    COLUMN: season leadSeason=1 leadSeason=2 leadSeason=3 leadSeason=4 '</tr><tr>' FMA 4 MJJ 4 ASO 4 NDJ 4
+    COMMENT: |
+        From Becker etal 2014. ( 10.1175/JCLI-D-13-00597.1 ) 1-4 lead seasonal forecast correlation. 
+        
+        The correlation is between 1st member and ensemble mean of rest of members.
+

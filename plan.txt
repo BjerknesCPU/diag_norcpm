@@ -1,0 +1,64 @@
+Some kind of TODO list.
+
+usage scenario plan:
+    1.  cp diag_norcpm.sh to user directory
+        modify plotCase, ensDataDirs and plotRecipes in diag_norcpm.sh
+        run diag_norcpm.sh
+
+    2.  cp plotRecipes to user directory and modify it.
+        run diag_norcpm.sh with arguments
+        ex: 
+            /path/to/diag_norcpm.sh --plotCase='Case' --ensDataDirs=$(ls -d /path/to/data/) [plotRecipes_*.yml]
+
+    3.  execute diag_norcpm.sh from work directory
+        an plot all figures
+        ex:
+            /path/to/diag_norcpm.sh /path/to/hindcastdir
+
+    use 3
+
+
+better terminal output:
+    multi-line progress indicator
+    ex.:
+        (3/5) 01_recipe, running 3-plot_something.ncl
+        (5/5) 02_recipe, done.
+        (2/5) 03_recipe, running 2-long_processing.sh
+
+    after all done, show result:
+        01_recipe done in 10m3s.
+        02_recipe done in 4m15s.
+        03_recipe done in 34m40s.
+
+    detect tty (stdout is not piped)
+
+recipe log checker:
+    check output log see if any thing wrong
+    need be automatically generate and import successful log 
+       run once, and compare to following run
+    show in result
+
+
+dependency between recipes:
+    looking for useable library.
+
+
+parallel setting in recipes:
+    ex.
+        -
+            plotScript: tobeParallel1.ncl
+            Parallel: True
+        -
+            plotScript: tobeParallel2.ncl
+            Parallel: True
+        -
+            plotScript: notParallel.ncl
+            Parallel: False
+
+    script tobeParallel1 and 2 will be execute together.
+    notParallel.ncl will execute after above done.
+
+
+better doplot.py code
+    functionize
+    replace of diag_norcpm.sh

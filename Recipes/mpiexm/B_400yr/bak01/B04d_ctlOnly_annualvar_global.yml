@@ -1,0 +1,284 @@
+# plot data variance in mpiexm
+# mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
+
+Title: SST Annual variance ratio. Control run self comparison.
+Description: |
+    SST annual variiance ratio. 
+    Control run self comparison.
+    (1101-1300)/(1101-1500) and (1301-1500)/(1101-1500)
+    nyear are 150/350
+COMPONENT:  mpiom
+VARIABLE:  sst
+PLOTRES: |
+    res@mpLimitMode = "LatLon"
+    res@mpMinLatF = -90.
+    res@mpMaxLatF = 90.
+    res@mpMinLonF = -330.
+    res@mpMaxLonF =   30.
+    res@mpCenterLonF =   -150.
+    res@cnLinesOn = False
+    res@cnFillOn = True
+    res@lbOrientation = "Vertical"
+    res@pmLabelBarWidthF = 0.1
+    res@pmLabelBarOrthogonalPosF   = 0.01
+    ;;res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/253,152,153/),(/255,118,33/),(/254,254,0/)/)
+    res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/203,204,254/),(/255,255,255/),(/255,255,255/),(/254,254,0/),(/255,118,33/),(/255,0,0/),(/255,0,222/)/)
+    res@cnFillColors   := res@cnFillColors/255. 
+    res@cnLevelSelectionMode = "ExplicitLevels"
+    ;res@cnLevels = (/.2,1,2,3,4,5/)
+    res@cnLevels = (/.2,.4,.6,.8,.9,1.,1.1,1.2,1.4,1.6/)
+    res@gsnRightString = "1"
+
+    lres@cnLineColor = "Red"
+    lres@cnLinesOn = True
+    lres@cnFillOn = False
+    lres@cnLevelSelectionMode = "ExplicitLevels"
+    lres@cnLevels := (/.2/)
+    lres@cnLineLabelsOn = False
+    lres@cnInfoLabelOn = False
+
+CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+    ## CASE define later
+
+CTN: f08_1AGCM
+    ## proxy of CCASE 'control case'
+CCASE: CTN
+CONTROLDIR: /tos-project4/NS9207K/pgchiu/CCASE
+YBEC: 1101,1500
+CONTROLYEARBE: YBEC
+NYC: 400
+
+CAA: f08_1AGCM
+CNA: 1351-1400
+YBEA: 1301,1500
+NYA: 200
+
+CAS: f08_1AGCM
+CNS: 1101-1250
+YBES: 1101,1300
+NYS: 200 
+
+Scripts:
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    TITLE: "yearly SST variance ratio CNA/CTL (nyear: NYA,NYC)"
+    FIGFILENAME: sst_var_ratio_CNA_case
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAS
+    YEARBE: YBES
+    TITLE: "yearly SST variance ratio CNS/CTL (nyear: NYS,NYC)"
+    FIGFILENAME: sst_var_ratio_CNS_case
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: 12,1,2
+    TITLE: "yearly SST variance ratio CNS/CTL DJF (nyear: NYS,NYC)"
+    FIGFILENAME: sst_var_ratio_CNS_case_DJF
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: 12,1,2
+    TITLE: "yearly SST variance ratio CNA/CTL DJF (nyear: NYA,NYC)"
+    FIGFILENAME: sst_var_ratio_CNA_case_DJF
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: 3,4,5
+    TITLE: "yearly SST variance ratio CNS/CTL MAM (nyear: NYS,NYC)"
+    FIGFILENAME: sst_var_ratio_CNS_case_MAM
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: 3,4,5
+    TITLE: "yearly SST variance ratio CNA/CTL MAM (nyear: NYA,NYC)"
+    FIGFILENAME: sst_var_ratio_CNA_case_MAM
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: 6,7,8
+    TITLE: "yearly SST variance ratio CNS/CTL JJA (nyear: NYS,NYC)"
+    FIGFILENAME: sst_var_ratio_CNS_case_JJA
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: 6,7,8
+    TITLE: "yearly SST variance ratio CNA/CTL JJA (nyear: NYA,NYC)"
+    FIGFILENAME: sst_var_ratio_CNA_case_JJA
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: 9,10,11
+    TITLE: "yearly SST variance ratio CNS/CTL SON (nyear: NYS,NYC)"
+    FIGFILENAME: sst_var_ratio_CNS_case_SON
+-  
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: 9,10,11
+    TITLE: "yearly SST variance ratio CNA/CTL SON (nyear: NYA,NYC)"
+    FIGFILENAME: sst_var_ratio_CNA_case_SON
+
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAS
+    YEARBE: YBES
+    LATBE: 50.,60.
+    LONBE: -40.,-10.
+    PLOTRES:
+    TITLE: SST ts CNS 50N-60N,40W-10W
+    FIGFILENAME: sst_ts_CNS_case
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    LATBE: 50.,60.
+    LONBE: -40.,-10.
+    PLOTRES:
+    TITLE: SST ts CNA 50N-60N,40W-10W
+    FIGFILENAME: sst_ts_CNA_case
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    LATBE: 50.,60.
+    LONBE: -40.,-10.
+    PLOTRES:
+    TITLE: SST ts CTL 50N-60N,40W-10W
+    FIGFILENAME: sst_ts_control_case
+
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: 12,1,2
+    LATBE: 50.,60.
+    LONBE: -40.,-10.
+    PLOTRES:
+    TITLE: SST ts CNS DJF 50N-60N,40W-10W
+    FIGFILENAME: sst_ts_CNS_case_DJF
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: 12,1,2
+    LATBE: 50.,60.
+    LONBE: -40.,-10.
+    PLOTRES:
+    TITLE: SST ts CNA DJF 50N-60N,40W-10W
+    FIGFILENAME: sst_ts_CNA_case_DJF
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MONTHS: 12,1,2
+    LATBE: 50.,60.
+    LONBE: -40.,-10.
+    PLOTRES:
+    TITLE: SST ts CTL DJF 50N-60N,40W-10W
+    FIGFILENAME: sst_ts_control_case_DJF
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: 3,4,5
+    LATBE: 50.,60.
+    LONBE: -40.,-10.
+    PLOTRES:
+    TITLE: SST ts CNS MAM 50N-60N,40W-10W
+    FIGFILENAME: sst_ts_CNS_case_MAM
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: 3,4,5
+    LATBE: 50.,60.
+    LONBE: -40.,-10.
+    PLOTRES:
+    TITLE: SST ts CNA MAM 50N-60N,40W-10W
+    FIGFILENAME: sst_ts_CNA_case_MAM
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MONTHS: 3,4,5
+    LATBE: 50.,60.
+    LONBE: -40.,-10.
+    PLOTRES:
+    TITLE: SST ts CTL MAM 50N-60N,40W-10W
+    FIGFILENAME: sst_ts_control_case_MAM
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: 6,7,8
+    LATBE: 50.,60.
+    LONBE: -40.,-10.
+    PLOTRES:
+    TITLE: SST ts CNS JJA 50N-60N,40W-10W
+    FIGFILENAME: sst_ts_CNS_case_JJA
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: 6,7,8
+    LATBE: 50.,60.
+    LONBE: -40.,-10.
+    PLOTRES:
+    TITLE: SST ts CNA JJA 50N-60N,40W-10W
+    FIGFILENAME: sst_ts_CNA_case_JJA
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MONTHS: 6,7,8
+    LATBE: 50.,60.
+    LONBE: -40.,-10.
+    PLOTRES:
+    TITLE: SST ts CTL JJA 50N-60N,40W-10W
+    FIGFILENAME: sst_ts_control_case_JJA
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAS
+    YEARBE: YBES
+    MONTHS: 9,10,11
+    LATBE: 50.,60.
+    LONBE: -40.,-10.
+    PLOTRES:
+    TITLE: SST ts CNS SON 50N-60N,40W-10W
+    FIGFILENAME: sst_ts_CNS_case_SON
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CAA
+    YEARBE: YBEA
+    MONTHS: 9,10,11
+    LATBE: 50.,60.
+    LONBE: -40.,-10.
+    PLOTRES:
+    TITLE: SST ts CNA SON 50N-60N,40W-10W
+    FIGFILENAME: sst_ts_CNA_case_SON
+-  
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    MONTHS: 9,10,11
+    LATBE: 50.,60.
+    LONBE: -40.,-10.
+    PLOTRES:
+    TITLE: SST ts CTL SON 50N-60N,40W-10W
+    FIGFILENAME: sst_ts_control_case_SON
+
+-  
+    plotScript: mk_html_page.sh
+    FIGFILES: sst_var_ratio_CNS_case sst_var_ratio_CNA_case sst_ts_CNS_case sst_ts_CNA_case sst_ts_control_case sst_var_ratio_CNS_case_DJF sst_var_ratio_CNA_case_DJF sst_var_ratio_CNS_case_MAM sst_var_ratio_CNA_case_MAM sst_var_ratio_CNS_case_JJA sst_var_ratio_CNA_case_JJA sst_var_ratio_CNS_case_SON sst_var_ratio_CNA_case_SON sst_ts_CNS_case_DJF sst_ts_CNA_case_DJF sst_ts_control_case_DJF sst_ts_CNS_case_MAM sst_ts_CNA_case_MAM sst_ts_control_case_MAM sst_ts_CNS_case_JJA sst_ts_CNA_case_JJA sst_ts_control_case_JJA sst_ts_CNS_case_SON sst_ts_CNA_case_SON sst_ts_control_case_SON 
+    COLUMN: figs CNS CNA Control '</tr><tr>' ANN 2 ANN 3 DJF 2 MAM 2 JJA 2 SON 2 DJF 3 MAM 3 JJA 3 SON 3
+    COMMENT: SST variance ratio control run self comprison.

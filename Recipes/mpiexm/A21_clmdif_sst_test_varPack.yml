@@ -1,0 +1,164 @@
+# plot data difference in mpiexm
+# mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
+
+Title: SST difference
+Description: 
+    SST diference between interactive ensemble and control run.
+COMMENT: |
+    SST diference between interactive ensemble and control run.
+COMPONENT:  mpiom
+MODELN: 1
+VARI: SSTC
+VARIABLE: VARI
+VN: SST
+NatlRegine: 
+    REGNAME: natl
+    REGRES: |
+        res@mpLimitMode = "LatLon"
+        res@mpMinLatF = 20.
+        res@mpMaxLatF = 70.
+        res@mpMinLonF = -80.
+        res@mpMaxLonF =  10.
+        res@pmTickMarkDisplayMode = "Always"
+        res@mpCenterLatF = 50.
+        res@mpCenterLonF =  -35.
+        res@mpProjection = "LambertConformal"
+        res@mpGridAndLimbOn = True
+        res@gsnMaskLambertConformal = True
+        res@gsnRightString = "~F34~0~F~C"
+Global: 
+    REGNAME: global
+    REGRES: |
+        res@mpLimitMode = "LatLon"
+        res@mpMinLatF = -90.
+        res@mpMaxLatF = 90.
+        res@mpMinLonF = -330.
+        res@mpMaxLonF =   30.
+        res@pmTickMarkDisplayMode = "Always"
+        res@mpCenterLonF =   -150.
+DifferPlotRes:
+    plotScript: mpiexm/plot_mpiexm_difference.ncl
+    TITLE: "VN dif. TNAME - CTL (model year: TNAME=NYEAR, CTL=NYC)"
+    FIGFILENAME: dif_VARI_CASE_TSEA_REGNAME
+    PLOTRES: |
+        res@cnLinesOn = False
+        res@cnFillOn = True
+        res@lbOrientation = "Vertical"
+        res@cnLevelSelectionMode = "ExplicitLevels"
+        res@cnLevels = fspan(-.6,.6,13)
+        res@cnFillPalette = "BlAqGrWh2YeOrReVi22"
+        REGRES
+ClimatePlotRes: 
+    plotScript: mpiexm/plot_mpiexm_climatology.ncl
+    CASE: CTN
+    YEARBE: YBEC
+    TITLE: "VN mean CTL TSEA (model year: NYC)"
+    FIGFILENAME: cli_VARI_CASE_TSEA_REGNAME
+    PLOTRES: |
+        res@cnLinesOn = False
+        res@cnFillOn = True
+        res@lbOrientation = "Vertical"
+        res@cnLevelSelectionMode = "ExplicitLevels"
+        res@cnLevels = fspan(2.,30.,29)
+        REGRES
+
+
+CTN: f08_1AGCM
+    ## proxy of CCASE 'control case'
+CCASE: CTN
+CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
+YBEC: 1101,1250
+CONTROLYEARBE: YBEC
+NYC: 150
+
+Case_CTL2:
+    CASE: f08_5AGCMs_NASPG_sample
+    TNAME: CTL2
+    YEARBE: 1101,1250
+    NYEAR: 150
+
+CASEDIR: /projects/NS9207K/pgchiu/CASE
+    ## CASE define later
+Case_IEave:
+    CASE: f08_5AGCMs_NASPG_average
+    TNAME: IE-average
+    YEARBE: 1101,1250
+    NYEAR: 150 
+Case_IEsam:
+    CASE: f09_5AGCMs_NASPG_sample
+    TNAME: IE-sample
+    YEARBE: 1101,1250
+    NYEAR: 150
+Month_ANN:
+    MONTHS: 0
+    TSEA: ANN
+Month_DJF:
+    MONTHS: "12,13,14"
+    TSEA: DJF
+Month_MAM:
+    MONTHS: "3,4,5"
+    TSEA: MAM
+Month_JJA:
+    MONTHS: "6,7,8"
+    TSEA: JJA
+Month_SON:
+    MONTHS: "9,10,11"
+    TSEA: SON
+    
+
+Scripts:
+-  # annual CTL climatology
+    varPack: ClimatePlotRes, Month_ANN, Global
+-  # annual CTL2 - CTL
+    varPack: DifferPlotRes, Month_ANN, Global, Case_CTL2
+-  # annual IEave - CTL
+    varPack: DifferPlotRes, Month_ANN, Global, Case_IEave
+-  # annual IEsam - CTL
+    varPack: DifferPlotRes, Month_ANN, Global, Case_IEsam
+
+
+-  # Do not know how to get full list of FIGFILENAME....
+    plotScript: mk_html_page.sh
+    FIGFILES: 
+        cli_VARI_CTN
+        dif_VARI_CAD
+        dif_VARI_sample
+        dif_VARI_average
+        cli_VARI_CTN_DJF
+        dif_VARI_CAD_DJF
+        dif_VARI_sample_DJF
+        dif_VARI_average_DJF
+        cli_VARI_CTN_MAM
+        dif_VARI_CAD_MAM
+        dif_VARI_sample_MAM
+        dif_VARI_average_MAM
+        cli_VARI_CTN_JJA
+        dif_VARI_CAD_JJA
+        dif_VARI_sample_JJA
+        dif_VARI_average_JJA
+        cli_VARI_CTN_SON
+        dif_VARI_CAD_SON
+        dif_VARI_sample_SON
+        dif_VARI_average_SON
+        
+        cli_VARI_CTN_natl
+        dif_VARI_CAD_natl
+        dif_VARI_sample_natl
+        dif_VARI_average_natl
+        cli_VARI_CTN_DJF_natl
+        dif_VARI_CAD_DJF_natl
+        dif_VARI_sample_DJF_natl
+        dif_VARI_average_DJF_natl
+        cli_VARI_CTN_MAM_natl
+        dif_VARI_CAD_MAM_natl
+        dif_VARI_sample_MAM_natl
+        dif_VARI_average_MAM_natl
+        cli_VARI_CTN_JJA_natl
+        dif_VARI_CAD_JJA_natl
+        dif_VARI_sample_JJA_natl
+        dif_VARI_average_JJA_natl
+        cli_VARI_CTN_SON_natl
+        dif_VARI_CAD_SON_natl
+        dif_VARI_sample_SON_natl
+        dif_VARI_average_SON_natl
+    COLUMN: figures CTL CTL2 CNS CNA 'tr' ANN 4 DJF 4 MAM 4 JJA 4 SON 4 ANN 4 DJF 4 MAM 4 JJA 4 SON 4

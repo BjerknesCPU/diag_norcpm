@@ -1,0 +1,393 @@
+# plot 1 day weather in mpiexm
+# mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
+
+Title: 1Day QFlux and cloud cover of IEave f08_5AGCMs_NASPG_average 1180-06-02
+Description:  |
+    Cloud cover and surface heat flux plots of f08_5AGCMs_NASPG_average at 1180-06-02 </br>
+    QFlux is downward heat flux, include sensible, latent heat flux and solar, thermal radiation.
+Thumbnail: f08_5AGCMs_NASPG_average_Q_FLUX_SFC_mean_1180_06_02_thumb.png
+COMPONENT:  echam6
+VECTORU: u10
+VECTORV: v10
+SHADING: aclcov
+CONTOUR: tsurf
+USECACHE: False
+YEAR: 1180
+MON: 06
+DAY: 02
+MONTH: MON
+
+REG: |
+    res@mpLimitMode = "LatLon"
+    res@mpMinLatF = 20.
+    res@mpMaxLatF = 70.
+    res@mpMinLonF = -80.
+    res@mpMaxLonF =  10.
+    res@mpCenterLatF = 50.
+    res@mpCenterLonF =  -35.
+    res@mpProjection = "LambertConformal"
+    res@mpGridAndLimbOn = True
+    res@gsnMaskLambertConformal = True
+    res@mpFillOn = False
+PLOTRES: |
+    REG
+    res@vcMinDistanceF = .02
+    res@vcRefLengthF = .05
+    res@vcRefMagnitudeF = 20. 
+    res@vcGlyphStyle  = "CurlyVector"
+    res@vcMonoLineArrowColor  = True
+    res@vcLineArrowColor = "yellowgreen"
+    res@vcLineArrowThicknessF = 2.5
+    res@vcRefAnnoString1  = res@vcRefMagnitudeF+" m/s"
+
+    res@lbBoxSeparatorLinesOn = False
+    res@cnLevelSelectionMode = "ExplicitLevels"
+    ;res@cnLevels = fspan(-300,-50,91) ;; for trad0
+    ;cmap = RGBtoCmap("CODEDIR/mpiexm/Madison_ir.rgb")
+    ;res@cnFillPalette = cmap
+    ;res@cnLevels = fspan(0.,0.6,61)
+    ;res@cnFillPalette = "cmocean_gray"
+    res@cnFillMode = "RasterFill"
+    res@cnLevels = fspan(.800 ,1.0,26)
+    res@cnFillPalette        = "WhiteBlueGreenYellowRed" ; set color map
+
+AVGRES: |
+    REG
+    res@vcMinDistanceF = .02
+    res@vcRefLengthF = .05
+    res@vcRefMagnitudeF =  20.
+    res@vcGlyphStyle  = "CurlyVector"
+    res@vcMonoLineArrowColor  = True
+    res@vcLineArrowColor = "yellowgreen"
+    res@vcLineArrowThicknessF = 2.5
+    res@vcRefAnnoString1  = res@vcRefMagnitudeF+" m/s"
+    res@lbBoxSeparatorLinesOn = False
+    res@cnLevelSelectionMode = "ExplicitLevels"
+    res@cnLevels = fspan(-300,300,201)
+    res@cnFillPalette = "NCV_blue_red"
+
+
+CASEDIR: /tos-project4/NS9207K/pgchiu/CASE
+    ## CASE define later
+
+CAA: f08_5AGCMs_NASPG_average
+CNA: IEave
+
+Scripts:
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    MDN: 1
+    MODELN: MDN
+    TITLE: "CNA model MDN cloud cover and 10 wind at YEAR-MON-DAY"
+    FIGFILENAME: CAA_mod1_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    MDN: 2
+    MODELN: MDN
+    TITLE: "CNA model MDN cloud cover and 10 wind at YEAR-MON-DAY"
+    FIGFILENAME: CAA_mod2_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    MDN: 3
+    MODELN: MDN
+    TITLE: "CNA model MDN cloud cover and 10 wind at YEAR-MON-DAY"
+    FIGFILENAME: CAA_mod3_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    MDN: 4
+    MODELN: MDN
+    TITLE: "CNA model MDN cloud cover and 10 wind at YEAR-MON-DAY"
+    FIGFILENAME: CAA_mod4_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    MDN: 5
+    MODELN: MDN
+    TITLE: "CNA model MDN cloud cover and 10 wind at YEAR-MON-DAY"
+    FIGFILENAME: CAA_mod5_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    TITLE: "CNA model mean Q_FLUX_SFC at YEAR-MON-DAY"
+    MODELN: (/1,2,3,4,5/)
+    VECTORU: u10
+    VECTORV: v10
+    SHADING: Q_FLUX_SFC
+    PLOTRES: AVGRES
+    FIGFILENAME: CAA_Q_FLUX_SFC_mean_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: Q_FLUX_SFC
+    PLOTRES: AVGRES
+    MDN: 1
+    MODELN: MDN
+    TITLE: "CNA model MDN Q_FLUX_SFC at YEAR-MON-DAY"
+    FIGFILENAME: CAA_Q_FLUX_SFC_mod1_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: Q_FLUX_SFC
+    PLOTRES: AVGRES
+    MDN: 2
+    MODELN: MDN
+    TITLE: "CNA model MDN Q_FLUX_SFC at YEAR-MON-DAY"
+    FIGFILENAME: CAA_Q_FLUX_SFC_mod2_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: Q_FLUX_SFC
+    PLOTRES: AVGRES
+    MDN: 3
+    MODELN: MDN
+    TITLE: "CNA model MDN Q_FLUX_SFC at YEAR-MON-DAY"
+    FIGFILENAME: CAA_Q_FLUX_SFC_mod3_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: Q_FLUX_SFC
+    PLOTRES: AVGRES
+    MDN: 4
+    MODELN: MDN
+    TITLE: "CNA model MDN Q_FLUX_SFC at YEAR-MON-DAY"
+    FIGFILENAME: CAA_Q_FLUX_SFC_mod4_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: Q_FLUX_SFC
+    PLOTRES: AVGRES
+    MDN: 5
+    MODELN: MDN
+    TITLE: "CNA model MDN Q_FLUX_SFC at YEAR-MON-DAY"
+    FIGFILENAME: CAA_Q_FLUX_SFC_mod5_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    TITLE: "CNA model mean ahfs at YEAR-MON-DAY"
+    MODELN: (/1,2,3,4,5/)
+    VECTORU: u10
+    VECTORV: v10
+    SHADING: ahfs
+    PLOTRES: AVGRES
+    FIGFILENAME: CAA_ahfs_mean_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: ahfs
+    PLOTRES: AVGRES
+    MDN: 1
+    MODELN: MDN
+    TITLE: "CNA model MDN ahfs at YEAR-MON-DAY"
+    FIGFILENAME: CAA_ahfs_mod1_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: ahfs
+    PLOTRES: AVGRES
+    MDN: 2
+    MODELN: MDN
+    TITLE: "CNA model MDN ahfs at YEAR-MON-DAY"
+    FIGFILENAME: CAA_ahfs_mod2_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: ahfs
+    PLOTRES: AVGRES
+    MDN: 3
+    MODELN: MDN
+    TITLE: "CNA model MDN ahfs at YEAR-MON-DAY"
+    FIGFILENAME: CAA_ahfs_mod3_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: ahfs
+    PLOTRES: AVGRES
+    MDN: 4
+    MODELN: MDN
+    TITLE: "CNA model MDN ahfs at YEAR-MON-DAY"
+    FIGFILENAME: CAA_ahfs_mod4_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: ahfs
+    PLOTRES: AVGRES
+    MDN: 5
+    MODELN: MDN
+    TITLE: "CNA model MDN ahfs at YEAR-MON-DAY"
+    FIGFILENAME: CAA_ahfs_mod5_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    TITLE: "CNA model mean ahfl at YEAR-MON-DAY"
+    MODELN: (/1,2,3,4,5/)
+    VECTORU: u10
+    VECTORV: v10
+    SHADING: ahfl
+    PLOTRES: AVGRES
+    FIGFILENAME: CAA_ahfl_mean_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: ahfl
+    PLOTRES: AVGRES
+    MDN: 1
+    MODELN: MDN
+    TITLE: "CNA model MDN ahfl at YEAR-MON-DAY"
+    FIGFILENAME: CAA_ahfl_mod1_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: ahfl
+    PLOTRES: AVGRES
+    MDN: 2
+    MODELN: MDN
+    TITLE: "CNA model MDN ahfl at YEAR-MON-DAY"
+    FIGFILENAME: CAA_ahfl_mod2_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: ahfl
+    PLOTRES: AVGRES
+    MDN: 3
+    MODELN: MDN
+    TITLE: "CNA model MDN ahfl at YEAR-MON-DAY"
+    FIGFILENAME: CAA_ahfl_mod3_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: ahfl
+    PLOTRES: AVGRES
+    MDN: 4
+    MODELN: MDN
+    TITLE: "CNA model MDN ahfl at YEAR-MON-DAY"
+    FIGFILENAME: CAA_ahfl_mod4_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: ahfl
+    PLOTRES: AVGRES
+    MDN: 5
+    MODELN: MDN
+    TITLE: "CNA model MDN ahfl at YEAR-MON-DAY"
+    FIGFILENAME: CAA_ahfl_mod5_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    TITLE: "CNA model mean srads at YEAR-MON-DAY"
+    MODELN: (/1,2,3,4,5/)
+    VECTORU: u10
+    VECTORV: v10
+    SHADING: srads
+    PLOTRES: AVGRES
+    FIGFILENAME: CAA_srads_mean_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: srads
+    PLOTRES: AVGRES
+    MDN: 1
+    MODELN: MDN
+    TITLE: "CNA model MDN srads at YEAR-MON-DAY"
+    FIGFILENAME: CAA_srads_mod1_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: srads
+    PLOTRES: AVGRES
+    MDN: 2
+    MODELN: MDN
+    TITLE: "CNA model MDN srads at YEAR-MON-DAY"
+    FIGFILENAME: CAA_srads_mod2_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: srads
+    PLOTRES: AVGRES
+    MDN: 3
+    MODELN: MDN
+    TITLE: "CNA model MDN srads at YEAR-MON-DAY"
+    FIGFILENAME: CAA_srads_mod3_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: srads
+    PLOTRES: AVGRES
+    MDN: 4
+    MODELN: MDN
+    TITLE: "CNA model MDN srads at YEAR-MON-DAY"
+    FIGFILENAME: CAA_srads_mod4_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: srads
+    PLOTRES: AVGRES
+    MDN: 5
+    MODELN: MDN
+    TITLE: "CNA model MDN srads at YEAR-MON-DAY"
+    FIGFILENAME: CAA_srads_mod5_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    TITLE: "CNA model mean trads at YEAR-MON-DAY"
+    MODELN: (/1,2,3,4,5/)
+    VECTORU: u10
+    VECTORV: v10
+    SHADING: trads
+    PLOTRES: AVGRES
+    FIGFILENAME: CAA_trads_mean_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: trads
+    PLOTRES: AVGRES
+    MDN: 1
+    MODELN: MDN
+    TITLE: "CNA model MDN trads at YEAR-MON-DAY"
+    FIGFILENAME: CAA_trads_mod1_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: trads
+    PLOTRES: AVGRES
+    MDN: 2
+    MODELN: MDN
+    TITLE: "CNA model MDN trads at YEAR-MON-DAY"
+    FIGFILENAME: CAA_trads_mod2_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: trads
+    PLOTRES: AVGRES
+    MDN: 3
+    MODELN: MDN
+    TITLE: "CNA model MDN trads at YEAR-MON-DAY"
+    FIGFILENAME: CAA_trads_mod3_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: trads
+    PLOTRES: AVGRES
+    MDN: 4
+    MODELN: MDN
+    TITLE: "CNA model MDN trads at YEAR-MON-DAY"
+    FIGFILENAME: CAA_trads_mod4_YEAR_MON_DAY
+-  
+    plotScript: mpiexm/plot_1day_weather.ncl
+    CASE: CAA
+    SHADING: trads
+    PLOTRES: AVGRES
+    MDN: 5
+    MODELN: MDN
+    TITLE: "CNA model MDN trads at YEAR-MON-DAY"
+    FIGFILENAME: CAA_trads_mod5_YEAR_MON_DAY
+-  
+    plotScript: mk_html_page.sh
+    FIGFILES:  CAA_mod1_1180_06_02 CAA_mod2_1180_06_02 CAA_mod3_1180_06_02 CAA_mod4_1180_06_02 CAA_mod5_1180_06_02 CAA_Q_FLUX_SFC_mean_1180_06_02 f08_5AGCMs_NASPG_average_Q_FLUX_SFC_mod1_1180_06_02 f08_5AGCMs_NASPG_average_Q_FLUX_SFC_mod2_1180_06_02 f08_5AGCMs_NASPG_average_Q_FLUX_SFC_mod3_1180_06_02 f08_5AGCMs_NASPG_average_Q_FLUX_SFC_mod4_1180_06_02 f08_5AGCMs_NASPG_average_Q_FLUX_SFC_mod5_1180_06_02 CAA_ahfs_mean_1180_06_02 f08_5AGCMs_NASPG_average_ahfs_mod1_1180_06_02 f08_5AGCMs_NASPG_average_ahfs_mod2_1180_06_02 f08_5AGCMs_NASPG_average_ahfs_mod3_1180_06_02 f08_5AGCMs_NASPG_average_ahfs_mod4_1180_06_02 f08_5AGCMs_NASPG_average_ahfs_mod5_1180_06_02 CAA_ahfl_mean_1180_06_02 f08_5AGCMs_NASPG_average_ahfl_mod1_1180_06_02 f08_5AGCMs_NASPG_average_ahfl_mod2_1180_06_02 f08_5AGCMs_NASPG_average_ahfl_mod3_1180_06_02 f08_5AGCMs_NASPG_average_ahfl_mod4_1180_06_02 f08_5AGCMs_NASPG_average_ahfl_mod5_1180_06_02 CAA_srads_mean_1180_06_02 f08_5AGCMs_NASPG_average_srads_mod1_1180_06_02 f08_5AGCMs_NASPG_average_srads_mod2_1180_06_02 f08_5AGCMs_NASPG_average_srads_mod3_1180_06_02 f08_5AGCMs_NASPG_average_srads_mod4_1180_06_02 f08_5AGCMs_NASPG_average_srads_mod5_1180_06_02 CAA_trads_mean_1180_06_02 f08_5AGCMs_NASPG_average_trads_mod1_1180_06_02 f08_5AGCMs_NASPG_average_trads_mod2_1180_06_02 f08_5AGCMs_NASPG_average_trads_mod3_1180_06_02 f08_5AGCMs_NASPG_average_trads_mod4_1180_06_02 f08_5AGCMs_NASPG_average_trads_mod5_1180_06_02
+    COLUMN: mean AGCM1 AGCM2 AGCM3 AGCM4 AGCM5 '</tr><tr>' 'cloud cover' '</tr><tr>' '--' 5 'QFlux' '</tr><tr>' 6 'Sensible Heat Flux' '</tr><tr>' 6 'Latent Heat Flux' '</tr><tr>' 6 'Solar Radiation' '</tr><tr>' 6 'Thermal Radiation' '</tr><tr>' 6
+    COMMENT: |
+        ECHAM6 model day 10 wind and cloud cover of YEAR-MON-DAY </br>
+        QFlux is downward heat flux, include sensible, latent heat flux, solar and thermal radiation.

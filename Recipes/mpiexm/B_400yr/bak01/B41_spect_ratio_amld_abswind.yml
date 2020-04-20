@@ -1,0 +1,105 @@
+# plot spectral ratio of mpiexm
+# mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
+
+Title: Daily max mixing layer depth and 10m wind speed (amld/wind10) spectral ratio at subtropical/subploar gyre region
+Description: Daily max mixing layer depth and 10m wind speed (amld/wind10) spectral ratio at subtropical/subploar gyre region
+COMMENT: Daily max mixing layer depth and 10m wind speed (amld/wind10) spectral ratio at subtropical/subploar gyre region
+#Thumbnail: maxML_var_ratio_average_case_thumb.png
+Depends: 
+    mpiexm/B_400yr/B31_daily_spect_abswind.yml
+    mpiexm/B_400yr/B31subP_daily_spect_abswind.yml
+    mpiexm/B_400yr/B33_daily_spect_amld.yml
+    mpiexm/B_400yr/B33subP_daily_spect_amld.yml
+VARFRAC: amld
+VARDENO: wind10
+VN: amld-wind10
+PLOTRES: |
+    res@trYMinF = 1.e-1
+    res@trYMaxF = 1.e8
+    res@trXMinF = 1.e-3
+    res@trXMaxF = 2.e2
+CONFIDENCEHIGH: .5
+CONFIDENCELOW: .5
+CONFIDENCELINES: 0
+
+CTN: f08_1AGCM
+    ## proxy of CCASE 'control case'
+
+CAA: f08_5AGCMs_NASPG_average
+CNA: IEave
+CAS: f08_5AGCMs_NASPG_sample
+CNS: IEsam
+
+
+Scripts:
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CTL subtropical"
+    FIGFILENAME: CTN_VN_spectral_ratio_subtropical
+    REFFRAC: B33_daily_spect_amld
+    REFDENO: B31_daily_spect_abswind
+    DATAFNFRAC: ../REFFRAC/CTN_VARFRAC_daily_spectral.nc
+    DATAFNDENO: ../REFDENO/CTN_VARDENO_daily_spectral.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_noise.nc
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CNA subtropical"
+    FIGFILENAME: CAA_VN_spectral_ratio_subtropical
+    REFFRAC: B33_daily_spect_amld
+    REFDENO: B31_daily_spect_abswind
+    DATAFNFRAC: ../REFFRAC/CAA_VARFRAC_daily_spectral.nc
+    DATAFNDENO: ../REFDENO/CAA_VARDENO_daily_spectral.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_noise.nc
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CNS subtropical"
+    FIGFILENAME: CAS_VN_spectral_ratio_subtropical
+    REFFRAC: B33_daily_spect_amld
+    REFDENO: B31_daily_spect_abswind
+    DATAFNFRAC: ../REFFRAC/CAS_VARFRAC_daily_spectral.nc
+    DATAFNDENO: ../REFDENO/CAS_VARDENO_daily_spectral.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_noise.nc
+    
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CTL subpolar"
+    FIGFILENAME: CTN_VN_spectral_ratio_subpolar
+    REFFRAC: B33subP_daily_spect_amld
+    REFDENO: B31subP_daily_spect_abswind
+    DATAFNFRAC: ../REFFRAC/CTN_VARFRAC_daily_spectral.nc
+    DATAFNDENO: ../REFDENO/CTN_VARDENO_daily_spectral.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_noise.nc
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CNA subpolar"
+    FIGFILENAME: CAA_VN_spectral_ratio_subpolar
+    REFFRAC: B33subP_daily_spect_amld
+    REFDENO: B31subP_daily_spect_abswind
+    DATAFNFRAC: ../REFFRAC/CAA_VARFRAC_daily_spectral.nc
+    DATAFNDENO: ../REFDENO/CAA_VARDENO_daily_spectral.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_noise.nc
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CNS subpolar"
+    FIGFILENAME: CAS_VN_spectral_ratio_subpolar
+    REFFRAC: B33subP_daily_spect_amld
+    REFDENO: B31subP_daily_spect_abswind
+    DATAFNFRAC: ../REFFRAC/CAS_VARFRAC_daily_spectral.nc
+    DATAFNDENO: ../REFDENO/CAS_VARDENO_daily_spectral.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_noise.nc
+-  
+    plotScript: mk_html_page.sh
+    FIGFILES:
+        CAS_VN_spectral_ratio_subtropical
+        CAA_VN_spectral_ratio_subtropical
+        CTN_VN_spectral_ratio_subtropical
+        CAS_VN_spectral_ratio_subpolar
+        CAA_VN_spectral_ratio_subpolar
+        CTN_VN_spectral_ratio_subpolar
+    COLUMN: SpectralRatio '</tr><tr>' CNS CNA Control '</tr><tr>' 'Subtropical gyre (70W-20W, 20N-40N)' '</tr><tr>' 3 'Subpolar gyre (50W-15W, 45N-57N)' '</tr><tr>' 3 

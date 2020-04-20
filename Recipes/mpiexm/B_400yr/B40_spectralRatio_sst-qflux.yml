@@ -1,0 +1,194 @@
+# plot spectral ratio of mpiexm
+# mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
+
+Title: Daily SST and QFlux spectral ratio at subtropical/subploar gyre region
+Description: Daily SST and QFlux spectral ratio at subtropical/subploar gyre region
+COMMENT: Daily SST and QFlux spectral ratio at subtropical/subploar gyre and region
+#Thumbnail: maxML_var_ratio_average_case_thumb.png
+Depends: 
+    mpiexm/B_400yr/B30_spectral_sst.yml
+    mpiexm/B_400yr/B32_spectral_qflux.yml
+REFFRAC: A30_spectral_sst
+REFDENO: A32_spectral_qflux
+VARFRAC: sst
+VARDENO: Q_FLUX_SFC
+VN: SST-QFlux
+PLOTRES: |
+    res@trYMinF = 1.e-9
+    res@trYMaxF = 1.e1
+    res@trXMinF = 1.e-3
+    res@trXMaxF = 4.e2
+CONFIDENCEHIGH: .5
+CONFIDENCELOW: .5
+CONFIDENCELINES: 0
+
+CTN: f08_1AGCM
+    ## proxy of CCASE 'control case'
+CAD: f08_5AGCMs_NASPG_sample
+CND: CTL2
+
+CAA: f08_5AGCMs_NASPG_average
+CNA: IE-average
+CAS: f09_5AGCMs_NASPG_sample_notdone
+CNS: IE-sample
+
+
+Scripts:
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CTL subtropical"
+    FIGFILENAME: CTN_VN_spectral_ratio_subtropical
+    TAG: stgyre
+    TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
+    DATAFNFRAC: ../REFFRAC/CTN_VARFRAC_daily_spect_TAG.nc
+    DATAFNDENO: ../REFDENO/CTN_VARDENO_daily_spect_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_noise_TAG.nc
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CNA subtropical"
+    FIGFILENAME: CAA_VN_spectral_ratio_subtropical
+    TAG: stgyre
+    TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
+    DATAFNFRAC: ../REFFRAC/CAA_VARFRAC_daily_spect_TAG.nc
+    DATAFNDENO: ../REFDENO/CAA_VARDENO_daily_spect_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_noise_TAG.nc
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CNS subtropical"
+    FIGFILENAME: CAS_VN_spectral_ratio_subtropical
+    TAG: stgyre
+    TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
+    DATAFNFRAC: ../REFFRAC/CAS_VARFRAC_daily_spect_TAG.nc
+    DATAFNDENO: ../REFDENO/CAS_VARDENO_daily_spect_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_noise_TAG.nc
+    
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CTL subpolar"
+    FIGFILENAME: CTN_VN_spectral_ratio_subpolar
+    TAG: spgyre
+    TTAG: '50~F34~0~F~W-15~F34~0~F~W, 45~F34~0~F~N-57~F34~0~F~N'
+    DATAFNFRAC: ../REFFRAC/CTN_VARFRAC_daily_spect_TAG.nc
+    DATAFNDENO: ../REFDENO/CTN_VARDENO_daily_spect_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_noise_TAG.nc
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CNA subpolar"
+    FIGFILENAME: CAA_VN_spectral_ratio_subpolar
+    TAG: spgyre
+    TTAG: '50~F34~0~F~W-15~F34~0~F~W, 45~F34~0~F~N-57~F34~0~F~N'
+    DATAFNFRAC: ../REFFRAC/CAA_VARFRAC_daily_spect_TAG.nc
+    DATAFNDENO: ../REFDENO/CAA_VARDENO_daily_spect_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_noise_TAG.nc
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CNS subpolar"
+    FIGFILENAME: CAS_VN_spectral_ratio_subpolar
+    TAG: spgyre
+    TTAG: '50~F34~0~F~W-15~F34~0~F~W, 45~F34~0~F~N-57~F34~0~F~N'
+    DATAFNFRAC: ../REFFRAC/CAS_VARFRAC_daily_spect_TAG.nc
+    DATAFNDENO: ../REFDENO/CAS_VARDENO_daily_spect_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_noise_TAG.nc
+
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CTL subtropical"
+    FIGFILENAME: CTN_VN_spectral_ratio_subtropical_scr
+    TAG: stgyre
+    TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
+    DATAFNFRAC: ../REFFRAC/CTN_VARFRAC_daily_spect_TAG.nc
+    DATAFNDENO: ../REFDENO/CTN_VARDENO_daily_spect_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_acr_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CNA subtropical"
+    FIGFILENAME: CAA_VN_spectral_ratio_subtropical_scr
+    TAG: stgyre
+    TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
+    DATAFNFRAC: ../REFFRAC/CAA_VARFRAC_daily_spect_TAG.nc
+    DATAFNDENO: ../REFDENO/CAA_VARDENO_daily_spect_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_acr_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CNS subtropical"
+    FIGFILENAME: CAS_VN_spectral_ratio_subtropical_scr
+    TAG: stgyre
+    TTAG: '70~F34~0~F~W-20~F34~0~F~W, 20~F34~0~F~N-40~F34~0~F~N'
+    DATAFNFRAC: ../REFFRAC/CAS_VARFRAC_daily_spect_TAG.nc
+    DATAFNDENO: ../REFDENO/CAS_VARDENO_daily_spect_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_acr_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+    
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CTL subpolar"
+    FIGFILENAME: CTN_VN_spectral_ratio_subpolar_scr
+    TAG: spgyre
+    TTAG: '50~F34~0~F~W-15~F34~0~F~W, 45~F34~0~F~N-57~F34~0~F~N'
+    DATAFNFRAC: ../REFFRAC/CTN_VARFRAC_daily_spect_TAG.nc
+    DATAFNDENO: ../REFDENO/CTN_VARDENO_daily_spect_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_acr_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CNA subpolar"
+    FIGFILENAME: CAA_VN_spectral_ratio_subpolar_scr
+    TAG: spgyre
+    TTAG: '50~F34~0~F~W-15~F34~0~F~W, 45~F34~0~F~N-57~F34~0~F~N'
+    DATAFNFRAC: ../REFFRAC/CAA_VARFRAC_daily_spect_TAG.nc
+    DATAFNDENO: ../REFDENO/CAA_VARDENO_daily_spect_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_acr_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+-  
+    plotScript: mpiexm/plot_mpiexm_daily_spectral_ratio.ncl
+    TITLE: "VN spectral ratio CNS subpolar"
+    FIGFILENAME: CAS_VN_spectral_ratio_subpolar_scr
+    TAG: spgyre
+    TTAG: '50~F34~0~F~W-15~F34~0~F~W, 45~F34~0~F~N-57~F34~0~F~N'
+    DATAFNFRAC: ../REFFRAC/CAS_VARFRAC_daily_spect_TAG.nc
+    DATAFNDENO: ../REFDENO/CAS_VARDENO_daily_spect_TAG.nc
+    REDNOISEFILEFRAC: ../REFFRAC/CTL_acr_noise_TAG.nc
+    REDNOISEFILEDENO: ../REFDENO/CTL_acr_noise_TAG.nc
+    REMOVEDAILYCLIMATE: True
+
+-  
+    plotScript: mk_html_page.sh
+    FIGFILES:
+        CAS_VN_spectral_ratio_subtropical
+        CAA_VN_spectral_ratio_subtropical
+        CTN_VN_spectral_ratio_subtropical
+        CAS_VN_spectral_ratio_subpolar
+        CAA_VN_spectral_ratio_subpolar
+        CTN_VN_spectral_ratio_subpolar
+
+        CAS_VN_spectral_ratio_subtropical_scr
+        CAA_VN_spectral_ratio_subtropical_scr
+        CTN_VN_spectral_ratio_subtropical_scr
+        CAS_VN_spectral_ratio_subpolar_scr
+        CAA_VN_spectral_ratio_subpolar_scr
+        CTN_VN_spectral_ratio_subpolar_scr
+    COLUMN: 
+        SpectralRatio 'tr' 
+        CNS CNA Control 'tr' 
+        'Subtropical gyre (70W-20W, 20N-40N)' 'tr'
+        3 
+        'Subpolar gyre (50W-15W, 45N-57N)' 'tr'
+        3 
+        'Subtropical gyre (70W-20W, 20N-40N), </br>seasonal cycle removed' 'tr'
+        3
+        'Subpolar gyre (50W-15W, 45N-57N), </br>seasonal cycle removed' 'tr'
+        3 
+
