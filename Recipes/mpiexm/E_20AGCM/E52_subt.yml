@@ -109,18 +109,18 @@ CTN: f08_1AGCM
     ## proxy of CCASE 'control case'
 CCASE: CTN
 CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
-YBEC: 1101,1150
+YBEC: 1101,1242
 CONTROLYEARBE: YBEC
-NYC: 50
+NYC: 142
 
 CAA: f08_5AGCMs_NASPG_average
 CNA: IE-average
-YBEA: 1101,1150
-NYA: 50 
+YBEA: 1101,1242
+NYA: 142 
 CAS: f08_5AGCMs_NASPG_sample
 CNS: IE-average20
-YBES: 1101,1150
-NYS: 50
+YBES: 1101,1242
+NYS: 142
 
 
 Scripts:
@@ -226,7 +226,7 @@ Scripts:
     COMPONENT: echam6
     UVARIABLE: u10
     VVARIABLE: v10
-    MODELN: "(/1,2,3,4,5/)"
+    MODELN: "ispan(1,20,1)"
     FIGFILENAME: CASE_VN_sfc_uv_reg
     TSNETCDFFILE: CASE_VN_amo
     TSVARNAME: ts

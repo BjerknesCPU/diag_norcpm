@@ -415,7 +415,7 @@ begin
     if(all(dims.eq.(/96,192/)))then  ;; for atm, need modify
         af = addfile(g_areafile,"r")
         vn = "al01.srf"
-        area = f->$vn$
+        area = af->$vn$
         wgt = wgt / sum(wgt)
     end if
     if(all(dims.eq.(/220,256/)))then  ;; for ocn, need modify
@@ -1067,6 +1067,30 @@ begin
     end if
     return read_mpiexm_filevar_daily_1m(case, casedir,component,varname,year,month,modeln)
 end
+function read_mpiexm_var_daily_months(case, casedir,component,varname,yyyymms[*],modeln)
+begin
+    ;; front end for read_mpiexm_var_daily_1m()
+    nm = dimsizes(yyyymms)
+    if(nm.eq.1)then
+        year = yyyymms(0) / 100
+        month = yyyymms(0) % 100
+        return read_mpiexm_var_daily_1m(case, casedir,component,varname,year,month,modeln)
+    end if
+
+    
+    year = yyyymms(0) / 100
+    month = yyyymms(0) % 100
+    v1 = read_mpiexm_var_daily_1m(case, casedir,component,varname,year,month,modeln)
+    do m = 1, nm-1
+        year = yyyymms(m) / 100
+        month = yyyymms(m) % 100
+        v1 := array_append_record(v1,read_mpiexm_var_daily_1m(case, casedir,component,varname,year,month,modeln),0)
+    end do
+
+    return v1
+
+end
+
 function read_mpiexm_filevar_season_1y(case, casedir,component,ivarname,year,months,modeln)
 begin
     ;; read months monthly data in same year
@@ -1626,4 +1650,6 @@ end
 ;a = fn_mpiexm("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","echam6","aps",1060,12,1)
 ;print(a)
 ;a = read_mpiexm_season_mean_ensmean_ZLL("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","psitro",(/1060,1061,1062,1063/),(/6/),0) 
+
+;a = read_mpiexm_var_daily_months("f08_5AGCMs_NASPG_average","/projects//NS9207K/pgchiu/f08_5AGCMs_NASPG_average","mpiom","amld",(/106102,106103,106104/),1)
 ;printVarSummary(a)

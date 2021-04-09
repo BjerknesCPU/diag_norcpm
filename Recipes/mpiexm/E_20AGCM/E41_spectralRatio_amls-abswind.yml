@@ -8,8 +8,8 @@ COMMENT: Daily max mixing layer depth and 10m wind speed (amld/wind10) spectral 
 Depends: 
     mpiexm/E_20AGCM/E31_spectral_abswind.yml
     mpiexm/E_20AGCM/E33_spectral_amld.yml
-REFFRAC: E31_spectral_abswind
-REFDENO: E33_spectral_amld
+REFFRAC: A31_spectral_abswind
+REFDENO: A33_spectral_amld
 VARFRAC: amld
 VARDENO: wind10
 VN: amld-wind10

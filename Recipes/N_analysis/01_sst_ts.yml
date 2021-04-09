@@ -1,0 +1,129 @@
+# plot for NorCPM2 analysis, which is import HadISST with EnKF
+
+Title: SST time series
+Description: SST time series of NorCPM2 analysis with HadISST
+COMMENT: |
+    SST time series of NorCPM2 analysis with HadISST
+
+Tags: sst, timeSeries
+
+FORECASTDIRS: BASEDIR
+COMPONENT: ocn
+VARIABLE: sst
+OBSDATASET: SST/HADISST
+OBSVARNAME: sst
+
+YEARB: 1970
+YEARE: 2014
+YEARBE: YEARB,YEARE
+MONTHS: 0
+
+RegNino34:
+    LATBE: -5.,5.
+    LONBE: -150.,-90.
+    REG: nino34
+    PLOTRES: |
+        res@trYMinF = 24.
+RegNAtl:
+    LATBE:  10.,60.
+    LONBE: -60.,-20.
+    REG: natl
+    PLOTRES: |
+        res@trYMinF = 16.
+        res@trYMaxF = 23.
+RegNPac:
+    LATBE:  10.,60.
+    LONBE: 120.,200.
+    REG: npac
+    PLOTRES: |
+        res@trYMinF = 16.
+        res@trYMaxF = 23.
+
+Scripts:
+-   ## time series of annual
+    varPack: RegNino34
+    plotScript: Decadal/plot_mean_ts_ens.ncl
+    TITLE: REG HadISST and analysis
+    FIGFILENAME: ts_VARIABLE_REG
+-   ## time series of DJF
+    varPack: RegNino34
+    plotScript: Decadal/plot_mean_ts_ens.ncl
+    TITLE: REG HadISST and analysis DJF
+    FIGFILENAME: ts_VARIABLE_REG_DJF
+    MONTHS: 12,1,2
+-   ## time series of JJA
+    varPack: RegNino34
+    plotScript: Decadal/plot_mean_ts_ens.ncl
+    TITLE: REG HadISST and analysis JJA
+    FIGFILENAME: ts_VARIABLE_REG_JJA
+    MONTHS: 6,7,8
+-   ## time series of annual
+    varPack: RegNAtl
+    plotScript: Decadal/plot_mean_ts_ens.ncl
+    TITLE: REG HadISST and analysis
+    FIGFILENAME: ts_VARIABLE_REG
+-   ## time series of DJF
+    varPack: RegNAtl
+    plotScript: Decadal/plot_mean_ts_ens.ncl
+    TITLE: REG HadISST and analysis DJF
+    FIGFILENAME: ts_VARIABLE_REG_DJF
+    MONTHS: 12,1,2
+-   ## time series of JJA
+    varPack: RegNAtl
+    plotScript: Decadal/plot_mean_ts_ens.ncl
+    TITLE: REG HadISST and analysis JJA
+    FIGFILENAME: ts_VARIABLE_REG_JJA
+    MONTHS: 6,7,8
+-   ## time series of annual
+    varPack: RegNPac
+    plotScript: Decadal/plot_mean_ts_ens.ncl
+    TITLE: REG HadISST and analysis
+    FIGFILENAME: ts_VARIABLE_REG
+-   ## time series of DJF
+    varPack: RegNPac
+    plotScript: Decadal/plot_mean_ts_ens.ncl
+    TITLE: REG HadISST and analysis DJF
+    FIGFILENAME: ts_VARIABLE_REG_DJF
+    MONTHS: 12,1,2
+-   ## time series of JJA
+    varPack: RegNPac
+    plotScript: Decadal/plot_mean_ts_ens.ncl
+    TITLE: REG HadISST and analysis JJA
+    FIGFILENAME: ts_VARIABLE_REG_JJA
+    MONTHS: 6,7,8
+-   ## ens mean lat/lon plot 
+    plotScript: plot_ens_mean_latlon.ncl.notyet
+    INPUTFILES: BASEDIR/*/ocn/hist/*.hm.{YEARB..YEARE}-*.nc
+    TITLE: REG analysis
+    FIGFILENAME: VARIABLE_ensmean
+-   ## ens mean lat/lon plot DJF
+    plotScript: plot_ens_mean_latlon.ncl.notyet
+    INPUTFILES: BASEDIR/*/ocn/hist/*hm.{YEARB..YEARE}-{12,01,02}.nc
+    TITLE: REG analysis DJF
+    FIGFILENAME: VARIABLE_ensmean_DJF
+-   ## ens mean lat/lon plot JJA
+    plotScript: plot_ens_mean_latlon.ncl.notyet
+    INPUTFILES: BASEDIR/*/ocn/hist/*hm.{YEARB..YEARE}-{06,07,08}.nc
+    TITLE: REG analysis JJA
+    FIGFILENAME: VARIABLE_ensmean_JJA
+
+-  # mk html pages with figure filename
+    plotScript: mk_html_page.sh
+    COLUMN: |
+        NINO3.4 3
+        NAtl    3
+        NPac    3
+        SST     3
+    FIGFILES: 
+        ts_sst_nino34
+        ts_sst_nino34_DJF
+        ts_sst_nino34_JJA
+        ts_sst_natl
+        ts_sst_natl_DJF
+        ts_sst_natl_JJA
+        ts_sst_npac
+        ts_sst_npac_DJF
+        ts_sst_npac_JJA
+        sst_ensmean
+        sst_ensmean_DJF
+        sst_ensmean_JJA

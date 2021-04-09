@@ -12,7 +12,7 @@ MONTHS: 0
 VARI: atlantic_moc
 VARIABLE: VARI
 VN: AMOC
-RERES:  |
+REGRES:  |
     ;; Coordinates
     res@trYReverse = True
     res@gsnYAxisIrregular2Linear = True ; converts irreg depth to linear 
@@ -20,7 +20,7 @@ RERES:  |
     res@trYMaxF = 5000.
     res@trYMinF =    0.
 DIFRES:  | ## for dif plot
-    RERES
+    REGRES
     res@cnLinesOn = False
     res@cnFillOn = True
     res@cnFillMode = "CellFill"
@@ -33,7 +33,7 @@ DIFRES:  | ## for dif plot
     vardif = vardif* 1.e-9
     vardif@units = "Sv"
 CTLRES:  |
-    RERES
+    REGRES
     res@cnLinesOn = False
     res@cnFillOn = True
     res@cnFillMode = "CellFill"
@@ -52,25 +52,25 @@ CTN: f08_1AGCM
     ## proxy of CCASE 'control case'
 CCASE: CTN
 CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
-YBEC: 1101,1150
+YBEC: 1101,1242
 CONTROLYEARBE: YBEC
-NYC: 50
+NYC: 142
 
 CAD: f08_5AGCMs_NASPG_sample
 CND: CTL2
-YBED: 1101,1150
-NYD: 50
+YBED: 1101,1242
+NYD: 142
 
 CASEDIR: /projects/NS9207K/pgchiu/CASE
     ## CASE define later
 CAA: f08_5AGCMs_NASPG_average
 CNA: IE-average
-YBEA: 1101,1150
-NYA: 50 
+YBEA: 1101,1242
+NYA: 142 
 CAS: f08_20AGCMs_NASPG_test
 CNS: IE-average20
-YBES: 1101,1150
-NYS: 50
+YBES: 1101,1242
+NYS: 142
 
 
 Scripts:

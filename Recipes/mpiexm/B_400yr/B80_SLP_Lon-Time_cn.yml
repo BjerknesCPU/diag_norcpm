@@ -1,0 +1,115 @@
+# plot data variance in mpiexm
+# mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
+
+Title: SLP lat-time contour
+Description: 
+    SLP lat-time contour
+COMMENT: |
+    SLP lat-time contour
+COMPONENT:  echam6
+VN: slp
+TVN: SLP
+VARIABLE:  VN
+
+## plots setting
+FIGFILES: $(cat figfilelist.txt) # for mk_html_pages.sh
+
+PLOTRES: |
+    res@cnLevelSelectionMode  = "ExplicitLevels"
+    res@cnLevels              = fspan(950,1050,21)
+    varDL = varDL/100
+    varDL@units = "hPa"
+    res@gsnRightString = varDL@units
+    res@gsnLeftString = "NAME"
+    res@vpWidthF = .3
+    res@tmYLLabelFontHeightF = .01 
+    res@lbLabelFontHeightF = .01
+plotLonDay_Lat50:
+    plotScript: mpiexm/plot_mpiexm_lon-day_cn.ncl
+    TITLE: "TVN Lon-Day at Lat 50-55N "
+    FIGFILENAME: VN_londay_CASE_modMODELN_lat50_TTAG
+    LATBE: 50,55
+plotLonDay_Lat40:
+    plotScript: mpiexm/plot_mpiexm_lon-day_cn.ncl
+    TITLE: "TVN Lon-Day at Lat 40-45N "
+    FIGFILENAME: VN_londay_CASE_modMODELN_lat40_TTAG
+    LATBE: 40,45
+
+Year_1201:
+    YYYYMMS: 120101,120102,120103,120104,120105,120106,120107,120108,120109,120110,120111,120112
+    TTAG: yr1201 
+Year_1301:
+    YYYYMMS: 130101,130102,130103,130104,130105,130106,130107,130108,130109,130110,130111,130112
+    TTAG: yr1301 
+## case setting
+CASEDIR: /projects/NS9207K/pgchiu/CASE
+    ## CASE define later
+
+Case_CTL:
+    CASE: f08_1AGCM
+    NAME: CTL
+    MODELN: 0
+Case_CTL2:
+    CASE: f08_5AGCMs_NASPG_sample
+    NAME: CTL2
+    MODELN: 1
+Case_AVG:
+    CASE: f08_5AGCMs_NASPG_average
+    NAME: IEave
+    MODELN: 1
+Case_AVG_glob:
+    CASE: f09_5AGCMs_Global_average
+    NAME: IEGave
+    MODELN: 1
+Case_SAM:
+    CASE: f09_5AGCMs_NASPG_sample
+    NAME: IEsam
+    MODELN: 1
+ModelN_2:
+    MODELN: 2
+
+Scripts:
+-  # Remove figfilelist.txt which is for mk_html_page.sh at bottom
+    plotScript: mk_runcode.sh
+    RUNTHESECODES: |
+        rm -f figfilelist.txt
+- varPack: plotLonDay_Lat50, Year_1201, Case_CTL
+- varPack: plotLonDay_Lat50, Year_1201, Case_CTL2
+- varPack: plotLonDay_Lat50, Year_1201, Case_SAM
+- varPack: plotLonDay_Lat50, Year_1201, Case_AVG
+- varPack: plotLonDay_Lat50, Year_1201, Case_AVG_glob
+- varPack: plotLonDay_Lat50, Year_1301, Case_CTL
+- varPack: plotLonDay_Lat50, Year_1301, Case_CTL2
+- varPack: plotLonDay_Lat50, Year_1301, Case_SAM
+- varPack: plotLonDay_Lat50, Year_1301, Case_AVG
+- varPack: plotLonDay_Lat50, Year_1301, Case_AVG_glob
+
+- varPack: plotLonDay_Lat40, Year_1201, Case_CTL
+- varPack: plotLonDay_Lat40, Year_1201, Case_CTL2
+- varPack: plotLonDay_Lat40, Year_1201, Case_SAM
+- varPack: plotLonDay_Lat40, Year_1201, Case_AVG
+- varPack: plotLonDay_Lat40, Year_1201, Case_AVG_glob
+- varPack: plotLonDay_Lat40, Year_1301, Case_CTL
+- varPack: plotLonDay_Lat40, Year_1301, Case_CTL2
+- varPack: plotLonDay_Lat40, Year_1301, Case_SAM
+- varPack: plotLonDay_Lat40, Year_1301, Case_AVG
+- varPack: plotLonDay_Lat40, Year_1301, Case_AVG_glob
+
+- varPack: plotLonDay_Lat40, Year_1301, Case_SAM, ModelN_2
+- varPack: plotLonDay_Lat40, Year_1301, Case_AVG, ModelN_2
+- varPack: plotLonDay_Lat40, Year_1301, Case_AVG_glob, ModelN_2
+
+-  
+    plotScript: mk_html_page.sh
+    COLUMN:
+        Year CTL CTL2 IE-sample IE-average IE-average_global 'tr' 
+        Lat_50 'tr'
+        Year_1201 5
+        Year_1301 5
+
+        Lat_40 'tr'
+        Year_1201 5
+        Year_1301 5
+
+        ModelN_2 '-' '-' 3
+

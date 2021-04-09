@@ -55,8 +55,8 @@ PLOTRES: |
 TSRES: |
     res@trYMinF = -100.
     res@trYMaxF =  100.
-TLAT: 50.,60.
-TLON: -40,-10
+TLAT: TLAT
+TLON: TLON
 TADD: 50~F34~0~F~N-60~F34~0~F~N,40~F34~0~F~W-10~F34~0~F~W
     ## append coordinate to title of time series figures
 
@@ -67,23 +67,23 @@ CTN: f08_1AGCM
     ## proxy of CCASE 'control case'
 CCASE: CTN
 CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
-YBEC: 1101,1150
+YBEC: 1101,1242
 CONTROLYEARBE: YBEC
-NYC: 50
+NYC: 142
 
 CAD: f08_5AGCMs_NASPG_sample
 CND: CTL2
-YBED: 1101,1150
-NYD: 50
+YBED: 1101,1242
+NYD: 142
 
 CAA: f08_5AGCMs_NASPG_average
 CNA: IE-average
-YBEA: 1101,1150
-NYA: 50 
+YBEA: 1101,1242
+NYA: 142 
 CAS: f08_20AGCMs_NASPG_test
 CNS: IE-average20
-YBES: 1101,1150
-NYS: 50
+YBES: 1101,1242
+NYS: 142
 
 
 Scripts:
@@ -415,5 +415,5 @@ Scripts:
         OHC100_ts_average_SON
         OHC100_ts_control_SON
 
-    COLUMN: figs CNS CNA Control 'tr' 'OHC100' 'tr' ANN 2 - 2 ANN 3 '(OHC200)' 2 '(OHC500)' 'tr' ANN 2 DJF 2 MAM 2 JJA 2 SON 2 'OHC100' 'tr' DJF 3 MAM 3 JJA 3 SON 3
+    COLUMN: figs CNS CNA Control 'tr' 'OHC100' 'tr' ANN 2 2 ANN 3 '(OHC200)' 2 '(OHC500)' 'OHC100' 'tr' DJF 2 MAM 2 JJA 2 SON 2 DJF 3 MAM 3 JJA 3 SON 3
 

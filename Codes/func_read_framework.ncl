@@ -634,7 +634,7 @@ begin
         ;; one file with all data
         opt = True
             opt@datafilename = "SST/HadISST_sst_187001-201910.nc"
-        data = read_data_profile_03("~/NS9039K/shared/obsdata/gridded", dataset, varname, years, months, lev, latbe, lonbe, opt)
+        data = read_data_profile_03("~/NS9039K/shared/obsdata/regridded", dataset, varname, years, months, lev, latbe, lonbe, opt)
         data = where(data.lt.-2,data@_FillValue,data)
         return data
     end if

@@ -18,7 +18,7 @@ column=(COLUMN)
     ## can be a array
 ncolarr=${#column[*]}
 
-export MAGICK_THREAD_LIMIT=1   ## avoid "libgomp: Thread creation failed"
+#export MAGICK_THREAD_LIMIT=1   ## avoid "libgomp: Thread creation failed"
 
 # html header
 text=$'\n'
@@ -69,8 +69,11 @@ col=${column[$icol]}
 for i in ${figs}; do
     if [ -f "${i}.ps" ] ; then ## ps2png
         convert -density 300 "${i}.ps" ${i}.png
+        if [  $? != 0 ];then
+            MAGICK_THREAD_LIMIT=1 convert -density 300 "${i}.ps" ${i}.png
+        fi
         gzip -f "${i}.ps"
-    fi 
+    fi
     if [ -f "${i}.png" ] ; then ## trim white edge and make thumbnail
         convert ${i}.png -fuzz 1% -trim +repage tmp-${i}-${pid}.png 
         mv tmp-${i}-${pid}.png ${i}.png

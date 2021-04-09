@@ -20,9 +20,12 @@ FIGFILES: $(cat figfilelist.txt) # for mk_html_pages.sh
 
 VariGlobal:
     plotScript: mpiexm/plot_mpiexm_variance.ncl
-    TITLE: "yearly TVN variance ratio NAME/CTL (model year: NAME=NYR, CTL=NYC)"
+    TITLE: "yearly TVN variance ratio NAME/CTL"
     FIGFILENAME: VN_var-ratio_CASE_SEAS
     PLOTRES: |
+        res@tiMainString = title
+        res@tiMainOffsetYF  = -.040
+        res@gsnLeftString = "model year: NAME=NYR, CTL=NYC"
         res@mpLimitMode = "LatLon"
         res@mpMinLatF = -90.
         res@mpMaxLatF = 90.

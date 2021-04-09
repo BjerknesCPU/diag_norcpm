@@ -1,0 +1,10 @@
+plotCase: norcpm_verify
+BASEDIR: /trd-project4/NS9039K/shared/pgchiu/archive/noresm_ctl_f09_tn14_19700101
+RUNPRE:
+plotRecipes:
+
+outputDir: /nird/home/pgchiu/scratch/work/work_20agcm
+diag_norcpm_Root: /nird/home/pgchiu/scratch/diag_norcpm
+DefaultYML: /nird/home/pgchiu/scratch/diag_norcpm/Defaults.yml
+Dryrun: False
+

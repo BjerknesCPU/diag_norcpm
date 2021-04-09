@@ -4,8 +4,8 @@
 
 ;;DIAG_NORCPM; MINLAT: -90.
 ;;DIAG_NORCPM; MAXLAT:  90.
-;;DIAG_NORCPM; MINLON:   0.
-;;DIAG_NORCPM; MAXLON: 360.
+;;DIAG_NORCPM; MINLON:  30.
+;;DIAG_NORCPM; MAXLON: 390.
 ;;DIAG_NORCPM; OCNGRIDFILE: ../../Data/grid.nc
 ;;DIAG_NORCPM; FIGFILENAME: fig
 ;;DIAG_NORCPM; BEFOREPLOT: 
@@ -18,7 +18,7 @@
     ;; higher shade pattern, =2 means vertical lines
 ;;DIAG_NORCPM; SHADELOW: 17
     ;; lower shade pattern, =17 means dots
-;;DIAG_NORCPM; PROJECTION: LambertConformal
+;;DIAG_NORCPM; PROJECTION: CylindricalEquidistant
 
 
 load "CODEDIR/func_read_all_members.ncl"
@@ -51,6 +51,7 @@ begin
         res@mpMaxLatF = MAXLAT
         res@mpMinLonF = MINLON
         res@mpMaxLonF = MAXLON
+        res@mpCenterLonF = (MINLON+MAXLON)/2
         res@mpProjection = projection
         if(res@mpProjection .eq. "LambertConformal")then
             res@gsnMaskLambertConformal = True

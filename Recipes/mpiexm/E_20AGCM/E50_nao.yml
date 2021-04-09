@@ -63,18 +63,18 @@ CTN: f08_1AGCM
     ## proxy of CCASE 'control case'
 CCASE: CTN
 CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
-YBEC: 1101,1150
+YBEC: 1101,1242
 CONTROLYEARBE: YBEC
-NYC: 50
+NYC: 142
 
 CAA: f08_5AGCMs_NASPG_average
 CNA: IE-average
-YBEA: 1101,1150
-NYA: 50 
+YBEA: 1101,1242
+NYA: 142 
 CAS: f08_5AGCMs_NASPG_sample
 CNS: IE-average20
-YBES: 1101,1150
-NYS: 50
+YBES: 1101,1242
+NYS: 142
 
 
 Scripts:
@@ -89,7 +89,7 @@ Scripts:
     plotScript: mpiexm/plot_mpiexm_NAO.ncl
     CASE: CAA
     YEARBE: YBEA
-    MODELN: (/1,2,3,4,5/)
+    MODELN: ispan(1,20,1)
     TITLE: "NAO index CNA(model year: NYA)"
     FIGFILENAME: CAA_VN_dif_5AGCM
 -  
@@ -119,7 +119,7 @@ Scripts:
     plotScript: mpiexm/plot_mpiexm_regmap.ncl
     CASE: CAA
     YEARBE: YBEA
-    MODELN: (/1,2,3,4,5/)
+    MODELN: ispan(1,20,1)
     TITLE: "NAO index reg. CNA (model year: NYA)"
     FIGFILENAME: CASE_VN_regmap_5AGCM
     TSNETCDFFILE: CASE_VN_dif_5AGCM
@@ -159,7 +159,7 @@ Scripts:
     plotScript: mpiexm/plot_mpiexm_regmap.ncl
     CASE: CAA
     YEARBE: YBEA
-    MODELN: (/1,2,3,4,5/)
+    MODELN: ispan(1,20,1)
     TITLE: "NAO index reg. CNA (model year: NYA)"
     FIGFILENAME: CASE_VN_regmap_natl_5AGCM
     CACHEFILENAME: CASE_VN_regmap_5AGCM
@@ -202,7 +202,7 @@ Scripts:
     plotScript: mpiexm/plot_mpiexm_regmap.ncl
     CASE: CAA
     YEARBE: YBEA
-    MODELN: (/1,2,3,4,5/)
+    MODELN: ispan(1,20,1)
     TITLE: "NAO index A reg. CNA (model year: NYA)"
     FIGFILENAME: CASE_VN_regmap_A_5AGCM
     TSNETCDFFILE: CASE_VN_dif_5AGCM
@@ -231,7 +231,7 @@ Scripts:
     plotScript: mpiexm/plot_mpiexm_regmap.ncl
     CASE: CAA
     YEARBE: YBEA
-    MODELN: (/1,2,3,4,5/)
+    MODELN: ispan(1,20,1)
     TITLE: "NAO index B reg. CNA (model year: NYA)"
     FIGFILENAME: CASE_VN_regmap_B_5AGCM
     TSNETCDFFILE: CASE_VN_dif_5AGCM

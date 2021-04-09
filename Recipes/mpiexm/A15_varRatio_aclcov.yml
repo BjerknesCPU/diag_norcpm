@@ -1,0 +1,449 @@
+# plot data variance in mpiexm
+# mpiexm contains multiple atm(echam6) and one ocn(mpiom) coupling
+
+Title: Total cloud cover Annual(seasonal) variance ratio
+Description: 
+    Total cloud cover variance ratio to control run and annual anomaly time series.
+COMMENT: |
+    Total cloud cover variance ratio to control run and annual anomaly time series.
+COMPONENT:  echam6
+VN: aclcov
+TVN: Cloud
+VARIABLE:  VN
+YEARBE: 1101,1250
+NYR: 150
+
+## plots setting
+FIGFILES: $(cat figfilelist.txt) # for mk_html_pages.sh
+
+VariGlobal:
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    TITLE: "yearly TVN variance ratio NAME/CTL"
+    FIGFILENAME: VN_var-ratio_CASE_modMODELN_SEAS
+    PLOTRES: |
+        res@tiMainString = title
+        res@tiMainOffsetYF  = -.040
+        res@gsnLeftString = "model year: NAME=NYR, CTL=NYC"
+        res@mpLimitMode = "LatLon"
+        res@mpMinLatF = -90.
+        res@mpMaxLatF = 90.
+        res@mpMinLonF = -330.
+        res@mpMaxLonF =   30.
+        res@pmTickMarkDisplayMode = "Always"
+        res@mpCenterLonF =   -150.
+        res@cnLinesOn = False
+        res@cnFillOn = True
+        res@lbOrientation = "Vertical"
+        res@pmLabelBarWidthF = 0.1
+        res@pmLabelBarOrthogonalPosF   = 0.01
+        ;;res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/253,152,153/),(/255,118,33/),(/254,254,0/)/)
+        res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/203,204,254/),(/255,255,255/),(/255,255,255/),(/254,254,0/),(/255,118,33/),(/255,0,0/),(/255,0,222/)/)
+        res@cnFillColors   := res@cnFillColors/255. 
+        res@cnLevelSelectionMode = "ExplicitLevels"
+        res@cnLevels = (/.2,.4,.6,.8,.9,1.,1.1,1.2,1.4,1.6/)
+        res@gsnRightString = "1"
+
+        lres@cnLineColor = "Red"
+        lres@cnLinesOn = True
+        lres@cnFillOn = False
+        lres@cnLevelSelectionMode = "ExplicitLevels"
+        lres@cnLevels := (/.2/)
+        lres@cnLineLabelsOn = False
+        lres@cnInfoLabelOn = False
+VariNAtl:
+    plotScript: mpiexm/plot_mpiexm_variance.ncl
+    TITLE: "yearly TVN variance ratio NAME/CTL SEAS (model year: NAME=NYR, CTL=NYC)"
+    FIGFILENAME: VN_var-ratio_CASE_modMODELN_SEAS_natl
+    CACHEFILENAME: VN_var-ratio_CASE_SEAS
+    PLOTRES: |
+        res@mpLimitMode = "LatLon"
+        res@mpMinLatF = 20.
+        res@mpMaxLatF = 70.
+        res@mpMinLonF = -80.
+        res@mpMaxLonF =  10.
+        res@pmTickMarkDisplayMode = "Always"
+        res@mpCenterLatF = 50.
+        res@mpCenterLonF =  -35.
+        res@mpProjection = "LambertConformal"
+        res@mpGridAndLimbOn = True
+        res@gsnMaskLambertConformal = True
+        res@cnLinesOn = False
+        res@cnFillOn = True
+        res@lbOrientation = "Vertical"
+        res@pmLabelBarWidthF = 0.1
+        res@pmLabelBarOrthogonalPosF   = 0.01
+        ;res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/253,152,153/),(/255,118,33/),(/254,254,0/)/)
+        res@cnFillColors         = (/(/150,255,253/),(/0,255,253/),(/34,118,254/),(/153,154,254/),(/203,204,254/),(/255,255,255/),(/255,255,255/),(/254,254,0/),(/255,118,33/),(/255,0,0/),(/255,0,222/)/)
+        res@cnFillColors   := res@cnFillColors/255. 
+        res@cnLevelSelectionMode = "ExplicitLevels"
+        res@cnLevels = (/.2,.4,.6,.8,.9,1.,1.1,1.2,1.4,1.6/)
+        res@gsnRightString = "1"
+
+        lres@cnLineColor = "Red"
+        lres@cnLinesOn = True
+        lres@cnFillOn = False
+        lres@cnLevelSelectionMode = "ExplicitLevels"
+        lres@cnLevels := (/.2/)
+        lres@cnLineLabelsOn = False
+        lres@cnInfoLabelOn = False
+
+TS_plot:
+    plotScript: mpiexm/plot_annual_timeseries.ncl
+    TITLE: "TVN NAME TREG"
+    FIGFILENAME: VN_REG_ts_CASE_SEAS
+REG_spg:
+    LATBE: 50.,60.
+    LONBE: -40.,-10.
+    REG: spg
+    TREG: "50~F34~0~F~N-60~F34~0~F~N,40~F34~0~F~W-10~F34~0~F~W"
+    PLOTRES: |
+        res@trYMinF =  -.04 
+        res@trYMaxF =   .04 
+REG_nino34:
+    LATBE: -5.,5.
+    LONBE: -170.,-120.
+    REG: nino34
+    TREG: "5~F34~0~F~S-5~F34~0~F~N,170~F34~0~F~W-120~F34~0~F~W"
+    PLOTRES: |
+        res@trYMinF =  -.15
+        res@trYMaxF =   .15
+REG_nino3:
+    LATBE: -5.,5.
+    LONBE: -150.,-90.
+    REG: nino3
+    TREG: "5~F34~0~F~S-5~F34~0~F~N,150~F34~0~F~W-90~F34~0~F~W"
+    PLOTRES: |
+        res@trYMinF =  -.15
+        res@trYMaxF =   .15
+REG_atl3:
+    LATBE: -3.,3.
+    LONBE: -20.,0.
+    REG: alt3
+    TREG: "3~F34~0~F~S-3~F34~0~F~N,20~F34~0~F~W-0~F34~0~F~"
+    PLOTRES: |
+        res@trYMinF =  -.5
+        res@trYMaxF =   .5
+REG_NPac:
+    LATBE: 40.,50.
+    LONBE: 160.,200.
+    REG: npac
+    TREG: "40~F34~0~F~N-50~F34~0~F~N,160~F34~0~F~E-160~F34~0~F~W"
+    PLOTRES: |
+        res@trYMinF =  -.025
+        res@trYMaxF =   .025
+
+TS_Cache_only:
+    WRITEFIGFILELIST: ;; do not output figfile name
+TS_Clm12_plot:
+    plotScript: mpiexm/plot_mpiexm_ts.ncl
+    TITLE: "TVN NAME TREG"
+    FIGFILENAME: VN_REG_CASE_clm12
+    TSMAINPROC: |
+        ts_yearly = new((/dimsizes(years),12/),"float")
+        do m = 1,12
+            ts_yearly(:,m-1) = read_mpiexm_season_ts(case,casedir,component,varname,years,m,latbe,lonbe,modeln)
+        end do
+        ts_yearly!0 = "year"
+        ts_yearly&year = years
+        ts_yearly!1 = "month"
+        ts_yearly&month = ispan(1,12,1)
+        ts = dim_avg_n_Wrap(ts_yearly,0)
+    XMAINPROC:
+        x = ispan(1,12,1)
+    PLOTRES: |
+        res@vpHeightF = .3
+        res@tmXBMode = "Explicit"
+        res@tmXBLabelStride  = 0
+        res@tmXBValues = ispan(1,12,1)
+        res@tmXBLabels = ispan(1,12,1)
+TS_Dif12_plot:
+    plotScript: mpiexm/plot_mpiexm_ts.ncl
+    TITLE: "TVN NAME-CTL TREG"
+    FIGFILENAME: VN_REG_CASE_dif12
+    CTLFNAME: VN_REG_f08_1AGCM_clm12.nc
+    TSMAINPROC: |
+        ts_yearly = new((/dimsizes(years),12/),"float")
+        do m = 1,12
+            ts_yearly(:,m-1) = read_mpiexm_season_ts(case,casedir,component,varname,years,m,latbe,lonbe,modeln)
+        end do
+        ts_yearly!0 = "year"
+        ts_yearly&year = years
+        ts_yearly!1 = "month"
+        ts_yearly&month = ispan(1,12,1)
+        ts = dim_avg_n_Wrap(ts_yearly,0)
+
+        ctlf = addfile("CTLFNAME","r")
+        ctlts = ctlf->ts
+        ts = ts - ctlts
+        
+    XMAINPROC:
+        x = ispan(1,12,1)
+    PLOTRES: |
+        res@vpHeightF = .3
+        res@tmXBMode = "Explicit"
+        res@tmXBLabelStride  = 0
+        res@tmXBValues = ispan(1,12,1) 
+        res@tmXBLabels = ispan(1,12,1)
+        res@trYMinF =  -.05
+        res@trYMaxF =   .05
+
+
+## case setting
+CASEDIR: /projects/NS9207K/pgchiu/CASE
+    ## CASE define later
+
+CTN: f08_1AGCM
+    ## proxy of CCASE 'control case'
+CCASE: CTN
+CONTROLDIR: /projects/NS9207K/pgchiu/CCASE
+YBEC: 1101,1250
+CONTROLYEARBE: YBEC
+NYC: 150
+
+Case_CTL:
+    CASE: f08_1AGCM
+    NAME: CTL
+Case_CTL2:
+    CASE: f08_5AGCMs_NASPG_sample
+    NAME: CTL2
+Case_AVG:
+    CASE: f08_5AGCMs_NASPG_average
+    NAME: IEave
+Case_AVG_glob:
+    CASE: f09_5AGCMs_Global_average
+    NAME: IEGave
+Case_SAM:
+    CASE: f09_5AGCMs_NASPG_sample
+    NAME: IEsam
+
+ModelN_1:
+    MODELN: 1
+ModelN_2:
+    MODELN: 2
+ModelN_3:
+    MODELN: 3
+ModelN_4:
+    MODELN: 4
+ModelN_5:
+    MODELN: 5
+
+Season_ANN:
+    SEAS: ANN
+    MONTHS: 1,2,3,4,5,6,7,8,9,10,11,12
+Season_DJF:
+    SEAS: DJF
+    MONTHS: 12,13,14
+Season_MAM:
+    SEAS: MAM
+    MONTHS: 3,4,5
+Season_JJA:
+    SEAS: JJA
+    MONTHS: 6,7,8
+Season_SON:
+    SEAS: SON
+    MONTHS: 9,10,11
+
+Scripts:
+-  # Remove figfilelist.txt which is for mk_html_page.sh at bottom
+    plotScript: mk_runcode.sh
+    RUNTHESECODES: |
+        rm -f figfilelist.txt
+## annual global, 1st AGCM
+- varPack: VariGlobal, Season_ANN, Case_CTL2, ModelN_1
+- varPack: VariGlobal, Season_ANN, Case_SAM, ModelN_1
+- varPack: VariGlobal, Season_ANN, Case_AVG, ModelN_1
+- varPack: VariGlobal, Season_ANN, Case_AVG_glob, ModelN_1
+## annual global, 2nd AGCM
+- varPack: VariGlobal, Season_ANN, Case_CTL2, ModelN_2
+- varPack: VariGlobal, Season_ANN, Case_SAM, ModelN_2
+- varPack: VariGlobal, Season_ANN, Case_AVG, ModelN_2
+- varPack: VariGlobal, Season_ANN, Case_AVG_glob, ModelN_2
+## annual global, 3rd AGCM
+- varPack: VariGlobal, Season_ANN, Case_CTL2, ModelN_3
+- varPack: VariGlobal, Season_ANN, Case_SAM, ModelN_3
+- varPack: VariGlobal, Season_ANN, Case_AVG, ModelN_3
+- varPack: VariGlobal, Season_ANN, Case_AVG_glob, ModelN_3
+## annual global, 4th AGCM
+- varPack: VariGlobal, Season_ANN, Case_CTL2, ModelN_4
+- varPack: VariGlobal, Season_ANN, Case_SAM, ModelN_4
+- varPack: VariGlobal, Season_ANN, Case_AVG, ModelN_4
+- varPack: VariGlobal, Season_ANN, Case_AVG_glob, ModelN_4
+## annual global, 5th AGCM
+- varPack: VariGlobal, Season_ANN, Case_CTL2, ModelN_5
+- varPack: VariGlobal, Season_ANN, Case_SAM, ModelN_5
+- varPack: VariGlobal, Season_ANN, Case_AVG, ModelN_5
+- varPack: VariGlobal, Season_ANN, Case_AVG_glob, ModelN_5
+
+## annual spg ts
+- varPack: TS_plot, REG_spg, Season_ANN, Case_CTL2, ModelN_1
+- varPack: TS_plot, REG_spg, Season_ANN, Case_SAM, ModelN_1
+- varPack: TS_plot, REG_spg, Season_ANN, Case_AVG, ModelN_1
+- varPack: TS_plot, REG_spg, Season_ANN, Case_AVG_glob, ModelN_1
+- varPack: TS_plot, REG_spg, Season_ANN, Case_CTL
+
+## annual nino34 ts
+- varPack: TS_plot, REG_nino34, Season_ANN, Case_CTL2, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_ANN, Case_SAM, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_ANN, Case_AVG, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_ANN, Case_AVG_glob, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_ANN, Case_CTL
+#
+## annual North Pacific ts
+- varPack: TS_plot, REG_NPac, Season_ANN, Case_CTL2, ModelN_1
+- varPack: TS_plot, REG_NPac, Season_ANN, Case_SAM, ModelN_1
+- varPack: TS_plot, REG_NPac, Season_ANN, Case_AVG, ModelN_1
+- varPack: TS_plot, REG_NPac, Season_ANN, Case_AVG_glob, ModelN_1
+- varPack: TS_plot, REG_NPac, Season_ANN, Case_CTL
+
+## annual climate NINO3.4
+- varPack: REG_nino34, TS_Clm12_plot, Case_CTL, TS_Cache_only
+- varPack: REG_nino34, TS_Dif12_plot, Case_CTL2, ModelN_1
+- varPack: REG_nino34, TS_Dif12_plot, Case_SAM, ModelN_1
+- varPack: REG_nino34, TS_Dif12_plot, Case_AVG, ModelN_1
+- varPack: REG_nino34, TS_Dif12_plot, Case_AVG_glob, ModelN_1
+- varPack: REG_nino34, TS_Clm12_plot, Case_CTL
+
+## annual climate NINO3
+- varPack: REG_nino3, TS_Clm12_plot, Case_CTL, TS_Cache_only
+- varPack: REG_nino3, TS_Dif12_plot, Case_CTL2, ModelN_1
+- varPack: REG_nino3, TS_Dif12_plot, Case_SAM, ModelN_1
+- varPack: REG_nino3, TS_Dif12_plot, Case_AVG, ModelN_1
+- varPack: REG_nino3, TS_Dif12_plot, Case_AVG_glob, ModelN_1
+- varPack: REG_nino3, TS_Clm12_plot, Case_CTL
+
+## annual climate Atl3
+- varPack: REG_atl3, TS_Clm12_plot, Case_CTL, TS_Cache_only
+- varPack: REG_atl3, TS_Dif12_plot, Case_CTL2, ModelN_1
+- varPack: REG_atl3, TS_Dif12_plot, Case_SAM, ModelN_1
+- varPack: REG_atl3, TS_Dif12_plot, Case_AVG, ModelN_1
+- varPack: REG_atl3, TS_Dif12_plot, Case_AVG_glob, ModelN_1
+- varPack: REG_atl3, TS_Clm12_plot, Case_CTL
+
+
+## seasonal variance ratio
+- varPack: VariGlobal, Season_DJF, Case_CTL2, ModelN_1
+- varPack: VariGlobal, Season_DJF, Case_SAM, ModelN_1
+- varPack: VariGlobal, Season_DJF, Case_AVG, ModelN_1
+- varPack: VariGlobal, Season_DJF, Case_AVG_glob, ModelN_1
+- varPack: VariGlobal, Season_MAM, Case_CTL2, ModelN_1
+- varPack: VariGlobal, Season_MAM, Case_SAM, ModelN_1
+- varPack: VariGlobal, Season_MAM, Case_AVG, ModelN_1
+- varPack: VariGlobal, Season_MAM, Case_AVG_glob, ModelN_1
+- varPack: VariGlobal, Season_JJA, Case_CTL2, ModelN_1
+- varPack: VariGlobal, Season_JJA, Case_SAM, ModelN_1
+- varPack: VariGlobal, Season_JJA, Case_AVG, ModelN_1
+- varPack: VariGlobal, Season_JJA, Case_AVG_glob, ModelN_1
+- varPack: VariGlobal, Season_SON, Case_CTL2, ModelN_1
+- varPack: VariGlobal, Season_SON, Case_SAM, ModelN_1
+- varPack: VariGlobal, Season_SON, Case_AVG, ModelN_1
+- varPack: VariGlobal, Season_SON, Case_AVG_glob, ModelN_1
+
+## seasonal spg time sries
+- varPack: TS_plot, REG_spg, Season_DJF, Case_CTL2, ModelN_1
+- varPack: TS_plot, REG_spg, Season_DJF, Case_SAM, ModelN_1
+- varPack: TS_plot, REG_spg, Season_DJF, Case_AVG, ModelN_1
+- varPack: TS_plot, REG_spg, Season_DJF, Case_AVG_glob, ModelN_1
+- varPack: TS_plot, REG_spg, Season_DJF, Case_CTL
+- varPack: TS_plot, REG_spg, Season_MAM, Case_CTL2, ModelN_1
+- varPack: TS_plot, REG_spg, Season_MAM, Case_SAM, ModelN_1
+- varPack: TS_plot, REG_spg, Season_MAM, Case_AVG, ModelN_1
+- varPack: TS_plot, REG_spg, Season_MAM, Case_AVG_glob, ModelN_1
+- varPack: TS_plot, REG_spg, Season_MAM, Case_CTL
+- varPack: TS_plot, REG_spg, Season_JJA, Case_CTL2, ModelN_1
+- varPack: TS_plot, REG_spg, Season_JJA, Case_SAM, ModelN_1
+- varPack: TS_plot, REG_spg, Season_JJA, Case_AVG, ModelN_1
+- varPack: TS_plot, REG_spg, Season_JJA, Case_AVG_glob, ModelN_1
+- varPack: TS_plot, REG_spg, Season_JJA, Case_CTL
+- varPack: TS_plot, REG_spg, Season_SON, Case_CTL2, ModelN_1
+- varPack: TS_plot, REG_spg, Season_SON, Case_SAM, ModelN_1
+- varPack: TS_plot, REG_spg, Season_SON, Case_AVG, ModelN_1
+- varPack: TS_plot, REG_spg, Season_SON, Case_AVG_glob, ModelN_1
+- varPack: TS_plot, REG_spg, Season_SON, Case_CTL
+## seasonal nino34 time sries
+- varPack: TS_plot, REG_nino34, Season_DJF, Case_CTL2, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_DJF, Case_SAM, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_DJF, Case_AVG, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_DJF, Case_AVG_glob, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_DJF, Case_CTL
+- varPack: TS_plot, REG_nino34, Season_MAM, Case_CTL2, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_MAM, Case_SAM, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_MAM, Case_AVG, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_MAM, Case_AVG_glob, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_MAM, Case_CTL
+- varPack: TS_plot, REG_nino34, Season_JJA, Case_CTL2, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_JJA, Case_SAM, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_JJA, Case_AVG, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_JJA, Case_AVG_glob, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_JJA, Case_CTL
+- varPack: TS_plot, REG_nino34, Season_SON, Case_CTL2, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_SON, Case_SAM, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_SON, Case_AVG, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_SON, Case_AVG_glob, ModelN_1
+- varPack: TS_plot, REG_nino34, Season_SON, Case_CTL
+## NAtl plots
+- varPack: VariNAtl, Season_ANN, Case_CTL2, ModelN_1
+- varPack: VariNAtl, Season_ANN, Case_SAM, ModelN_1
+- varPack: VariNAtl, Season_ANN, Case_AVG, ModelN_1
+- varPack: VariNAtl, Season_ANN, Case_AVG_glob, ModelN_1
+- varPack: VariNAtl, Season_DJF, Case_CTL2, ModelN_1
+- varPack: VariNAtl, Season_DJF, Case_SAM, ModelN_1
+- varPack: VariNAtl, Season_DJF, Case_AVG, ModelN_1
+- varPack: VariNAtl, Season_DJF, Case_AVG_glob, ModelN_1
+- varPack: VariNAtl, Season_MAM, Case_CTL2, ModelN_1
+- varPack: VariNAtl, Season_MAM, Case_SAM, ModelN_1
+- varPack: VariNAtl, Season_MAM, Case_AVG, ModelN_1
+- varPack: VariNAtl, Season_MAM, Case_AVG_glob, ModelN_1
+- varPack: VariNAtl, Season_JJA, Case_CTL2, ModelN_1
+- varPack: VariNAtl, Season_JJA, Case_SAM, ModelN_1
+- varPack: VariNAtl, Season_JJA, Case_AVG, ModelN_1
+- varPack: VariNAtl, Season_JJA, Case_AVG_glob, ModelN_1
+- varPack: VariNAtl, Season_SON, Case_CTL2, ModelN_1
+- varPack: VariNAtl, Season_SON, Case_SAM, ModelN_1
+- varPack: VariNAtl, Season_SON, Case_AVG, ModelN_1
+- varPack: VariNAtl, Season_SON, Case_AVG_glob, ModelN_1
+
+
+-  
+    plotScript: mk_html_page.sh
+    COLUMN:
+        CTL2 IE-sample IE-average IE-average_global CTL 'tr' 
+        'Annual variance ratio' 'tr'
+        'ANN 1st AGCM' 'tr' 4
+        'ANN 2nd AGCM' 'tr' 4
+        'ANN 3rd AGCM' 'tr' 4
+        'ANN 4th AGCM' 'tr' 4
+        'ANN 5th AGCM' 'tr' 4
+        'Annual subpolar gyre time series' 'tr' 
+        ANN 'tr' 5
+        'Annual NINO 3.4 time series' 'tr' 
+        ANN 'tr' 5
+        'Annual North Pacific time series' 'tr' 
+        ANN 'tr' 5
+        'Annual NINO 3.4 climate difference' 'tr' 
+        5
+        'Annual NINO 3 climate difference' 'tr' 
+        5
+        'Annual Atl3 climate difference' 'tr' 
+        5
+        'Seasonal variance ratio' 'tr'
+        DJF 'tr' 4 
+        MAM 'tr' 4 
+        JJA 'tr' 4 
+        SON 'tr' 4
+        'Seasonal subpolar gyre time series' 'tr' 
+        DJF 'tr' 5 
+        MAM 'tr' 5 
+        JJA 'tr' 5 
+        SON 'tr' 5
+        'Seasonal NINO 3.4 time series' 'tr' 
+        DJF 'tr' 5 
+        MAM 'tr' 5 
+        JJA 'tr' 5 
+        SON 'tr' 5
+        'North At5antic variance ratio' 'tr'
+        ANN 'tr' 4
+        DJF 'tr' 4 
+        MAM 'tr' 4 
+        JJA 'tr' 4 
+        SON 'tr' 4
+

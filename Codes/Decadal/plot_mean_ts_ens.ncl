@@ -5,7 +5,6 @@
 ;;;     they indicate which data/variable needed here,
 ;;;     and default values in this script.
 
-;DIAG_NORCPM; need_be_replace: INPUTFILES, VARIABLE, FIGFILENAME
 
 ;;; Following def will be all replaced with defalut value if not pre-set in recipe.
 ;DIAG_NORCPM; ADDRUNAVE: False
@@ -27,9 +26,13 @@
 ;DIAG_NORCPM; LINESRES:
 ;DIAG_NORCPM; READCACHEONLY: False
     ;; True: cache file will be prepared, do not read raw data here.
+;DIAG_NORCPM; ENSTYPE: errbar
+    ;; greylines: grey lines, default
+    ;; errbar: error bar for 1 stddev
+    ;; shading: shading for 1 stddev
 
 load "CODEDIR/func_read_all_members.ncl"
-load "CODEDIR/func_read_framework.ncl" ;; prototype reading function for obs data
+load "CODEDIR/func_read_framework.ncl" ;; reading function for obs data
 begin
     forecastdirs=systemfunc("ls -d FORECASTDIRS|sort")
     varname = "VARIABLE"
@@ -51,6 +54,7 @@ begin
     obsdataset = "OBSDATASET"
     obsvn = "OBSVARNAME"
 
+    enstype = "ENSTYPE" ;; line type of ensemble members
     readcacheonly = READCACHEONLY
 
 
@@ -76,7 +80,7 @@ begin
     res = True
         res@gsnLeftString = title
         res@vpHeightF = .3
-        res@gsnRightString = "std.="+sprintf("%2.2f",stddev(obsts))
+        ;;res@gsnRightString = "std.="+sprintf("%2.2f",stddev(obsts))
         res@gsnDraw = False
         res@gsnFrame = False
     PLOTRES
@@ -123,17 +127,35 @@ begin
             f->ts = ts
         end if
 
-        dims := dimsizes(ts)
-        nline = dims(0)
-        time := cd_calendar(ts&time,0)
-        do l = 0, nline-1
-            gsn_polyline(wks,plot,time(:,0),ts(l,:),res)
-        end do
-        tsens := dim_avg_n_Wrap(ts,0)
-        ensplot@$unique_string("ensplot")$ =gsn_add_polyline(wks,plot,time(:,0),tsens,ensres)
-        ensplot@$unique_string("ensplot")$ =gsn_add_polymarker(wks,plot,min(time(:,0)),tsens(0),ensres)
-        delete(tsens)
-        delete(ts)
+        if(enstype .eq. "errbar")then
+            ;; error bar res
+            ebres = True
+                ebres@gsMarkerIndex = 1
+                ebres@gsMarkerSizeF = .02
+                ebres@gsLineColor = "pink"
+            tsens := dim_avg_n_Wrap(ts,0)
+            tsstddev = dim_stddev_n_Wrap(ts,0)
+            time := cd_calendar(ts&time,0) ;; yearly
+            do t = 0, dimsizes(time(:,0))-1
+                tt = time(t,0)
+                ensplot@$unique_string("errorbars")$ =gsn_add_polyline(wks,plot,(/tt,tt/),(/tsens(t)-tsstddev(t),tsens(t)+tsstddev(t)/),ebres)
+            end do
+            ensplot@$unique_string("ensplot")$ =gsn_add_polyline(wks,plot,time(:,0),tsens,ensres)
+            
+        end if
+        if(enstype .eq. "greylines")then
+            dims := dimsizes(ts)
+            nline = dims(0)
+            time := cd_calendar(ts&time,0) ;; yearly
+            do l = 0, nline-1
+                gsn_polyline(wks,plot,time(:,0),ts(l,:),res)
+            end do
+            tsens := dim_avg_n_Wrap(ts,0)
+            ensplot@$unique_string("ensplot")$ =gsn_add_polyline(wks,plot,time(:,0),tsens,ensres)
+            ensplot@$unique_string("ensplot")$ =gsn_add_polymarker(wks,plot,min(time(:,0)),tsens(0),ensres)
+            delete(tsens)
+            delete(ts)
+        end if
     end do
     
     ;; draw and frame

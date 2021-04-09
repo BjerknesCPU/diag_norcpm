@@ -417,7 +417,7 @@ for i in subdirs:
     tags = ['misc']
     # try index.html
     if isbs4: # if bs4 present and there is index.html in subdir, not done yet
-        indexfile =  [ j for j in os.listdir(i) if re.match(".*index..*",j) ] [0]
+        indexfile =  [ j for j in os.listdir(i) if re.match(".*index..*",j) ] 
         if indexfile:
             thumbnail = ''
             description = ''

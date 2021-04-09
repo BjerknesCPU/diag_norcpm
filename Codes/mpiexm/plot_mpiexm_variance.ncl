@@ -9,6 +9,8 @@
 ;;DIAG_NORCPM; TITLE: title
 ;;DIAG_NORCPM; MONTHS: 0
     ;; which season in yearly time series 
+;;DIAG_NORCPM; CMODELN: 0
+;;DIAG_NORCPM; MODELN: 0
 
 load "CODEDIR/mpiexm/func_read_mpiexm.ncl"
 begin
@@ -26,10 +28,12 @@ begin
     if(any(months .eq.0))then
         months := ispan(1,12,1)
     end if
+    modeln = MODELN
 
     ccase = "CCASE"
     controldir = "CONTROLDIR"
     cybe = (/CONTROLYEARBE/)
+    cmodeln = CMODELN
 
     if(isfilepresent(cachefile))then
         f = addfile(cachefile,"r")
@@ -40,8 +44,8 @@ begin
         dvar@lon2d := onedtond(dvar@lon2d,dims)
         end if
     else
-        varall = read_mpiexm_season_YZLL(case,casedir,component,varname,ispan(min(ybe),max(ybe),1),months,1)
-        varcon = read_mpiexm_season_YZLL(ccase,controldir,component,varname,ispan(min(cybe),max(cybe),1),months,1)
+        varall = read_mpiexm_season_YZLL(case,casedir,component,varname,ispan(min(ybe),max(ybe),1),months,modeln)
+        varcon = read_mpiexm_season_YZLL(ccase,controldir,component,varname,ispan(min(cybe),max(cybe),1),months,CMODELN)
 
         dims = dimsizes(varall)
         ndim = dimsizes(dims)

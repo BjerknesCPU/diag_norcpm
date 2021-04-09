@@ -3,7 +3,7 @@
 ;;DIAG_NORCPM; PLOTRES: ;; PLOTRES
 ;;DIAG_NORCPM; TITLE: title
 ;;DIAG_NORCPM; MONTHS: 0
-;;DIAG_NORCPM; MODELN: 1
+;;DIAG_NORCPM; MODELN: 0
 
 load "CODEDIR/mpiexm/func_read_mpiexm.ncl"
 begin
@@ -58,8 +58,9 @@ write_table("figfilelist.txt","a",[/figfn/],"%s") ;; for mk_html_page.sh
             end if
             varts = wgt_areaave2(varall,wgt2d,0)
         else
-            print("plot_annual_timeseries.ncl: other component not done yet")
-            exit
+            ;;print("plot_annual_timeseries.ncl: other component not done yet")
+            ;;exit
+            varts = mean_with_latbe_lonbe(varall,latbe,lonbe)
         end if
 
         f = addfile(cachefile,"c")
@@ -101,9 +102,9 @@ write_table("figfilelist.txt","a",[/figfn/],"%s") ;; for mk_html_page.sh
     wks = gsn_open_wks("ps",figfn)
 
     plot = gsn_csm_xy(wks,years,vartsano,res)
-    gsn_text(wks,plot,"stddev="+sprintf("%2.2f",varstd),years(0)+1,varstd+0.05,textres)
-
     draw(plot)
+    gsn_text(wks,plot,"stddev="+sprintf("%2.2f",varstd),years(0)+1,varstd,textres)
+
     frame(wks)
 
 end

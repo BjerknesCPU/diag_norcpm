@@ -1,12 +1,3 @@
-## python tmp file
-__pycache__
-
-## python module
-yaml/
-
-## data file
-*.grid
-*.nc
-
-## test files
-tests/
+yaml/*
+*.pyc
+obsoleted

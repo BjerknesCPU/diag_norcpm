@@ -581,7 +581,7 @@ begin
 end
 
 undef("read_all_files_var")
-function read_all_files_var(fns[*]:string,varname[1]:string,ocngridfile[1]:string)
+function read_all_files_var(fns[*]:string,varname[1]:string,ocngridfile[1]:string) ;; took too much ram, should be modify.
 begin
     ;; assume one file per member
     ;;     not used in forecast dirs
@@ -605,6 +605,7 @@ begin
 
     ;; read them 
     do i = 0, nmem-1
+        ;;print(fns(i)+"")
         f = addfile(fns(i),"r")
         var1t = f->$varname$
         if(vartype.eq."short")then ;; extract var from scale and offset
